@@ -1,4 +1,6 @@
 //! Spacepacket EDS Library
+//!
+//! Implements an EDS model for CCSDS 876.0-B-1 ([Blue Book](https://public.ccsds.org/Pubs/876x0b1.pdf))
 
 #![deny(non_camel_case_types)]
 #![deny(unused_parens)]
@@ -11,5 +13,5 @@
 // TODO: Enable this once we have documentation
 // #![deny(missing_docs)]
 
-pub mod datasheet;
 pub mod deserialize;
+pub mod package;

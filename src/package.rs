@@ -1,7 +1,7 @@
 //! EDS PackageFile Model
 use serde::{Deserialize, Serialize};
 
-/// A Package File may describe a composable unit of software or hardware
+/// Package File describes a composable unit of software or hardware
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct PackageFile {
     /// PackageFile includes a Package element  
@@ -9,7 +9,7 @@ pub struct PackageFile {
     pub package: Vec<Package>,
 }
 
-/// Packages describe a related set of components, data types, and interfaces
+/// Package describes a related set of components, data types, and interfaces
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct Package {
     #[serde(flatten)]
@@ -20,18 +20,17 @@ pub struct Package {
     pub data_type_set: DataTypeSet,
 }
 
-/// The DataTypeSet element contained in a package or component shall contain one
-/// or more DataType elements
+/// DataTypeSet element contains one or more DataType elements
 #[derive(Debug, Default, Serialize, PartialEq)]
 pub struct DataTypeSet {
     /// DataTypeSet includes a DataType element
     pub data_types: Vec<DataType>,
 }
 
-/// The DataTypeSet element contained in a package or component shall contain one or
-/// more of the following elements: ArrayDataType, BinaryDataType, BooleanDataType,
-/// ContainerDataType, EnumeratedDataType, FloatDataType, IntegerDataType,
-/// StringDataType, and SubRangeDataType.
+/// DataTypeSet element contains one or more of the following elements:
+/// ArrayDataType, BinaryDataType, BooleanDataType, ContainerDataType,
+/// EnumeratedDataType, FloatDataType, IntegerDataType, StringDataType,
+/// and SubRangeDataType.
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub enum DataType {
     BooleanDataType(BooleanDataType),
@@ -43,6 +42,7 @@ pub enum DataType {
     StringDataType(StringDataType),
 }
 
+/// EnumeratedDataType defines an enumerated data type
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct EnumeratedDataType {
     #[serde(flatten)]
@@ -53,9 +53,8 @@ pub struct EnumeratedDataType {
     pub enumeration_list: EnumerationList,
 }
 
-/// for an element containing the NamedEntityType, the element shall have a
-/// name attribute and may have the optional shortDescription attribute and
-/// LongDescription child element.
+/// NamedEntityType stores the name attribute and may have the optional
+/// shortDescription attribute and LongDescription child element.
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct NamedEntityType {
     pub name: String,
@@ -65,15 +64,14 @@ pub struct NamedEntityType {
     pub long_description: Option<String>,
 }
 
-/// an EnumerationList element, consisting of a list of one or more Enumeration
-/// elements
+///EnumerationList consists of a list of one or more Enumeration elements
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct EnumerationList {
     #[serde(rename = "Enumeration", default)]
     pub enumeration: Vec<Enumeration>,
 }
 
-/// Each Enumeration element shall have required label and value attributes,
+/// Enumeration element has required label and value attributes,
 /// indicating the integer value corresponding to a given label string
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct Enumeration {
@@ -85,6 +83,7 @@ pub struct Enumeration {
     pub short_description: String,
 }
 
+/// ContainerDataType defines a container data type
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct ContainerDataType {
     #[serde(flatten)]
@@ -93,17 +92,20 @@ pub struct ContainerDataType {
     pub entry_list: EntryList,
 }
 
+/// EntryList consists of a list of one or more EntryElement elements
 #[derive(Debug, Default, Serialize, PartialEq)]
 pub struct EntryList {
     pub entries: Vec<EntryElement>,
 }
 
+/// EntryElement is either an Entry or a PaddingEntry
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum EntryElement {
     Entry(Entry),
     PaddingEntry(PaddingEntry),
 }
 
+/// Entry element defines a field within a container
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct Entry {
     #[serde(flatten)]
@@ -112,6 +114,8 @@ pub struct Entry {
     pub type_: String,
 }
 
+/// PaddingEntry within a container has an attribute sizeInBits that specifies
+/// the position of successive fields
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct PaddingEntry {
     #[serde(rename = "sizeInBits")]
@@ -120,6 +124,7 @@ pub struct PaddingEntry {
     pub short_description: String,
 }
 
+/// ArrayDataType defines an array data type
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct ArrayDataType {
     #[serde(flatten)]
@@ -130,18 +135,21 @@ pub struct ArrayDataType {
     pub dimension_list: DimensionList,
 }
 
+/// DimensionList consists of a list of one or more Dimension elements
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct DimensionList {
     #[serde(rename = "Dimension", default)]
     pub dimension: Vec<Dimension>,
 }
 
+/// Dimension determines the length of the array dimension
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct Dimension {
     #[serde(rename = "size", default)]
     pub size: String,
 }
 
+/// BooleanDataType defines a boolean data type
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct BooleanDataType {
     #[serde(flatten)]
@@ -150,12 +158,14 @@ pub struct BooleanDataType {
     pub boolean_data_encoding: BooleanDataEncoding,
 }
 
+/// BooleanDataEncoding defines the size in bits of a boolean data type
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct BooleanDataEncoding {
     #[serde(rename = "sizeInBits", default)]
     pub size_in_bits: u8,
 }
 
+/// IntegerDataType defines an integer data type
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct IntegerDataType {
     #[serde(rename = "name", default)]
@@ -168,6 +178,8 @@ pub struct IntegerDataType {
     pub range: Range,
 }
 
+/// IntegerDataEncoding defines the encoding of an integer data type,
+/// including the size in bits, encoding, and byte order
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct IntegerDataEncoding {
     #[serde(rename = "sizeInBits", default)]
@@ -178,12 +190,14 @@ pub struct IntegerDataEncoding {
     pub byte_order: String,
 }
 
+/// Range defines an interval of inclusive or exclusive minimum and maximum values
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct Range {
     #[serde(rename = "MinMaxRange", default)]
     pub min_max_range: MinMaxRange,
 }
 
+/// MinMaxRange defines the minimum and maximum values of a data type
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct MinMaxRange {
     #[serde(rename = "max", default)]
@@ -194,6 +208,7 @@ pub struct MinMaxRange {
     pub range_type: String,
 }
 
+/// FloatDataEncoding defines the precision and encoding of a floating point data type
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct FloatDataEncoding {
     #[serde(rename = "encodingAndPrecision", default)]
@@ -204,6 +219,7 @@ pub struct FloatDataEncoding {
     pub size_in_bits: u8,
 }
 
+/// FloatDataType defines a floating point data type
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct FloatDataType {
     #[serde(flatten)]
@@ -213,6 +229,7 @@ pub struct FloatDataType {
     pub range: Option<Range>,
 }
 
+/// StringDataType defines a string data type of either fixed or variable length
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct StringDataType {
     #[serde(flatten)]

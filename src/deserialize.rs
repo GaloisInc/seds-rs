@@ -1,11 +1,15 @@
-//! Deserialization of EDS Models
+//! Deserialization Implementations of EDS Models
+//!
+//! Implements serde visitors and deserialization for the EDS models defined
+//! in the package module.
 use serde::{
     de::{self, MapAccess, Visitor},
     Deserialize, Deserializer,
 };
 
-use crate::datasheet::{DataType, DataTypeSet, EntryElement, EntryList};
+use crate::package::{DataType, DataTypeSet, EntryElement, EntryList};
 
+/// Visitor for DataTypeSet
 struct DataTypeVisitor;
 
 impl<'de> Visitor<'de> for DataTypeVisitor {
@@ -63,6 +67,7 @@ impl<'de> Deserialize<'de> for DataTypeSet {
     }
 }
 
+/// Visitor for EntryList
 struct EntryElementVisitor;
 
 impl<'de> Visitor<'de> for EntryElementVisitor {

@@ -1,9 +1,9 @@
-use serde::Deserialize;
+//! This example shows how to parse an XML file into a `PackageFile` struct
 use serde_xml_rs::from_str;
 use std::env;
 use std::fs;
 
-use seds_rs::datasheet::PackageFile;
+use seds_rs::package::PackageFile;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -21,6 +21,7 @@ fn main() {
     }
 }
 
+/// Parse an XML string into a `PackageFile` struct
 fn parse_xml<DeError: std::convert::From<serde_xml_rs::Error>>(
     xml: &str,
 ) -> Result<PackageFile, DeError> {
