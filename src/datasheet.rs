@@ -28,14 +28,13 @@ struct DataTypeSet {
 enum DataType {
     EnumeratedDataType(EnumeratedDataType),
     ContainerDataType(ContainerDataType),
+    ArrayDataType(ArrayDataType),
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct EnumeratedDataType {
-    #[serde(rename = "name", default)]
-    name: String,
-    #[serde(rename = "shortDescription", default)]
-    short_description: String,
+    #[serde(flatten)]
+    name_field_type: NamedFieldType,
     #[serde(rename = "IntegerDataEncoding", default)]
     integer_data_encoding: IntegerDataEncoding,
     #[serde(rename = "EnumerationList", default)]
@@ -48,6 +47,15 @@ pub struct IntegerDataEncoding {
     size_in_bits: String,
     #[serde(rename = "encoding", default)]
     encoding: String,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct NamedFieldType {
+    name: String,
+    #[serde(rename = "shortDescription", default)]
+    short_description: Option<String>,
+    #[serde(rename = "longDescription", default)]
+    long_description: Option<String>,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
@@ -68,10 +76,8 @@ pub struct Enumeration {
 
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 struct ContainerDataType {
-    #[serde(rename = "name", default)]
-    name: String,
-    #[serde(rename = "shortDescription", default)]
-    short_description: String,
+    #[serde(flatten)]
+    name_field_type: NamedFieldType,
     #[serde(rename = "EntryList", default)]
     entry_list: EntryList,
 }
@@ -90,4 +96,26 @@ struct Entry {
     entry_type: String,
     #[serde(rename = "shortDescription", default)]
     short_description: String,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+struct ArrayDataType {
+    #[serde(flatten)]
+    name_field_type: NamedFieldType,
+    #[serde(rename = "dataTypeRef", default)]
+    data_type_ref: String,
+    #[serde(rename = "DimensionList", default)]
+    dimension_list: DimensionList,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+struct DimensionList {
+    #[serde(rename = "Dimension", default)]
+    dimension: Vec<Dimension>,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+struct Dimension {
+    #[serde(rename = "size", default)]
+    size: String,
 }
