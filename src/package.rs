@@ -31,8 +31,10 @@ pub struct DataTypeSet {
 /// ArrayDataType, BinaryDataType, BooleanDataType, ContainerDataType,
 /// EnumeratedDataType, FloatDataType, IntegerDataType, StringDataType,
 /// and SubRangeDataType.
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Default, Deserialize, Serialize, PartialEq)]
 pub enum DataType {
+    #[default]
+    NoneDataType,
     BooleanDataType(BooleanDataType),
     IntegerDataType(IntegerDataType),
     ArrayDataType(ArrayDataType),
@@ -109,10 +111,11 @@ pub struct EntryList {
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum EntryElement {
     Entry(Entry),
+    FixedValueEntry(FixedValueEntry),
     PaddingEntry(PaddingEntry),
+    ListEntry(ListEntry),
     LengthEntry(LengthEntry),
     ErrorControlEntry(ErrorControlEntry),
-    FixedValueEntry(FixedValueEntry),
 }
 
 /// Entry element defines a field within a container
@@ -173,6 +176,18 @@ pub struct BooleanDataType {
 pub struct BooleanDataEncoding {
     #[serde(rename = "sizeInBits", default)]
     pub size_in_bits: u8,
+    #[serde(rename = "falseValue", default)]
+    pub false_value: bool,
+}
+
+/// BooleanFalseValue - Req 3.7.4
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub enum BooleanFalseValue {
+    #[default]
+    #[serde(rename = "zeroIsFalse")]
+    ZeroIsFalse,
+    #[serde(rename = "nonZeroIsFalse")]
+    NonZeroIsFalse,
 }
 
 /// IntegerDataType defines an integer data type
@@ -200,6 +215,22 @@ pub struct IntegerDataEncoding {
     pub byte_order: String,
 }
 
+/// IntegerEncoding - Req 3.7.5
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub enum IntegerEncoding {
+    #[default]
+    #[serde(rename = "unsigned")]
+    Unsigned,
+    #[serde(rename = "signMagnitude")]
+    SignMagnitude,
+    #[serde(rename = "twosComplement")]
+    TwosComplement,
+    #[serde(rename = "onesComplement")]
+    OnesComplement,
+    #[serde(rename = "BCD")]
+    BinaryCodedDecimal,
+}
+
 /// Range defines an interval of inclusive or exclusive minimum and maximum values
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct Range {
@@ -215,18 +246,81 @@ pub struct MinMaxRange {
     #[serde(rename = "min", default)]
     pub min: String,
     #[serde(rename = "rangeType", default)]
-    pub range_type: String,
+    pub range_type: MinMaxRangeType,
+}
+
+/// MinMaxRangeType Options - Table 3.2
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub enum MinMaxRangeType {
+    /// {x | a < x < b}
+    #[default]
+    #[serde(rename = "exclusiveMinExclusiveMax")]
+    ExclusiveMinExclusiveMax,
+
+    /// {x | a <= x <= b}
+    #[serde(rename = "inclusiveMinInclusiveMax")]
+    InclusiveMinInclusiveMax,
+
+    /// {x | a <= x < b}
+    #[serde(rename = "inclusiveMinExclusiveMax")]
+    InclusiveMinExclusiveMax,
+
+    /// {x | a < x <= b}
+    #[serde(rename = "exclusiveMinInclusiveMax")]
+    ExclusiveMinInclusiveMax,
+
+    /// {x | a < x}
+    #[serde(rename = "greaterThan")]
+    GreaterThan,
+
+    /// {x | a <= x}
+    #[serde(rename = "atLeast")]
+    AtLeast,
+
+    /// {x | x < b}
+    #[serde(rename = "lessThan")]
+    LessThan,
+
+    /// {x | x <= b}
+    #[serde(rename = "atMost")]
+    AtMost,
 }
 
 /// FloatDataEncoding defines the precision and encoding of a floating point data type
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct FloatDataEncoding {
     #[serde(rename = "encodingAndPrecision", default)]
-    pub encoding_and_precision: String,
+    pub encoding_and_precision: FloatEncodingAndPrecision,
     #[serde(rename = "byteOrder", default)]
     pub byte_order: String,
     #[serde(rename = "sizeInBits", default)]
     pub size_in_bits: u8,
+}
+
+/// FloatEncodingAndPrecision defines the encoding and precision of a floating point data type
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub enum FloatEncodingAndPrecision {
+    #[default]
+    #[serde(rename = "IEEE754_2008_single")]
+    IEEE7542008Single,
+    #[serde(rename = "IEEE754_2008_double")]
+    IEEE7542008Double,
+    #[serde(rename = "IEEE754_2008_quad")]
+    IEEE7542008Quadruple,
+    #[serde(rename = "MILSTD_1770A_simple")]
+    MILSTD1770ASimple,
+    #[serde(rename = "MILSTD_1770A_extended")]
+    MILSTD1770AExtended,
+}
+
+/// ByteOrder defines the byte order of a data type
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub enum ByteOrder {
+    #[default]
+    #[serde(rename = "bigEndian")]
+    BigEndian,
+    #[serde(rename = "littleEndian")]
+    LittleEndian,
 }
 
 /// FloatDataType defines a floating point data type
@@ -348,6 +442,8 @@ pub struct LengthEntry {
     pub polynomial_calibrator: PolynomialCalibrator,
 }
 
+/// PolynomialCalibrator calibration that would be required to take the raw value represented by the data
+/// type and convert it into the units and other semantic terms associated with the field
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct PolynomialCalibrator {
     #[serde(rename = "Term")]
@@ -360,6 +456,8 @@ pub struct Term {
     pub exponent: String,
 }
 
+/// ErrorControlEntry specifies an entry whose value is constrained, or derived,
+/// based on the contents of the container in which it is present.
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct ErrorControlEntry {
     #[serde(flatten)]
@@ -367,15 +465,42 @@ pub struct ErrorControlEntry {
     #[serde(rename = "type")]
     pub type_: String,
     #[serde(rename = "errorControlType")]
-    pub error_control_type: String,
+    pub error_control_type: ErrorControlType,
 }
 
+/// ErrorControlType - Table 3.3
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub enum ErrorControlType {
+    /// G(X) = X^16 + X^12 + X^5 + 1
+    #[default]
+    #[serde(rename = "CRC16_CCITT")]
+    CRC16CCITT,
+    /// G(x) = x^8 + x^2 + x^1 + x^0
+    CRC8,
+    /// modulo 2^32 addition of all 4-byte
+    CHECKSUM,
+    /// Longitudinal redundancy check, bitwise XOR of all bytes
+    #[serde(rename = "CHECKSUM_LONGITUDINAL")]
+    CHECKSUMLONGITUDINAL,
+}
+
+/// FixedValueEntry within a container contains a fixed value
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct FixedValueEntry {
     #[serde(flatten)]
     pub named_entity_type: NamedEntityType,
     #[serde(rename = "type")]
     pub type_: String,
+
+    /// value to which the container entry should be fixed
+    /// the value is a Literal whose type matches the type of the entry
+    /// TODO: table 3.1
     #[serde(rename = "fixedValue")]
     pub fixed_value: String,
+}
+
+/// TODO: ListEntry
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct ListEntry {
+    // TODO
 }
