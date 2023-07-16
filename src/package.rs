@@ -103,6 +103,9 @@ pub struct EntryList {
 pub enum EntryElement {
     Entry(Entry),
     PaddingEntry(PaddingEntry),
+    LengthEntry(LengthEntry),
+    ErrorControlEntry(ErrorControlEntry),
+    FixedValueEntry(FixedValueEntry),
 }
 
 /// Entry element defines a field within a container
@@ -155,7 +158,7 @@ pub struct BooleanDataType {
     #[serde(flatten)]
     pub name_entity_type: NamedEntityType,
     #[serde(rename = "BooleanDataEncoding")]
-    pub boolean_data_encoding: BooleanDataEncoding,
+    pub boolean_data_encoding: Option<BooleanDataEncoding>,
 }
 
 /// BooleanDataEncoding defines the size in bits of a boolean data type
@@ -235,4 +238,137 @@ pub struct StringDataType {
     #[serde(flatten)]
     pub name_entity_type: NamedEntityType,
     pub length: String,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct ComponentSet {
+    #[serde(rename = "Component", default)]
+    pub components: Vec<Component>,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct Component {
+    #[serde(rename = "name")]
+    pub name: String,
+    #[serde(rename = "RequiredInterfaceSet", default)]
+    pub required_interface_set: RequiredInterfaceSet,
+    #[serde(rename = "Implementation")]
+    pub implementation: Implementation,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct RequiredInterfaceSet {
+    #[serde(rename = "Interface", default)]
+    pub interfaces: Vec<Interface>,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct Interface {
+    #[serde(rename = "name")]
+    pub name: String,
+    #[serde(rename = "type")]
+    pub type_: String,
+    #[serde(rename = "shortDescription")]
+    pub short_description: String,
+    #[serde(rename = "GenericTypeMapSet", default)]
+    pub generic_type_map_set: GenericTypeMapSet,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct GenericTypeMapSet {
+    #[serde(rename = "GenericTypeMap", default)]
+    pub generic_type_maps: Vec<GenericTypeMap>,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct GenericTypeMap {
+    #[serde(rename = "name")]
+    pub name: String,
+    #[serde(rename = "type")]
+    pub type_: String,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct Implementation {
+    #[serde(rename = "VariableSet", default)]
+    pub variable_set: VariableSet,
+    #[serde(rename = "ParameterMapSet", default)]
+    pub parameter_map_set: ParameterMapSet,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct VariableSet {
+    #[serde(rename = "Variable", default)]
+    pub variables: Vec<Variable>,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct Variable {
+    #[serde(rename = "type")]
+    pub type_: String,
+    #[serde(rename = "readOnly")]
+    pub read_only: bool,
+    #[serde(rename = "name")]
+    pub name: String,
+    #[serde(rename = "initialValue")]
+    pub initial_value: String,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct ParameterMapSet {
+    #[serde(rename = "ParameterMap", default)]
+    pub parameter_maps: Vec<ParameterMap>,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct ParameterMap {
+    #[serde(rename = "interface")]
+    pub interface: String,
+    #[serde(rename = "parameter")]
+    pub parameter: String,
+    #[serde(rename = "variableRef")]
+    pub variable_ref: String,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct LengthEntry {
+    pub name: String,
+    #[serde(rename = "type")]
+    pub type_: String,
+    #[serde(rename = "shortDescription")]
+    pub short_description: String,
+    #[serde(rename = "PolynomialCalibrator")]
+    pub polynomial_calibrator: PolynomialCalibrator,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct PolynomialCalibrator {
+    #[serde(rename = "Term")]
+    pub term: Vec<Term>,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct Term {
+    pub coefficient: String,
+    pub exponent: String,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct ErrorControlEntry {
+    #[serde(flatten)]
+    pub named_entity_type: NamedEntityType,
+    #[serde(rename = "type")]
+    pub type_: String,
+    #[serde(rename = "errorControlType")]
+    pub error_control_type: String,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct FixedValueEntry {
+    #[serde(flatten)]
+    pub named_entity_type: NamedEntityType,
+    #[serde(rename = "type")]
+    pub type_: String,
+    #[serde(rename = "fixedValue")]
+    pub fixed_value: String,
 }

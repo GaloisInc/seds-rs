@@ -91,6 +91,15 @@ impl<'de> Visitor<'de> for EntryElementVisitor {
                 "PaddingEntry" => {
                     data_types.push(EntryElement::PaddingEntry(map.next_value()?));
                 }
+                "LengthEntry" => {
+                    data_types.push(EntryElement::LengthEntry(map.next_value()?));
+                }
+                "ErrorControlEntry" => {
+                    data_types.push(EntryElement::ErrorControlEntry(map.next_value()?));
+                }
+                "FixedValueEntry" => {
+                    data_types.push(EntryElement::FixedValueEntry(map.next_value()?));
+                }
                 _ => return Err(de::Error::unknown_field(&key, &[])),
             }
         }
