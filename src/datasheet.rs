@@ -73,18 +73,31 @@ pub struct ContainerDataType {
     pub entry_list: EntryList,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, PartialEq)]
 pub struct EntryList {
-    #[serde(rename = "Entry", default)]
-    pub entry: Vec<Entry>,
+    pub entries: Vec<EntryElement>,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub enum EntryElement {
+    Entry(Entry),
+    PaddingEntry(PaddingEntry),
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct Entry {
     #[serde(flatten)]
-    pub named_field_type: NamedFieldType,
-    #[serde(rename = "type", default)]
-    pub entry_type: String,
+    named_field_type: NamedFieldType,
+    #[serde(rename = "type")]
+    pub type_: String,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct PaddingEntry {
+    #[serde(rename = "sizeInBits")]
+    pub size_in_bits: u32,
+    #[serde(rename = "shortDescription")]
+    pub short_description: String,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
