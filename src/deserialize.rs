@@ -1,3 +1,4 @@
+//! Deserialization of EDS Models
 use serde::{
     de::{self, MapAccess, Visitor},
     Deserialize, Deserializer,

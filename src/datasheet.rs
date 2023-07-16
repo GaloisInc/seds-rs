@@ -1,24 +1,37 @@
+//! EDS PackageFile Model
 use serde::{Deserialize, Serialize};
 
+/// A Package File may describe a composable unit of software or hardware
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct PackageFile {
+    /// PackageFile includes a Package element  
     #[serde(rename = "Package", default)]
     pub package: Vec<Package>,
 }
 
+/// Packages describe a related set of components, data types, and interfaces
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct Package {
     #[serde(flatten)]
-    pub named_field_type: NamedFieldType,
+    pub name_entity_type: NamedEntityType,
+
+    /// A Package element may contain a DataTypeSet element
     #[serde(rename = "DataTypeSet", default)]
     pub data_type_set: DataTypeSet,
 }
 
+/// The DataTypeSet element contained in a package or component shall contain one
+/// or more DataType elements
 #[derive(Debug, Default, Serialize, PartialEq)]
 pub struct DataTypeSet {
+    /// DataTypeSet includes a DataType element
     pub data_types: Vec<DataType>,
 }
 
+/// The DataTypeSet element contained in a package or component shall contain one or
+/// more of the following elements: ArrayDataType, BinaryDataType, BooleanDataType,
+/// ContainerDataType, EnumeratedDataType, FloatDataType, IntegerDataType,
+/// StringDataType, and SubRangeDataType.
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub enum DataType {
     BooleanDataType(BooleanDataType),
@@ -33,15 +46,18 @@ pub enum DataType {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct EnumeratedDataType {
     #[serde(flatten)]
-    pub name_field_type: NamedFieldType,
+    pub name_field_type: NamedEntityType,
     #[serde(rename = "IntegerDataEncoding", default)]
     pub integer_data_encoding: IntegerDataEncoding,
     #[serde(rename = "EnumerationList", default)]
     pub enumeration_list: EnumerationList,
 }
 
+/// for an element containing the NamedEntityType, the element shall have a
+/// name attribute and may have the optional shortDescription attribute and
+/// LongDescription child element.
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
-pub struct NamedFieldType {
+pub struct NamedEntityType {
     pub name: String,
     #[serde(rename = "shortDescription", default)]
     pub short_description: Option<String>,
@@ -49,12 +65,16 @@ pub struct NamedFieldType {
     pub long_description: Option<String>,
 }
 
+/// an EnumerationList element, consisting of a list of one or more Enumeration
+/// elements
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct EnumerationList {
     #[serde(rename = "Enumeration", default)]
     pub enumeration: Vec<Enumeration>,
 }
 
+/// Each Enumeration element shall have required label and value attributes,
+/// indicating the integer value corresponding to a given label string
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct Enumeration {
     #[serde(rename = "label", default)]
@@ -68,7 +88,7 @@ pub struct Enumeration {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct ContainerDataType {
     #[serde(flatten)]
-    pub name_field_type: NamedFieldType,
+    pub name_field_type: NamedEntityType,
     #[serde(rename = "EntryList", default)]
     pub entry_list: EntryList,
 }
@@ -87,7 +107,7 @@ pub enum EntryElement {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct Entry {
     #[serde(flatten)]
-    named_field_type: NamedFieldType,
+    name_entity_type: NamedEntityType,
     #[serde(rename = "type")]
     pub type_: String,
 }
@@ -103,7 +123,7 @@ pub struct PaddingEntry {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct ArrayDataType {
     #[serde(flatten)]
-    pub name_field_type: NamedFieldType,
+    pub name_field_type: NamedEntityType,
     #[serde(rename = "dataTypeRef", default)]
     pub data_type_ref: String,
     #[serde(rename = "DimensionList", default)]
@@ -125,7 +145,7 @@ pub struct Dimension {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct BooleanDataType {
     #[serde(flatten)]
-    pub named_field_type: NamedFieldType,
+    pub name_entity_type: NamedEntityType,
     #[serde(rename = "BooleanDataEncoding")]
     pub boolean_data_encoding: BooleanDataEncoding,
 }
@@ -187,7 +207,7 @@ pub struct FloatDataEncoding {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct FloatDataType {
     #[serde(flatten)]
-    pub named_field_type: NamedFieldType,
+    pub name_entity_type: NamedEntityType,
     #[serde(rename = "FloatDataEncoding")]
     pub float_data_encoding: FloatDataEncoding,
     pub range: Option<Range>,
@@ -196,6 +216,6 @@ pub struct FloatDataType {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct StringDataType {
     #[serde(flatten)]
-    pub named_field_type: NamedFieldType,
+    pub name_entity_type: NamedEntityType,
     pub length: String,
 }
