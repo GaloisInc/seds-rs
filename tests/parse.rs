@@ -1,3 +1,4 @@
+//! Parsing tests for external EDS files
 use seds_rs::package::PackageFile;
 use serde_xml_rs::from_str;
 use std::fs;
@@ -38,11 +39,13 @@ fn test_directory(directory_name: &str) {
     }
 }
 
+/// test parsing our basic EDS files
 #[test]
 fn test_parsing_basic() {
     test_directory("eds/basic");
 }
 
+/// test parsing NASA's cFE EDS files
 #[test]
 fn test_parsing_cfe() {
     test_directory("eds/cFE");
