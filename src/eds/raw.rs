@@ -1,5 +1,7 @@
-//! EDS PackageFile Model
+//! Raw EDS PackageFile Model
 use serde::{Deserialize, Serialize};
+
+type Expression = String;
 
 /// Package File describes a composable unit of software or hardware
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
@@ -87,7 +89,7 @@ pub struct Enumeration {
     #[serde(rename = "label", default)]
     pub label: String,
     #[serde(rename = "value", default)]
-    pub value: String,
+    pub value: Expression,
     #[serde(rename = "shortDescription", default)]
     pub short_description: String,
 }
@@ -132,7 +134,7 @@ pub struct Entry {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct PaddingEntry {
     #[serde(rename = "sizeInBits")]
-    pub size_in_bits: u32,
+    pub size_in_bits: Expression,
     #[serde(rename = "shortDescription")]
     pub short_description: String,
 }
@@ -159,7 +161,7 @@ pub struct DimensionList {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct Dimension {
     #[serde(rename = "size", default)]
-    pub size: String,
+    pub size: Expression,
 }
 
 /// BooleanDataType defines a boolean data type
@@ -175,7 +177,7 @@ pub struct BooleanDataType {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct BooleanDataEncoding {
     #[serde(rename = "sizeInBits", default)]
-    pub size_in_bits: u8,
+    pub size_in_bits: Expression,
     #[serde(rename = "falseValue", default)]
     pub false_value: bool,
 }
@@ -208,27 +210,11 @@ pub struct IntegerDataType {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct IntegerDataEncoding {
     #[serde(rename = "sizeInBits", default)]
-    pub size_in_bits: String,
+    pub size_in_bits: Expression,
     #[serde(rename = "encoding", default)]
-    pub encoding: String,
+    pub encoding: Expression,
     #[serde(rename = "byteOrder", default)]
-    pub byte_order: String,
-}
-
-/// IntegerEncoding - Req 3.7.5
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
-pub enum IntegerEncoding {
-    #[default]
-    #[serde(rename = "unsigned")]
-    Unsigned,
-    #[serde(rename = "signMagnitude")]
-    SignMagnitude,
-    #[serde(rename = "twosComplement")]
-    TwosComplement,
-    #[serde(rename = "onesComplement")]
-    OnesComplement,
-    #[serde(rename = "BCD")]
-    BinaryCodedDecimal,
+    pub byte_order: Expression,
 }
 
 /// Range defines an interval of inclusive or exclusive minimum and maximum values
@@ -242,85 +228,11 @@ pub struct Range {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct MinMaxRange {
     #[serde(rename = "max", default)]
-    pub max: String,
+    pub max: Expression,
     #[serde(rename = "min", default)]
-    pub min: String,
+    pub min: Expression,
     #[serde(rename = "rangeType", default)]
-    pub range_type: MinMaxRangeType,
-}
-
-/// MinMaxRangeType Options - Table 3.2
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
-pub enum MinMaxRangeType {
-    /// {x | a < x < b}
-    #[default]
-    #[serde(rename = "exclusiveMinExclusiveMax")]
-    ExclusiveMinExclusiveMax,
-
-    /// {x | a <= x <= b}
-    #[serde(rename = "inclusiveMinInclusiveMax")]
-    InclusiveMinInclusiveMax,
-
-    /// {x | a <= x < b}
-    #[serde(rename = "inclusiveMinExclusiveMax")]
-    InclusiveMinExclusiveMax,
-
-    /// {x | a < x <= b}
-    #[serde(rename = "exclusiveMinInclusiveMax")]
-    ExclusiveMinInclusiveMax,
-
-    /// {x | a < x}
-    #[serde(rename = "greaterThan")]
-    GreaterThan,
-
-    /// {x | a <= x}
-    #[serde(rename = "atLeast")]
-    AtLeast,
-
-    /// {x | x < b}
-    #[serde(rename = "lessThan")]
-    LessThan,
-
-    /// {x | x <= b}
-    #[serde(rename = "atMost")]
-    AtMost,
-}
-
-/// FloatDataEncoding defines the precision and encoding of a floating point data type
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
-pub struct FloatDataEncoding {
-    #[serde(rename = "encodingAndPrecision", default)]
-    pub encoding_and_precision: FloatEncodingAndPrecision,
-    #[serde(rename = "byteOrder", default)]
-    pub byte_order: String,
-    #[serde(rename = "sizeInBits", default)]
-    pub size_in_bits: u8,
-}
-
-/// FloatEncodingAndPrecision defines the encoding and precision of a floating point data type
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
-pub enum FloatEncodingAndPrecision {
-    #[default]
-    #[serde(rename = "IEEE754_2008_single")]
-    IEEE7542008Single,
-    #[serde(rename = "IEEE754_2008_double")]
-    IEEE7542008Double,
-    #[serde(rename = "IEEE754_2008_quad")]
-    IEEE7542008Quadruple,
-    #[serde(rename = "MILSTD_1770A_simple")]
-    MILSTD1770ASimple,
-    #[serde(rename = "MILSTD_1770A_extended")]
-    MILSTD1770AExtended,
-}
-
-/// ByteOrder defines the byte order of a data type
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
-pub enum ByteOrder {
-    #[default]
-    #[serde(rename = "bigEndian")]
-    BigEndian,
-    #[serde(rename = "littleEndian")]
-    LittleEndian,
+    pub range_type: Expression,
 }
 
 /// FloatDataType defines a floating point data type
@@ -329,7 +241,7 @@ pub struct FloatDataType {
     #[serde(flatten)]
     pub name_entity_type: NamedEntityType,
     #[serde(rename = "FloatDataEncoding")]
-    pub float_data_encoding: FloatDataEncoding,
+    pub float_data_encoding: Expression,
     pub range: Option<Range>,
 }
 
@@ -338,7 +250,7 @@ pub struct FloatDataType {
 pub struct StringDataType {
     #[serde(flatten)]
     pub name_entity_type: NamedEntityType,
-    pub length: String,
+    pub length: Expression,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
@@ -412,7 +324,7 @@ pub struct Variable {
     #[serde(rename = "name")]
     pub name: String,
     #[serde(rename = "initialValue")]
-    pub initial_value: String,
+    pub initial_value: Expression,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
@@ -465,23 +377,7 @@ pub struct ErrorControlEntry {
     #[serde(rename = "type")]
     pub type_: String,
     #[serde(rename = "errorControlType")]
-    pub error_control_type: ErrorControlType,
-}
-
-/// ErrorControlType - Table 3.3
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
-pub enum ErrorControlType {
-    /// G(X) = X^16 + X^12 + X^5 + 1
-    #[default]
-    #[serde(rename = "CRC16_CCITT")]
-    CRC16CCITT,
-    /// G(x) = x^8 + x^2 + x^1 + x^0
-    CRC8,
-    /// modulo 2^32 addition of all 4-byte
-    CHECKSUM,
-    /// Longitudinal redundancy check, bitwise XOR of all bytes
-    #[serde(rename = "CHECKSUM_LONGITUDINAL")]
-    CHECKSUMLONGITUDINAL,
+    pub error_control_type: Expression,
 }
 
 /// FixedValueEntry within a container contains a fixed value
