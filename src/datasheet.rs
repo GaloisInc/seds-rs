@@ -18,15 +18,16 @@ pub struct Package {
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
-pub struct DataTypeSet {
-    #[serde(rename = "EnumeratedDataType", default)]
-    enumerated_data_type: Vec<EnumeratedDataType>,
-    //#[serde(rename = "StringDataType", default)]
-    //string_data_type: Vec<StringDataType>,
-    //#[serde(rename = "ContainerDataType", default)]
-    //container_data_type: Vec<ContainerDataType>,
-    //#[serde(rename = "ArrayDataType", default)]
-    //array_data_type: Vec<ArrayDataType>,
+struct DataTypeSet {
+    #[serde(rename = "$value", default)]
+    data_types: Vec<DataType>,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[serde(untagged)]
+enum DataType {
+    EnumeratedDataType(EnumeratedDataType),
+    ContainerDataType(ContainerDataType),
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
@@ -61,6 +62,32 @@ pub struct Enumeration {
     label: String,
     #[serde(rename = "value", default)]
     value: String,
+    #[serde(rename = "shortDescription", default)]
+    short_description: String,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+struct ContainerDataType {
+    #[serde(rename = "name", default)]
+    name: String,
+    #[serde(rename = "shortDescription", default)]
+    short_description: String,
+    #[serde(rename = "EntryList", default)]
+    entry_list: EntryList,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+struct EntryList {
+    #[serde(rename = "Entry", default)]
+    entry: Vec<Entry>,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+struct Entry {
+    #[serde(rename = "name", default)]
+    name: String,
+    #[serde(rename = "type", default)]
+    entry_type: String,
     #[serde(rename = "shortDescription", default)]
     short_description: String,
 }
