@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds">
+  <Package name="CFE_ES" shortDescription="NASA Core Flight System Executive Services">
+    <DataTypeSet>
+
+      <EnumeratedDataType name="LogMode" shortDescription="Identifies handling of log messages after storage is filled" >
+        <IntegerDataEncoding sizeInBits="32" encoding="unsigned" />
+        <EnumerationList>
+          <Enumeration label="OVERWRITE" value="0" shortDescription="Overwrite Log Mode" />
+          <Enumeration label="DISCARD" value="1" shortDescription="Discard Log Mode" />
+        </EnumerationList>
+      </EnumeratedDataType>
+   </DataTypeSet>
+</Package>
+</PackageFile>

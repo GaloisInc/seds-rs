@@ -60,8 +60,15 @@ pub struct NamedEntityType {
     pub name: String,
     #[serde(rename = "shortDescription", default)]
     pub short_description: Option<String>,
-    #[serde(rename = "longDescription", default)]
-    pub long_description: Option<String>,
+    #[serde(rename = "LongDescription", default)]
+    pub long_description: Option<LongDescription>,
+}
+
+/// LongDescription element contains text representing a long description
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct LongDescription {
+    #[serde(rename = "$value", default)]
+    pub text: String,
 }
 
 ///EnumerationList consists of a list of one or more Enumeration elements
