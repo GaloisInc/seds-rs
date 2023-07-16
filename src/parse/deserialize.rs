@@ -7,7 +7,7 @@ use serde::{
     Deserialize, Deserializer,
 };
 
-use crate::package::{DataType, DataTypeSet, EntryElement, EntryList};
+use crate::eds::raw::{DataType, DataTypeSet, EntryElement, EntryList};
 
 /// Visitor for DataTypeSet
 struct DataTypeVisitor;
@@ -99,6 +99,9 @@ impl<'de> Visitor<'de> for EntryElementVisitor {
                 }
                 "FixedValueEntry" => {
                     data_types.push(EntryElement::FixedValueEntry(map.next_value()?));
+                }
+                "ListEntry" => {
+                    data_types.push(EntryElement::ListEntry(map.next_value()?));
                 }
                 _ => return Err(de::Error::unknown_field(&key, &[])),
             }

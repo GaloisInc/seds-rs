@@ -40,7 +40,7 @@ fn main() {
     let namespaces = json_to_namespace(&json).unwrap();
     println!("{:#?}", namespaces);
 
-    let expression = "${CFE_MISSION/MAX_CPU_ADDRESS_SIZE}/test.cfg";
+    let expression = "${CFE_MISSION/MAX_CPU_ADDRESS_SIZE} * ${POWER}";
     match eval_namespaced_expression(expression, &namespaces) {
         Ok(value) => println!("{}", value),
         Err(err) => eprintln!("Error evaluating expression: {:?}", err),

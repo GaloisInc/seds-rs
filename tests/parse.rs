@@ -1,5 +1,5 @@
 //! Parsing tests for external EDS files
-use seds_rs::package::PackageFile;
+use seds_rs::eds::raw::PackageFile;
 use serde_xml_rs::from_str;
 use std::fs;
 use walkdir::{DirEntry, WalkDir};

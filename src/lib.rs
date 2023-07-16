@@ -13,5 +13,5 @@
 // TODO: Enable this once we have documentation
 // #![deny(missing_docs)]
 
-pub mod deserialize;
-pub mod package;
+pub mod parse;
+pub mod eds;

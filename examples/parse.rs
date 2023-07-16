@@ -3,7 +3,7 @@ use serde_xml_rs::from_str;
 use std::env;
 use std::fs;
 
-use seds_rs::package::PackageFile;
+use seds_rs::eds::raw::PackageFile;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
