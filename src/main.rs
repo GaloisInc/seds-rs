@@ -8,7 +8,7 @@ fn main() {
     //let package: PackageFile = from_str(s).unwrap();
 
     // open the xml file as a string
-    let s = std::fs::read_to_string("test.xml").unwrap();
+    let s = std::fs::read_to_string("base.xml").unwrap();
     let package: PackageFile = serde_xml_rs::from_str(&s).unwrap();
     println!("{:#?}", package);
 }
