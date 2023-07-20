@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSheet
+ xmlns="http://www.ccsds.org/schema/sois/seds"
+ xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+ <Device name="SimpleDevice" shortDescription="Simple arbitrary example of SEDS XML usage">
+ <MetaData/>
+ </Device>
+ <xi:include href="ccsds.sois.subnetwork.xml" xpointer="element(/1/1)"/>
+ <Package name="SimpleDemo">
+ <DataTypeSet>
+      <BooleanDataType name="StatusBit" shortDescription="Single true/false status bit">
+        <BooleanDataEncoding sizeInBits="1"/>
+      </BooleanDataType>
+      <IntegerDataType name="int8" shortDescription="Signed 8 bit integer">
+        <IntegerDataEncoding sizeInBits="8" encoding="${CFE_MISSION/SIGNED_INTEGER_ENCODING}"  byteOrder="bigEndian" />
+        <Range>
+          <MinMaxRange max="127" min="-128" rangeType="inclusiveMinInclusiveMax"/>
+        </Range>
+      </IntegerDataType>
+      <FloatDataType name="float" shortDescription="Single precision (32 bit) floating point value">
+        <FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" byteOrder="bigEndian" sizeInBits="32" />
+        <Range>
+          <PrecisionRange>single</PrecisionRange>
+        </Range>
+      </FloatDataType>
+      <StringDataType name="PathName" length="128">
+        <StringDataEncoding encoding="ASCII" terminationCharacter="\n" />
+      </StringDataType>
+    <EnumeratedDataType name="StartStop">
+        <IntegerDataEncoding sizeInBits="8" encoding="${CFE_MISSION/SIGNED_INTEGER_ENCODING}"  byteOrder="littleEndian" />
+        <EnumerationList>
+            <Enumeration label="Start" value="0" />
+            <Enumeration label="Stop" value="1" />
+        </EnumerationList>
+    </EnumeratedDataType>
+ </DataTypeSet>
+ </Package >
+</DataSheet>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds">
+  <Package name="TestPackage" shortDescription="NASA Core Flight System Executive Services">
+    <DataTypeSet>
+   </DataTypeSet>
+</Package>
+</PackageFile>
