@@ -3,6 +3,37 @@ use serde::{Deserialize, Serialize};
 
 type Expression = String;
 
+/// DataSheet contains one Device element and one or more Package elements
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct DataSheet {
+    #[serde(rename = "Device", default)]
+    pub devices: Vec<Device>,
+
+    #[serde(rename = "Package", default)]
+    pub packages: Vec<Package>,
+}
+
+/// Device defines a device and is based on the NamedEntityType
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct Device {
+    #[serde(flatten)]
+    pub name_entity_type: NamedEntityType,
+
+    #[serde(rename = "MetaData", default)]
+    pub metadata: Option<MetaData>,
+}
+
+/// MetaData provides additional information about the Device or PackageFile
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct MetaData {
+    #[serde(rename = "CreationDate", default)]
+    pub creation_date: Option<String>, // assuming creation date is string, change type accordingly
+
+    #[serde(rename = "Creator", default)]
+    pub creator: Option<String>,
+    // Add other fields as required...
+}
+
 /// Package File describes a composable unit of software or hardware
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct PackageFile {
@@ -20,6 +51,9 @@ pub struct Package {
     /// A Package element may contain a DataTypeSet element
     #[serde(rename = "DataTypeSet", default)]
     pub data_type_set: DataTypeSet,
+
+    #[serde(rename = "MetaData", default)]
+    pub metadata: Option<MetaData>,
 }
 
 /// DataTypeSet element contains one or more DataType elements

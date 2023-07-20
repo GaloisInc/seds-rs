@@ -4,22 +4,22 @@ This document tracks our progress in implementing the SEDS requirements. A check
 
 ## 3.2 ELECTRONIC DATA SHEETS AND THE ASSOCIATED SCHEMA
 
-- [ ] **3.2.1** The basic unit of data exchange of SOIS device information is an XML document known as a device datasheet or package file.
-- [ ] **3.2.2** A device datasheet or package file shall be de defined by a single top-level XML file.
-- [ ] **3.2.3** Any files referenced by a device datasheet shall be XML package files compliant to the PackageFile element of the SEDS schema.
+- [x] **3.2.1** The basic unit of data exchange of SOIS device information is an XML document known as a device datasheet or package file.
+- [x] **3.2.2** A device datasheet or package file shall be de defined by a single top-level XML file.
+- [x] **3.2.3** Any files referenced by a device datasheet shall be XML package files compliant to the PackageFile element of the SEDS schema.
 - [ ] **3.2.4** When a package file is used by a datasheet, XInclude (reference [5]) may be used to incorporate the Package element of that file into a single logical document compliant to the DataSheet element of the SEDS schema.
 - [ ] **3.2.5** A package file shall be a single standalone XML file without any use of XInclude.
 - [ ] **3.2.6** A SEDS document can make reference to one or more user-defined DoTs. In this case, the actual schema reference from the datasheet will be to a schema which is an extension of the SEDS schema.
 
 ## 3.3 SEDS/XML BASIC STRUCTURE
 
-- [ ] **3.3.1** The root element of a SEDS document shall be one of the DataSheet and PackageFile elements.
-- [ ] **3.3.2** The DataSheet element shall contain exactly one Device element.
-- [ ] **3.3.3** The DataSheet element shall contain one or more Package elements.
-- [ ] **3.3.4** The PackageFile element shall contain exactly one Package element.
-- [ ] **3.3.5** The Device and PackageFile elements shall contain zero or one MetaData elements (see 3.4).
-- [ ] **3.3.6** If any SEDS element is based on the NamedEntityType, the element shall have a name attribute and may have the optional shortDescription attribute and LongDescription child element. Optionally, such an element may carry attributes specified by the standard DoT (reference [1]).
-- [ ] **3.3.7** The Device element shall be based on the NamedEntityType.
+- [x] **3.3.1** The root element of a SEDS document shall be one of the DataSheet and PackageFile elements.
+- [x] **3.3.2** The DataSheet element shall contain exactly one Device element.
+- [x] **3.3.3** The DataSheet element shall contain one or more Package elements.
+- [x] **3.3.4** The PackageFile element shall contain exactly one Package element.
+- [x] **3.3.5** The Device and PackageFile elements shall contain zero or one MetaData elements (see 3.4).
+- [x] **3.3.6** If any SEDS element is based on the NamedEntityType, the element shall have a name attribute and may have the optional shortDescription attribute and LongDescription child element. Optionally, such an element may carry attributes specified by the standard DoT (reference [1]).
+- [x] **3.3.7** The Device element shall be based on the NamedEntityType.
 
 ## 3.4 METADATA
 
