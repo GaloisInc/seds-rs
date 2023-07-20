@@ -1,10 +1,12 @@
 //! Raw EDS PackageFile Model
 use serde::{Deserialize, Serialize};
 
+use super::resolved::ByteOrder;
+
 type Expression = String;
 
 /// DataSheet contains one Device element and one or more Package elements
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct DataSheet {
     #[serde(rename = "Device", default)]
     pub devices: Vec<Device>,
@@ -14,7 +16,7 @@ pub struct DataSheet {
 }
 
 /// Device defines a device and is based on the NamedEntityType
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Device {
     #[serde(flatten)]
     pub name_entity_type: NamedEntityType,
@@ -24,7 +26,7 @@ pub struct Device {
 }
 
 /// MetaData provides additional information about the Device or PackageFile
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct MetaData {
     #[serde(rename = "CreationDate", default)]
     pub creation_date: Option<String>, // assuming creation date is string, change type accordingly
@@ -35,7 +37,7 @@ pub struct MetaData {
 }
 
 /// Package File describes a composable unit of software or hardware
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PackageFile {
     /// PackageFile includes a Package element  
     #[serde(rename = "Package", default)]
@@ -43,21 +45,21 @@ pub struct PackageFile {
 }
 
 /// Package describes a related set of components, data types, and interfaces
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Package {
     #[serde(flatten)]
     pub name_entity_type: NamedEntityType,
 
     /// A Package element may contain a DataTypeSet element
     #[serde(rename = "DataTypeSet", default)]
-    pub data_type_set: DataTypeSet,
+    pub data_type_set: Option<DataTypeSet>,
 
     #[serde(rename = "MetaData", default)]
     pub metadata: Option<MetaData>,
 }
 
 /// DataTypeSet element contains one or more DataType elements
-#[derive(Debug, Default, Serialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Clone, PartialEq)]
 pub struct DataTypeSet {
     /// DataTypeSet includes a DataType element
     pub data_types: Vec<DataType>,
@@ -67,7 +69,7 @@ pub struct DataTypeSet {
 /// ArrayDataType, BinaryDataType, BooleanDataType, ContainerDataType,
 /// EnumeratedDataType, FloatDataType, IntegerDataType, StringDataType,
 /// and SubRangeDataType.
-#[derive(Debug, Default, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone, PartialEq)]
 pub enum DataType {
     #[default]
     NoneDataType,
@@ -82,19 +84,19 @@ pub enum DataType {
 }
 
 /// EnumeratedDataType defines an enumerated data type
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct EnumeratedDataType {
     #[serde(flatten)]
-    pub name_field_type: NamedEntityType,
+    pub name_entity_type: NamedEntityType,
     #[serde(rename = "IntegerDataEncoding", default)]
-    pub integer_data_encoding: IntegerDataEncoding,
+    pub encoding: Option<IntegerDataEncoding>,
     #[serde(rename = "EnumerationList", default)]
     pub enumeration_list: EnumerationList,
 }
 
 /// NamedEntityType stores the name attribute and may have the optional
 /// shortDescription attribute and LongDescription child element.
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct NamedEntityType {
     pub name: String,
     #[serde(rename = "shortDescription", default)]
@@ -104,14 +106,14 @@ pub struct NamedEntityType {
 }
 
 /// LongDescription element contains text representing a long description
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct LongDescription {
     #[serde(rename = "$value", default)]
     pub text: String,
 }
 
 ///EnumerationList consists of a list of one or more Enumeration elements
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct EnumerationList {
     #[serde(rename = "Enumeration", default)]
     pub enumeration: Vec<Enumeration>,
@@ -119,7 +121,7 @@ pub struct EnumerationList {
 
 /// Enumeration element has required label and value attributes,
 /// indicating the integer value corresponding to a given label string
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Enumeration {
     #[serde(rename = "label", default)]
     pub label: String,
@@ -130,22 +132,22 @@ pub struct Enumeration {
 }
 
 /// ContainerDataType defines a container data type
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct ContainerDataType {
     #[serde(flatten)]
-    pub name_field_type: NamedEntityType,
+    pub name_entity_type: NamedEntityType,
     #[serde(rename = "EntryList", default)]
     pub entry_list: EntryList,
 }
 
 /// EntryList consists of a list of one or more EntryElement elements
-#[derive(Debug, Default, Serialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Clone, PartialEq)]
 pub struct EntryList {
     pub entries: Vec<EntryElement>,
 }
 
 /// EntryElement is either an Entry or a PaddingEntry
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum EntryElement {
     Entry(Entry),
     FixedValueEntry(FixedValueEntry),
@@ -156,7 +158,7 @@ pub enum EntryElement {
 }
 
 /// Entry element defines a field within a container
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Entry {
     #[serde(flatten)]
     name_entity_type: NamedEntityType,
@@ -166,7 +168,7 @@ pub struct Entry {
 
 /// PaddingEntry within a container has an attribute sizeInBits that specifies
 /// the position of successive fields
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PaddingEntry {
     #[serde(rename = "sizeInBits")]
     pub size_in_bits: Expression,
@@ -175,10 +177,10 @@ pub struct PaddingEntry {
 }
 
 /// ArrayDataType defines an array data type
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct ArrayDataType {
     #[serde(flatten)]
-    pub name_field_type: NamedEntityType,
+    pub name_entity_type: NamedEntityType,
     #[serde(rename = "dataTypeRef", default)]
     pub data_type_ref: String,
     #[serde(rename = "DimensionList", default)]
@@ -186,30 +188,30 @@ pub struct ArrayDataType {
 }
 
 /// DimensionList consists of a list of one or more Dimension elements
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct DimensionList {
     #[serde(rename = "Dimension", default)]
     pub dimension: Vec<Dimension>,
 }
 
 /// Dimension determines the length of the array dimension
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Dimension {
     #[serde(rename = "size", default)]
     pub size: Expression,
 }
 
 /// BooleanDataType defines a boolean data type
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct BooleanDataType {
     #[serde(flatten)]
     pub name_entity_type: NamedEntityType,
     #[serde(rename = "BooleanDataEncoding")]
-    pub boolean_data_encoding: Option<BooleanDataEncoding>,
+    pub encoding: Option<BooleanDataEncoding>,
 }
 
 /// BooleanDataEncoding defines the size in bits of a boolean data type
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct BooleanDataEncoding {
     #[serde(rename = "sizeInBits", default)]
     pub size_in_bits: Expression,
@@ -218,7 +220,7 @@ pub struct BooleanDataEncoding {
 }
 
 /// BooleanFalseValue - Req 3.7.4
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub enum BooleanFalseValue {
     #[default]
     #[serde(rename = "zeroIsFalse")]
@@ -228,21 +230,19 @@ pub enum BooleanFalseValue {
 }
 
 /// IntegerDataType defines an integer data type
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct IntegerDataType {
-    #[serde(rename = "name", default)]
-    pub name: String,
-    #[serde(rename = "shortDescription", default)]
-    pub short_description: Option<String>,
+    #[serde(flatten)]
+    pub name_entity_type: NamedEntityType,
     #[serde(rename = "IntegerDataEncoding")]
-    pub integer_data_encoding: Option<IntegerDataEncoding>,
+    pub encoding: Option<IntegerDataEncoding>,
     #[serde(rename = "Range", default)]
     pub range: Range,
 }
 
 /// IntegerDataEncoding defines the encoding of an integer data type,
 /// including the size in bits, encoding, and byte order
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct IntegerDataEncoding {
     #[serde(rename = "sizeInBits", default)]
     pub size_in_bits: Expression,
@@ -253,14 +253,14 @@ pub struct IntegerDataEncoding {
 }
 
 /// Range defines an interval of inclusive or exclusive minimum and maximum values
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Range {
     #[serde(rename = "MinMaxRange", default)]
     pub min_max_range: MinMaxRange,
 }
 
 /// MinMaxRange defines the minimum and maximum values of a data type
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct MinMaxRange {
     #[serde(rename = "max", default)]
     pub max: Expression,
@@ -271,30 +271,50 @@ pub struct MinMaxRange {
 }
 
 /// FloatDataType defines a floating point data type
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct FloatDataType {
     #[serde(flatten)]
     pub name_entity_type: NamedEntityType,
     #[serde(rename = "FloatDataEncoding")]
-    pub float_data_encoding: Expression,
+    pub encoding: Option<FloatDataEncoding>,
     pub range: Option<Range>,
 }
 
+/// FloatDataEncoding defines the encoding of a floating point data type
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+pub struct FloatDataEncoding {
+    #[serde(rename = "sizeInBits", default)]
+    pub size_in_bits: Expression,
+    #[serde(rename = "byteOrder", default)]
+    pub byte_order: Expression,
+}
+
 /// StringDataType defines a string data type of either fixed or variable length
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct StringDataType {
     #[serde(flatten)]
     pub name_entity_type: NamedEntityType,
     pub length: Expression,
+    #[serde(rename = "StringDataEncoding")]
+    pub encoding: Option<StringDataEncoding>,
+    pub fixed_length: Option<Expression>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+/// StringDataEncoding defines the encoding of a string data type
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+pub struct StringDataEncoding {
+    #[serde(rename = "terminationCharacter")]
+    pub termination_character: Option<Expression>,
+    pub encoding: Option<Expression>,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct ComponentSet {
     #[serde(rename = "Component", default)]
     pub components: Vec<Component>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Component {
     #[serde(rename = "name")]
     pub name: String,
@@ -304,13 +324,13 @@ pub struct Component {
     pub implementation: Implementation,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct RequiredInterfaceSet {
     #[serde(rename = "Interface", default)]
     pub interfaces: Vec<Interface>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Interface {
     #[serde(rename = "name")]
     pub name: String,
@@ -322,13 +342,13 @@ pub struct Interface {
     pub generic_type_map_set: GenericTypeMapSet,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct GenericTypeMapSet {
     #[serde(rename = "GenericTypeMap", default)]
     pub generic_type_maps: Vec<GenericTypeMap>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct GenericTypeMap {
     #[serde(rename = "name")]
     pub name: String,
@@ -336,7 +356,7 @@ pub struct GenericTypeMap {
     pub type_: String,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Implementation {
     #[serde(rename = "VariableSet", default)]
     pub variable_set: VariableSet,
@@ -344,13 +364,13 @@ pub struct Implementation {
     pub parameter_map_set: ParameterMapSet,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct VariableSet {
     #[serde(rename = "Variable", default)]
     pub variables: Vec<Variable>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Variable {
     #[serde(rename = "type")]
     pub type_: String,
@@ -362,13 +382,13 @@ pub struct Variable {
     pub initial_value: Expression,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct ParameterMapSet {
     #[serde(rename = "ParameterMap", default)]
     pub parameter_maps: Vec<ParameterMap>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct ParameterMap {
     #[serde(rename = "interface")]
     pub interface: String,
@@ -378,7 +398,7 @@ pub struct ParameterMap {
     pub variable_ref: String,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct LengthEntry {
     pub name: String,
     #[serde(rename = "type")]
@@ -391,13 +411,13 @@ pub struct LengthEntry {
 
 /// PolynomialCalibrator calibration that would be required to take the raw value represented by the data
 /// type and convert it into the units and other semantic terms associated with the field
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PolynomialCalibrator {
     #[serde(rename = "Term")]
     pub term: Vec<Term>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Term {
     pub coefficient: String,
     pub exponent: String,
@@ -405,7 +425,7 @@ pub struct Term {
 
 /// ErrorControlEntry specifies an entry whose value is constrained, or derived,
 /// based on the contents of the container in which it is present.
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct ErrorControlEntry {
     #[serde(flatten)]
     pub named_entity_type: NamedEntityType,
@@ -416,7 +436,7 @@ pub struct ErrorControlEntry {
 }
 
 /// FixedValueEntry within a container contains a fixed value
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct FixedValueEntry {
     #[serde(flatten)]
     pub named_entity_type: NamedEntityType,
@@ -431,13 +451,13 @@ pub struct FixedValueEntry {
 }
 
 /// TODO: ListEntry
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct ListEntry {
     // TODO
 }
 
 /// SubRangeDataType defines a sub range data type
-#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct SubRangeDataType {
     #[serde(rename = "baseType")]
     pub base_type: String,
@@ -447,4 +467,5 @@ pub struct SubRangeDataType {
     pub unit: String,
     #[serde(rename = "Range", default)]
     pub range: Range,
+    pub encoding: Option<Expression>,
 }

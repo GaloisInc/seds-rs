@@ -35,35 +35,35 @@ This document tracks our progress in implementing the SEDS requirements. A check
 
 ## 3.5 PACKAGES
 
-- [ ] **3.5.1** The name of each Package element declared shall be unique within the datasheet.
-- [ ] **3.5.2** A Package name may be hierarchical, in which case it shall consist of multiple name segments separated by the slash character (‘/’).
-- [ ] **3.5.3** A package may have an optional shortDescription attribute and an optional LongDescription child element.
+- [x] **3.5.1** The name of each Package element declared shall be unique within the datasheet.
+- [x] **3.5.2** A Package name may be hierarchical, in which case it shall consist of multiple name segments separated by the slash character (‘/’).
+- [x] **3.5.3** A package may have an optional shortDescription attribute and an optional LongDescription child element.
 - [ ] **3.5.4** A Package element may contain the following optional elements, in the following order: a) DataTypeSet; b) DeclaredInterfaceSet; c) ComponentSet.
 
 ## 3.6 DATA TYPES
-- [ ] **3.6.1** The DataTypeSet element contained in a package or component shall contain one or more of the following elements: ArrayDataType, BinaryDataType, BooleanDataType, ContainerDataType, EnumeratedDataType, FloatDataType, IntegerDataType, StringDataType, and SubRangeDataType.
-- [ ] **3.6.2** Each child element of a DataTypeSet element is based on the NamedEntityType (see 3.3.7).
-- [ ] **3.6.3** The name of each child element of a DataTypeSet element shall be unique within the containing package.
+- [x] **3.6.1** The DataTypeSet element contained in a package or component shall contain one or more of the following elements: ArrayDataType, BinaryDataType, BooleanDataType, ContainerDataType, EnumeratedDataType, FloatDataType, IntegerDataType, StringDataType, and SubRangeDataType.
+- [x] **3.6.2** Each child element of a DataTypeSet element is based on the NamedEntityType (see 3.3.7).
+- [x] **3.6.3** The name of each child element of a DataTypeSet element shall be unique within the containing package.
 
 ## 3.7 SCALAR DATA TYPES
 
-- [ ] **3.7.1** Each BooleanDataType, EnumeratedDataType, FloatDataType, IntegerDataType,
+- [x] **3.7.1** Each BooleanDataType, EnumeratedDataType, FloatDataType, IntegerDataType,
 StringDataType, or SubRangeDataType element may contain an optional encoding element
 of a type corresponding to table 3-1.
-- [ ] **3.7.2** A FloatDataEncoding or IntegerDataEncoding element may carry a byteOrder attribute specifying a value of a) bigEndian, the default, for values which are to be encoded most significant byte first; or b) littleEndian for values which are to be encoded least significant byte first. NOTE – The littleEndian specification applies only to data types whose size is a multiple of 8 bits.
-- [ ] **3.7.3** A BooleanDataEncoding element shall carry a sizeInBits attribute which specifies the size, in bits, of the encoded data as a positive integer.
+- [x] **3.7.2** A FloatDataEncoding or IntegerDataEncoding element may carry a byteOrder attribute specifying a value of a) bigEndian, the default, for values which are to be encoded most significant byte first; or b) littleEndian for values which are to be encoded least significant byte first. NOTE – The littleEndian specification applies only to data types whose size is a multiple of 8 bits.
+- [x] **3.7.3** A BooleanDataEncoding element shall carry a sizeInBits attribute which specifies the size, in bits, of the encoded data as a positive integer.
 - [ ] **3.7.4** A BooleanDataEncoding element may carry a falseValue attribute which specifies the value that corresponds to logical falsehood, with options a) zeroIsFalse (the default); and b) nonZeroIsFalse.
 - [ ] **3.7.5** An IntegerDataEncoding element shall carry an encoding attribute which has a value of a) unsigned, for an unsigned value; b) signMagnitude, for an encoding with a separate sign bit (the most significant bit is the sign bit, with 1 indicating negative); c) twosComplement, for twos complement; d) onesComplement, for ones complement; e) BCD, for a natural unsigned binary coded decimal, where each byte is a decimal digit encoded as binary; or f) packedBCD, where each byte contains two decimal digits encoded as binary, followed by an optional sign nibble. A negative sign is 1011 or 1101; a positive sign is 1010, 1100, 1110, 1111, or omitted.
 - [ ] **3.7.6** An IntegerDataEncoding element shall carry a sizeInBits attribute which specifies the size, in bits, of the encoded data as a positive integer.
 - [ ] **3.7.7** The size in bits of a BCD encoding shall be a multiple of 8. The size in bits of a packedBCD shall be a multiple of 4. The size in bits of both forms of binary coded decimals is a fixed value, so all high-order digits that are zero shall be present to fill the fixed size in bits.
 - [ ] **3.7.8** A FloatDataEncoding element shall carry an encodingAndPrecision attribute which has a value of either a) IEEE754_2008_single; b) IEEE754_2008_double; c) IEEE754_2008_quad; d) MILSTD_1750A_simple; or e) MILSTD_1750A_extended.  NOTE – These represent the supported sizes of IEEE (reference [6]) and MIL-STD1750A (reference [7]).
 - [ ] **3.7.9** A FloatDataEncoding element shall carry a sizeInBits attribute which specifies the size, in bits, of the encoded data as a positive integer.
-- [ ] **3.7.10** A StringDataType shall carry a length attribute which defines the maximum possible length of the string, in bytes.
-- [ ] **3.7.11** A StringDataType may carry a fixedLength attribute which, if ‘false’, indicates that the string can be shorter than the value specified by the length attribute.  NOTE – Specification of fixedLength="false" indicates a data type that occupies a variable amount of memory. When such a data type is an entry in a container, then the container is of variable length. (See 4.8 for details about string lengths.)
-- [ ] **3.7.12** A StringDataEncoding element may carry an encoding attribute which has a value of either a) UTF-8, specifying Unicode UTF-8 encoding (reference [8]); or b) ASCII, the default, specifying US ASCII encoding (reference [9]).
-- [ ] **3.7.13** The optional terminationCharacter attribute of a StringDataEncoding element shall specify the termination character for the string.  
-- [ ] **3.7.14** An EnumeratedDataType shall contain an EnumerationList element, consisting of a list of one or more Enumeration elements.
-- [ ] **3.7.15** Each Enumeration element shall have required label and value attributes, indicating the integer value corresponding to a given label string.
+- [x] **3.7.10** A StringDataType shall carry a length attribute which defines the maximum possible length of the string, in bytes.
+- [x] **3.7.11** A StringDataType may carry a fixedLength attribute which, if ‘false’, indicates that the string can be shorter than the value specified by the length attribute.  NOTE – Specification of fixedLength="false" indicates a data type that occupies a variable amount of memory. When such a data type is an entry in a container, then the container is of variable length. (See 4.8 for details about string lengths.)
+- [x] **3.7.12** A StringDataEncoding element may carry an encoding attribute which has a value of either a) UTF-8, specifying Unicode UTF-8 encoding (reference [8]); or b) ASCII, the default, specifying US ASCII encoding (reference [9]).
+- [x] **3.7.13** The optional terminationCharacter attribute of a StringDataEncoding element shall specify the termination character for the string.  
+- [x] **3.7.14** An EnumeratedDataType shall contain an EnumerationList element, consisting of a list of one or more Enumeration elements.
+- [x] **3.7.15** Each Enumeration element shall have required label and value attributes, indicating the integer value corresponding to a given label string.
 - [ ] **3.7.16** An Enumeration element may carry attributes provided by the standard DoT (reference [1]).
 
 ## 3.8 RANGES
