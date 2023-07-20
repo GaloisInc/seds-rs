@@ -1,8 +1,6 @@
 //! Raw EDS PackageFile Model
 use serde::{Deserialize, Serialize};
 
-use super::resolved::ByteOrder;
-
 type Expression = String;
 
 /// DataSheet contains one Device element and one or more Package elements
@@ -216,7 +214,7 @@ pub struct BooleanDataEncoding {
     #[serde(rename = "sizeInBits", default)]
     pub size_in_bits: Expression,
     #[serde(rename = "falseValue", default)]
-    pub false_value: bool,
+    pub false_value: Option<Expression>,
 }
 
 /// BooleanFalseValue - Req 3.7.4
@@ -287,6 +285,8 @@ pub struct FloatDataEncoding {
     pub size_in_bits: Expression,
     #[serde(rename = "byteOrder", default)]
     pub byte_order: Expression,
+    #[serde(rename = "encodingAndPrecision", default)]
+    pub encoding_and_precision: Expression,
 }
 
 /// StringDataType defines a string data type of either fixed or variable length

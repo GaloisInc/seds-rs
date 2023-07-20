@@ -1,5 +1,5 @@
 //! 3.7 SCALAR DATA TYPES
-use seds_rs::eds::raw::{DataType, DataTypeSet, Package, PackageFile};
+use seds_rs::eds::raw::{DataType, DataTypeSet, PackageFile};
 
 mod common;
 
@@ -72,6 +72,104 @@ fn test_3_7_3() {
         if let DataType::BooleanDataType(data) = data_type {
             let size_in_bits_string = data.encoding.unwrap().size_in_bits;
             let size_in_bits_int = size_in_bits_string.parse::<i32>().unwrap();
+            assert!(size_in_bits_int > 0);
+        }
+    }
+}
+
+/// 3.7.4 A BooleanDataEncoding element may carry a falseValue attribute which specifies the value that corresponds to logical falsehood, with options a) zeroIsFalse (the default); and b) nonZeroIsFalse.
+#[test]
+fn test_3_7_4() {
+    let data_type_set = get_test_data_type_set();
+    for data_type in data_type_set.data_types {
+        if let DataType::BooleanDataType(data) = data_type {
+            let value = data.encoding.unwrap().false_value.unwrap();
+            assert!(value == "zeroIsFalse" || value == "nonZeroIsFalse");
+        }
+    }
+}
+
+/// 3.7.5 An IntegerDataEncoding element shall carry an encoding attribute which has a value of a) unsigned, for an unsigned value; b) signMagnitude, for an encoding with a separate sign bit (the most significant bit is the sign bit, with 1 indicating negative); c) twosComplement, for twos complement; d) onesComplement, for ones complement; e) BCD, for a natural unsigned binary coded decimal, where each byte is a decimal digit encoded as binary; or f) packedBCD, where each byte contains two decimal digits encoded as binary, followed by an optional sign nibble.
+#[test]
+fn test_3_7_5() {
+    let data_type_set = get_test_data_type_set();
+    for data_type in data_type_set.data_types {
+        if let DataType::IntegerDataType(data) = data_type {
+            let value = data.encoding.unwrap().encoding;
+            let value_str = value.as_str();
+            assert!(matches!(
+                value_str,
+                "unsigned"
+                    | "signMagnitude"
+                    | "twosComplement"
+                    | "onesComplement"
+                    | "BCD"
+                    | "packedBCD"
+            ));
+        }
+    }
+}
+
+/// 3.7.6 An IntegerDataEncoding element shall carry a sizeInBits attribute which specifies the size, in bits, of the encoded data as a positive integer.
+#[test]
+fn test_3_7_6() {
+    let data_type_set = get_test_data_type_set();
+    for data_type in data_type_set.data_types {
+        if let DataType::IntegerDataType(data) = data_type {
+            let size_in_bits = data.encoding.unwrap().size_in_bits;
+            let size_in_bits_int = size_in_bits.parse::<i32>().unwrap();
+            assert!(size_in_bits_int > 0);
+        }
+    }
+}
+
+/// 3.7.7 The size in bits of a BCD encoding shall be a multiple of 8. The size in bits of a packedBCD shall be a multiple of 4. The size in bits of both forms of binary coded decimals is a fixed value, so all high-order digits that are zero shall be present to fill the fixed size in bits.
+#[test]
+fn test_3_7_7() {
+    let data_type_set = get_test_data_type_set();
+    for data_type in data_type_set.data_types {
+        if let DataType::IntegerDataType(data) = data_type {
+            let encoding = data.encoding.unwrap();
+            if matches!(encoding.encoding.as_str(), "BCD") {
+                let size_in_bits = encoding.size_in_bits;
+                let size_in_bits_int = size_in_bits.parse::<i32>().unwrap();
+                assert!(size_in_bits_int % 8 == 0);
+            } else if matches!(encoding.encoding.as_str(), "PackedBCD") {
+                let size_in_bits = encoding.size_in_bits;
+                let size_in_bits_int = size_in_bits.parse::<i32>().unwrap();
+                assert!(size_in_bits_int % 4 == 0);
+            }
+        }
+    }
+}
+
+/// 3.7.8 A FloatDataEncoding element shall carry an encodingAndPrecision attribute which has a value of either a) IEEE754_2008_single; b) IEEE754_2008_double; c) IEEE754_2008_quad; d) MILSTD_1750A_simple; or e) MILSTD_1750A_extended.
+#[test]
+fn test_3_7_8() {
+    let data_type_set = get_test_data_type_set();
+    for data_type in data_type_set.data_types {
+        if let DataType::FloatDataType(data) = data_type {
+            let enc_and_prec = data.encoding.unwrap().encoding_and_precision;
+            assert!(matches!(
+                enc_and_prec.as_str(),
+                "IEEE754_2008_single"
+                    | "IEEE754_2008_double"
+                    | "IEEE754_2008_quad"
+                    | "MILSTD_1750A_simple"
+                    | "MILSTD_1750A_extended"
+            ));
+        }
+    }
+}
+
+/// 3.7.9 A FloatDataEncoding element shall carry a sizeInBits attribute which specifies the size, in bits, of the encoded data as a positive integer.
+#[test]
+fn test_3_7_9() {
+    let data_type_set = get_test_data_type_set();
+    for data_type in data_type_set.data_types {
+        if let DataType::FloatDataType(data) = data_type {
+            let size_in_bits = data.encoding.unwrap().size_in_bits;
+            let size_in_bits_int = size_in_bits.parse::<i32>().unwrap();
             assert!(size_in_bits_int > 0);
         }
     }

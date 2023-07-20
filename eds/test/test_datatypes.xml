@@ -11,10 +11,10 @@
  <Package name="SimpleDemo">
  <DataTypeSet>
       <BooleanDataType name="StatusBit" shortDescription="Single true/false status bit">
-        <BooleanDataEncoding sizeInBits="1"/>
+        <BooleanDataEncoding sizeInBits="1" falseValue="zeroIsFalse"/>
       </BooleanDataType>
       <IntegerDataType name="int8" shortDescription="Signed 8 bit integer">
-        <IntegerDataEncoding sizeInBits="8" encoding="${CFE_MISSION/SIGNED_INTEGER_ENCODING}"  byteOrder="bigEndian" />
+        <IntegerDataEncoding sizeInBits="8" encoding="twosComplement"  byteOrder="bigEndian" />
         <Range>
           <MinMaxRange max="127" min="-128" rangeType="inclusiveMinInclusiveMax"/>
         </Range>
@@ -29,7 +29,7 @@
         <StringDataEncoding encoding="ASCII" terminationCharacter="\n" />
       </StringDataType>
     <EnumeratedDataType name="StartStop">
-        <IntegerDataEncoding sizeInBits="8" encoding="${CFE_MISSION/SIGNED_INTEGER_ENCODING}"  byteOrder="littleEndian" />
+        <IntegerDataEncoding sizeInBits="8" encoding="unsigned"  byteOrder="littleEndian" />
         <EnumerationList>
             <Enumeration label="Start" value="0" />
             <Enumeration label="Stop" value="1" />
