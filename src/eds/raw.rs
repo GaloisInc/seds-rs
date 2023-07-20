@@ -135,7 +135,53 @@ pub struct ContainerDataType {
     #[serde(flatten)]
     pub name_entity_type: NamedEntityType,
     #[serde(rename = "EntryList", default)]
-    pub entry_list: EntryList,
+    pub entry_list: Option<EntryList>,
+    #[serde(rename = "abstract")]
+    pub _abstract: Option<Expression>,
+    #[serde(rename = "baseType")]
+    pub base_type: Option<String>,
+    #[serde(rename = "ConstraintSet")]
+    pub constraint_set: Option<ConstraintSet>,
+    #[serde(rename = "TrailerEntryList")]
+    pub trailer_entry_list: Option<EntryList>,
+}
+
+/// ConstraintSet specifies the criteria that apply to the entries of the container type
+#[derive(Debug, Default, Serialize, Clone, PartialEq)]
+pub struct ConstraintSet {
+    pub constraints: Vec<Constraint>,
+}
+
+/// Constraint specifies the criteria that apply to the entries of the container type
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub enum Constraint {
+    RangeConstraint(RangeConstraint),
+    TypeConstraint(TypeConstraint),
+    ValueConstraint(ValueConstraint),
+}
+
+/// RangeConstraint specifies the range of valid values for a container entry
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+pub struct RangeConstraint {
+    #[serde(rename = "Range", default)]
+    pub range: Range,
+    pub entry: Expression,
+}
+
+/// TypeConstraint specifies the data type of a container entry
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+pub struct TypeConstraint {
+    #[serde(rename = "type")]
+    pub type_: String,
+    pub entry: Expression,
+}
+
+/// ValueConstraint specifies the value of a container entry
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+pub struct ValueConstraint {
+    #[serde(rename = "value")]
+    pub value: Expression,
+    pub entry: Expression,
 }
 
 /// EntryList consists of a list of one or more EntryElement elements
@@ -159,7 +205,7 @@ pub enum EntryElement {
 #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Entry {
     #[serde(flatten)]
-    name_entity_type: NamedEntityType,
+    pub name_entity_type: NamedEntityType,
     #[serde(rename = "type")]
     pub type_: String,
 }

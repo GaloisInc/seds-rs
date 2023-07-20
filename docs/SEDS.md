@@ -84,11 +84,11 @@ of a type corresponding to table 3-1.
 
 ## 3.10 CONTAINERS
 
-- [ ] **3.10.1** A ContainerDataType element may carry an optional abstract attribute which, if set to ‘true’, indicates that the container is not to be used directly, only referenced as the base type of other containers.
-- [ ] **3.10.2** A ContainerDataType element may carry an optional baseType attribute which indicates that the container is a constrained extension of another.
-- [ ] **3.10.3** A ContainerDataType element shall include zero or one ConstraintSet element and zero or one EntryList element.
-- [ ] **3.10.4** An abstract ContainerDataType element may include zero or one TrailerEntryList element.
-- [ ] **3.10.5** The ConstraintSet element of a ContainerDataType element shall specify the criteria that apply to the entries of the container type that is the base type of this container, in order for the type to be valid.
+- [x] **3.10.1** A ContainerDataType element may carry an optional abstract attribute which, if set to ‘true’, indicates that the container is not to be used directly, only referenced as the base type of other containers.
+- [x] **3.10.2** A ContainerDataType element may carry an optional baseType attribute which indicates that the container is a constrained extension of another.
+- [x] **3.10.3** A ContainerDataType element shall include zero or one ConstraintSet element and zero or one EntryList element.
+- [x] **3.10.4** An abstract ContainerDataType element may include zero or one TrailerEntryList element.
+- [x] **3.10.5** The ConstraintSet element of a ContainerDataType element shall specify the criteria that apply to the entries of the container type that is the base type of this container, in order for the type to be valid.
 - [ ] **3.10.6** The ConstraintSet element of a ContainerDataType element shall contain one or more child elements, which can be one of a RangeConstraint, a TypeConstraint, or a ValueConstraint.
 - [ ] **3.10.7** Each child entry of a ConstraintSet shall have an attribute entry, which names the entry that the constraint applies to. This entry shall exist within a base container reachable by a recursive chain of base container references from the current container.
 - [ ] **3.10.8** A RangeConstraint element shall carry a child element of any type of range legal for the type of the constrained entry (see table 3-1).

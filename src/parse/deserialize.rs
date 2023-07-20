@@ -7,7 +7,7 @@ use serde::{
     Deserialize, Deserializer,
 };
 
-use crate::eds::raw::{DataType, DataTypeSet, EntryElement, EntryList};
+use crate::eds::raw::{Constraint, ConstraintSet, DataType, DataTypeSet, EntryElement, EntryList};
 
 /// Visitor for DataTypeSet
 struct DataTypeVisitor;
@@ -84,33 +84,33 @@ impl<'de> Visitor<'de> for EntryElementVisitor {
     where
         A: MapAccess<'de>,
     {
-        let mut data_types = Vec::new();
+        let mut entries = Vec::new();
 
         while let Some(key) = map.next_key::<String>()? {
             match key.as_str() {
                 "Entry" => {
-                    data_types.push(EntryElement::Entry(map.next_value()?));
+                    entries.push(EntryElement::Entry(map.next_value()?));
                 }
                 "PaddingEntry" => {
-                    data_types.push(EntryElement::PaddingEntry(map.next_value()?));
+                    entries.push(EntryElement::PaddingEntry(map.next_value()?));
                 }
                 "LengthEntry" => {
-                    data_types.push(EntryElement::LengthEntry(map.next_value()?));
+                    entries.push(EntryElement::LengthEntry(map.next_value()?));
                 }
                 "ErrorControlEntry" => {
-                    data_types.push(EntryElement::ErrorControlEntry(map.next_value()?));
+                    entries.push(EntryElement::ErrorControlEntry(map.next_value()?));
                 }
                 "FixedValueEntry" => {
-                    data_types.push(EntryElement::FixedValueEntry(map.next_value()?));
+                    entries.push(EntryElement::FixedValueEntry(map.next_value()?));
                 }
                 "ListEntry" => {
-                    data_types.push(EntryElement::ListEntry(map.next_value()?));
+                    entries.push(EntryElement::ListEntry(map.next_value()?));
                 }
                 _ => return Err(de::Error::unknown_field(&key, &[])),
             }
         }
 
-        Ok(data_types)
+        Ok(entries)
     }
 }
 
@@ -123,6 +123,54 @@ impl<'de> Deserialize<'de> for EntryList {
             .deserialize_map(EntryElementVisitor)
             .map(|entry_types| EntryList {
                 entries: entry_types,
+            })
+    }
+}
+
+/// Visitor for Constraint
+struct ConstraintVisitor;
+
+impl<'de> Visitor<'de> for ConstraintVisitor {
+    type Value = Vec<Constraint>;
+
+    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+        formatter.write_str("a Constraint containing multiple types of data")
+    }
+
+    fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+    where
+        A: MapAccess<'de>,
+    {
+        let mut constraints = Vec::new();
+
+        while let Some(key) = map.next_key::<String>()? {
+            match key.as_str() {
+                "RangeConstraint" => {
+                    constraints.push(Constraint::RangeConstraint(map.next_value()?));
+                }
+                "TypeConstraint" => {
+                    constraints.push(Constraint::TypeConstraint(map.next_value()?));
+                }
+                "ValueConstraint" => {
+                    constraints.push(Constraint::ValueConstraint(map.next_value()?));
+                }
+                _ => return Err(de::Error::unknown_field(&key, &[])),
+            }
+        }
+
+        Ok(constraints)
+    }
+}
+
+impl<'de> Deserialize<'de> for ConstraintSet {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer
+            .deserialize_map(ConstraintVisitor)
+            .map(|constraints| ConstraintSet {
+                constraints: constraints,
             })
     }
 }
