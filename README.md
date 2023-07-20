@@ -25,7 +25,7 @@ graph LR
     DASchema --validates--> Datasheet
     Datasheet --describes--> Component
 
-    subgraph Red Book
+    subgraph Blue Book
     Book[DoT Magenta Book 876.1]
     SDot[Standard DoT]
     UDot[User DoT]
