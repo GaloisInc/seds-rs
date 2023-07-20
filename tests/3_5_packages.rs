@@ -23,7 +23,11 @@ fn get_test_package() -> Package {
 fn test_3_5_1() {
     let data_sheet = get_test_data_sheet(); // Assume this function returns a test DataSheet
 
-    let package_names: Vec<String> = data_sheet.packages.iter().map(|p| p.name_entity_type.name.clone()).collect();
+    let package_names: Vec<String> = data_sheet
+        .packages
+        .iter()
+        .map(|p| p.name_entity_type.name.clone())
+        .collect();
     let unique_package_names: HashSet<String> = package_names.into_iter().collect();
 
     assert_eq!(data_sheet.packages.len(), unique_package_names.len());
@@ -44,7 +48,10 @@ fn test_3_5_3() {
     let package = get_test_package(); // Assume this function returns a test Package
 
     // Checking if optional fields exist
-    assert!(package.name_entity_type.short_description.is_some() || package.name_entity_type.long_description.is_some());
+    assert!(
+        package.name_entity_type.short_description.is_some()
+            || package.name_entity_type.long_description.is_some()
+    );
 }
 
 /// **3.5.4** A Package element may contain the following optional elements, in the following order: a) DataTypeSet; b) DeclaredInterfaceSet; c) ComponentSet.
@@ -60,6 +67,6 @@ fn test_3_5_4() {
     // Check if the order of existence is correct
     // assert!(!data_type_set_exists || (data_type_set_exists && declared_interface_set_exists) || (data_type_set_exists && declared_interface_set_exists && component_set_exists));
     assert!(data_type_set_exists);
-    
+
     // TODO: we fail this req for now
 }

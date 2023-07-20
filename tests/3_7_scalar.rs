@@ -1,21 +1,15 @@
-use seds_rs::eds::raw::{DataType, DataTypeSet, PackageFile, Package};
+//! 3.7 SCALAR DATA TYPES
+use seds_rs::eds::raw::{DataType, DataTypeSet, Package, PackageFile};
 
 mod common;
 
 use common::open_file;
-
-fn get_test_package() -> Package {
-    let contents = open_file("eds/test/test_datatypes.xml");
-    let package: PackageFile = serde_xml_rs::from_str(&contents).unwrap();
-    package.package[0].clone()
-}
 
 fn get_test_data_type_set() -> DataTypeSet {
     let contents = open_file("eds/test/test_datatypes.xml");
     let package: PackageFile = serde_xml_rs::from_str(&contents).unwrap();
     package.package[0].clone().data_type_set.unwrap()
 }
-
 
 /// 3.7.1 Each BooleanDataType, EnumeratedDataType, FloatDataType, IntegerDataType,
 /// StringDataType, or SubRangeDataType element may contain an optional encoding element
@@ -37,9 +31,9 @@ fn test_3_7_1() {
     }
 }
 
-/// 3.7.2 A FloatDataEncoding or IntegerDataEncoding element may carry a byteOrder attribute specifying a value of 
-/// a) bigEndian, the default, for values which are to be encoded most significant byte first; or 
-/// b) littleEndian for values which are to be encoded least significant byte first. 
+/// 3.7.2 A FloatDataEncoding or IntegerDataEncoding element may carry a byteOrder attribute specifying a value of
+/// a) bigEndian, the default, for values which are to be encoded most significant byte first; or
+/// b) littleEndian for values which are to be encoded least significant byte first.
 /// NOTE – The littleEndian specification applies only to data types whose size is a multiple of 8 bits.
 #[test]
 fn test_3_7_2() {
@@ -50,18 +44,24 @@ fn test_3_7_2() {
         match data_type {
             DataType::FloatDataType(data) => {
                 let data_string = data.encoding.unwrap().byte_order;
-                assert!(data_string == "bigEndian".to_string() || data_string == "littleEndian".to_string())
-            },
+                assert!(
+                    data_string == "bigEndian".to_string()
+                        || data_string == "littleEndian".to_string()
+                )
+            }
             DataType::IntegerDataType(data) => {
                 let data_string = data.encoding.unwrap().byte_order;
-                assert!(data_string == "bigEndian".to_string() || data_string == "littleEndian".to_string())
-            },
+                assert!(
+                    data_string == "bigEndian".to_string()
+                        || data_string == "littleEndian".to_string()
+                )
+            }
             _ => (),
         }
     }
 }
 
-/// 3.7.3 A BooleanDataEncoding element shall carry a sizeInBits attribute which specifies the size, in bits, 
+/// 3.7.3 A BooleanDataEncoding element shall carry a sizeInBits attribute which specifies the size, in bits,
 /// of the encoded data as a positive integer.
 #[test]
 fn test_3_7_3() {
@@ -112,7 +112,9 @@ fn test_3_7_12() {
         if let DataType::StringDataType(data) = data_type {
             if let Some(encoding) = data.encoding {
                 let encoding_string = encoding.encoding.unwrap();
-                assert!(encoding_string == "UTF8".to_string() || encoding_string == "ASCII".to_string());
+                assert!(
+                    encoding_string == "UTF8".to_string() || encoding_string == "ASCII".to_string()
+                );
             }
         }
     }

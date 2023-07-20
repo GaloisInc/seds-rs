@@ -1,6 +1,7 @@
+//! 3.6 DATA TYPES
 use std::collections::HashSet;
 
-use seds_rs::eds::raw::{DataType, Package, PackageFile, DataTypeSet};
+use seds_rs::eds::raw::{DataType, DataTypeSet, Package, PackageFile};
 
 mod common;
 
@@ -18,7 +19,7 @@ fn get_test_data_type_set() -> DataTypeSet {
     package.package[0].clone().data_type_set.unwrap()
 }
 
-/// 3.6.1 The DataTypeSet element contained in a package or component shall contain one or more of the following elements: 
+/// 3.6.1 The DataTypeSet element contained in a package or component shall contain one or more of the following elements:
 /// ArrayDataType, BinaryDataType, BooleanDataType, ContainerDataType, EnumeratedDataType, FloatDataType, IntegerDataType, StringDataType, and SubRangeDataType.
 #[test]
 fn test_3_6_1() {
@@ -53,19 +54,19 @@ fn test_3_6_2() {
 fn test_3_6_3() {
     let data_type_set = get_test_data_type_set(); // Assume this function returns a test DataTypeSet
 
-    let data_type_names: Vec<String> = data_type_set.data_types.iter()
-        .map(|dt| {
-            match dt {
-                DataType::ArrayDataType(data) => data.name_entity_type.name.clone(),
-                DataType::BooleanDataType(data) => data.name_entity_type.name.clone(),
-                DataType::ContainerDataType(data) => data.name_entity_type.name.clone(),
-                DataType::EnumeratedDataType(data) => data.name_entity_type.name.clone(),
-                DataType::FloatDataType(data) => data.name_entity_type.name.clone(),
-                DataType::IntegerDataType(data) => data.name_entity_type.name.clone(),
-                DataType::StringDataType(data) => data.name_entity_type.name.clone(),
-                DataType::SubRangeDataType(data) => data.name_entity_type.name.clone(),
-                _ => String::new(),
-            }
+    let data_type_names: Vec<String> = data_type_set
+        .data_types
+        .iter()
+        .map(|dt| match dt {
+            DataType::ArrayDataType(data) => data.name_entity_type.name.clone(),
+            DataType::BooleanDataType(data) => data.name_entity_type.name.clone(),
+            DataType::ContainerDataType(data) => data.name_entity_type.name.clone(),
+            DataType::EnumeratedDataType(data) => data.name_entity_type.name.clone(),
+            DataType::FloatDataType(data) => data.name_entity_type.name.clone(),
+            DataType::IntegerDataType(data) => data.name_entity_type.name.clone(),
+            DataType::StringDataType(data) => data.name_entity_type.name.clone(),
+            DataType::SubRangeDataType(data) => data.name_entity_type.name.clone(),
+            _ => String::new(),
         })
         .collect();
     let unique_data_type_names: HashSet<String> = data_type_names.into_iter().collect();
