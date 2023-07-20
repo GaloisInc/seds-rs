@@ -44,6 +44,7 @@ pub enum DataType {
     ContainerDataType(ContainerDataType),
     FloatDataType(FloatDataType),
     StringDataType(StringDataType),
+    SubRangeDataType(SubRangeDataType),
 }
 
 /// EnumeratedDataType defines an enumerated data type
@@ -91,7 +92,7 @@ pub struct Enumeration {
     #[serde(rename = "value", default)]
     pub value: Expression,
     #[serde(rename = "shortDescription", default)]
-    pub short_description: String,
+    pub short_description: Option<String>,
 }
 
 /// ContainerDataType defines a container data type
@@ -136,7 +137,7 @@ pub struct PaddingEntry {
     #[serde(rename = "sizeInBits")]
     pub size_in_bits: Expression,
     #[serde(rename = "shortDescription")]
-    pub short_description: String,
+    pub short_description: Option<String>,
 }
 
 /// ArrayDataType defines an array data type
@@ -198,9 +199,9 @@ pub struct IntegerDataType {
     #[serde(rename = "name", default)]
     pub name: String,
     #[serde(rename = "shortDescription", default)]
-    pub short_description: String,
+    pub short_description: Option<String>,
     #[serde(rename = "IntegerDataEncoding")]
-    pub integer_data_encoding: IntegerDataEncoding,
+    pub integer_data_encoding: Option<IntegerDataEncoding>,
     #[serde(rename = "Range", default)]
     pub range: Range,
 }
@@ -282,7 +283,7 @@ pub struct Interface {
     #[serde(rename = "type")]
     pub type_: String,
     #[serde(rename = "shortDescription")]
-    pub short_description: String,
+    pub short_description: Option<String>,
     #[serde(rename = "GenericTypeMapSet", default)]
     pub generic_type_map_set: GenericTypeMapSet,
 }
@@ -349,9 +350,9 @@ pub struct LengthEntry {
     #[serde(rename = "type")]
     pub type_: String,
     #[serde(rename = "shortDescription")]
-    pub short_description: String,
+    pub short_description: Option<String>,
     #[serde(rename = "PolynomialCalibrator")]
-    pub polynomial_calibrator: PolynomialCalibrator,
+    pub polynomial_calibrator: Option<PolynomialCalibrator>,
 }
 
 /// PolynomialCalibrator calibration that would be required to take the raw value represented by the data
@@ -399,4 +400,17 @@ pub struct FixedValueEntry {
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct ListEntry {
     // TODO
+}
+
+/// SubRangeDataType defines a sub range data type
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct SubRangeDataType {
+    #[serde(rename = "baseType")]
+    pub base_type: String,
+    #[serde(flatten)]
+    pub name_entity_type: NamedEntityType,
+    #[serde(rename = "unit")]
+    pub unit: String,
+    #[serde(rename = "Range", default)]
+    pub range: Range,
 }

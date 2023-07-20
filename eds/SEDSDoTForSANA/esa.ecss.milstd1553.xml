@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.ccsds.org/schema/sois/seds">
+  <Package name="ESA/ECSS/MILSTD1553" shortDescription="Definitions from ECSS-E-ST-50-13C.">
+    <DataTypeSet>
+      <ContainerDataType name="TIME" shortDescription="Time service message from BC to RT.">
+        <EntryList>
+          <PaddingEntry sizeInBits="8"/>
+          <Entry name="pField" type="CCSDS/SOIS/SEDS/UINT8"/>
+          <Entry name="coarse" type="CCSDS/SOIS/SEDS/UINT32"/>
+          <Entry name="fine" type="CCSDS/SOIS/SEDS/UINT32">
+            <IntegerDataEncoding encoding="unsigned" sizeInBits="24"/>
+            <ValidRange>
+              <MinMaxRange max="16777215" min="0" rangeType="inclusiveMinInclusiveMax"/>
+            </ValidRange>
+          </Entry>
+          <FixedValueEntry fixedValue="0" name="spare" type="CCSDS/SOIS/SEDS/UINT8"/>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType name="TRANSFER" shortDescription="Distribution/Acquisition Transfer Descriptor/Confirmation">
+        <EntryList>
+          <PaddingEntry sizeInBits="4"/>
+          <Entry name="blockSize" type="CCSDS/SOIS/SEDS/UINT16">
+            <IntegerDataEncoding encoding="unsigned" sizeInBits="12"/>
+            <ValidRange>
+              <MinMaxRange max="4095" min="0" rangeType="inclusiveMinInclusiveMax"/>
+            </ValidRange>
+          </Entry>
+          <Entry name="qosOrError" type="CCSDS/SOIS/SEDS/BOOLEAN"/>
+          <Entry name="reset" type="CCSDS/SOIS/SEDS/BOOLEAN"/>
+          <Entry name="mode" type="CCSDS/SOIS/SEDS/BOOLEAN"/>
+          <Entry name="sa" type="CCSDS/SOIS/SEDS/UINT8">
+            <IntegerDataEncoding encoding="unsigned" sizeInBits="5"/>
+            <ValidRange>
+              <MinMaxRange max="31" min="0" rangeType="inclusiveMinInclusiveMax"/>
+            </ValidRange>
+          </Entry>
+          <Entry name="blockCount" type="CCSDS/SOIS/SEDS/UINT8"/>
+        </EntryList>
+      </ContainerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

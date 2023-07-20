@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds ../schema/seds.xsd">
+	<Package name="CCSDS/SOIS/Subnetwork">
+		<DataTypeSet>
+			<IntegerDataType name="Octet">
+			    <IntegerDataEncoding encoding="unsigned" sizeInBits="8"/>
+				<Range>
+					<MinMaxRange min="0" max="255" rangeType="inclusiveMinInclusiveMax" />
+				</Range>
+			</IntegerDataType>
+			<IntegerDataType name="MemoryIDType">
+				<Range>
+					<MinMaxRange min="0" max="65535" rangeType="inclusiveMinInclusiveMax" />
+				</Range>
+			</IntegerDataType>
+			<IntegerDataType name="MemoryAddressType">
+				<Range>
+					<MinMaxRange min="0" max="4294967295" rangeType="inclusiveMinInclusiveMax" />
+				</Range>
+			</IntegerDataType>
+			<EnumeratedDataType name="StartStop">
+				<EnumerationList>
+					<Enumeration label="Start" value="0" />
+					<Enumeration label="Stop" value="1" />
+				</EnumerationList>
+			</EnumeratedDataType>
+		</DataTypeSet>
+		<DeclaredInterfaceSet>
+			<Interface name="PSInterfaceType" level="subnetwork"
+				shortDescription="SOIS SUBNETWORK PACKET SERVICE from 851.0-M-1">
+				<GenericTypeSet>
+					<GenericType name="SendDataType" />
+					<GenericType name="ReceiveDataType" />
+					<GenericType name="FailureMetadataType" />
+				</GenericTypeSet>
+				<CommandSet>
+					<Command name="send" mode="async"
+						shortDescription="PACKET_SEND.request primitive only">
+						<Argument name="data" type="SendDataType" mode="in"
+							dataUnit="true" />
+					</Command>
+					<Command name="receive" mode="async"
+						shortDescription="PACKET_RECEIVE.indication primitive only">
+						<Argument name="data" type="ReceiveDataType" mode="out"
+							dataUnit="true" />
+					</Command>
+					<Command name="failure" mode="async"
+						shortDescription="PACKET_FAILURE.indication primitive only">
+						<Argument name="failureMetadata" type="FailureMetadataType" mode="out"/>
+					</Command>
+				</CommandSet>
+			</Interface>
+			<Interface name="MASInterfaceType" level="subnetwork"
+				shortDescription="SOIS SUBNETWORK MEMORY ACCESS SERVICE from 852.0-M-1">
+				<GenericTypeSet>
+					<GenericType name="ReadMemoryIDType" baseType="MemoryIDType" />
+					<GenericType name="ReadMemoryAddressType" baseType="MemoryAddressType" />
+					<GenericType name="ReadDataType" />
+					<GenericType name="WriteMemoryIDType" baseType="MemoryIDType" />
+					<GenericType name="WriteMemoryAddressType" baseType="MemoryAddressType" />
+					<GenericType name="WriteDataType" />
+					<GenericType name="RmwMemoryIDType" baseType="MemoryIDType" />
+					<GenericType name="RmwMemoryAddressType" baseType="MemoryAddressType" />
+					<GenericType name="RmwDataType" />
+				</GenericTypeSet>
+				<CommandSet>
+					<Command name="read" mode="sync"
+						shortDescription="READ.request and READ.indication primitives">
+						<Argument name="memoryID" type="ReadMemoryIDType" mode="inout" />
+						<Argument name="memoryAddress" type="ReadMemoryAddressType"
+							mode="inout" />
+						<Argument name="data" type="ReadDataType" mode="out"
+							dataUnit="true" />
+					</Command>
+					<Command name="write" mode="sync"
+						shortDescription="WRITE.request and MEMORY_ACCESS_RESULT.indication primitives">
+						<Argument name="memoryID" type="WriteMemoryIDType" mode="in" />
+						<Argument name="memoryAddress" type="WriteMemoryAddressType"
+							mode="in" />
+						<Argument name="data" type="WriteDataType" mode="in"
+							dataUnit="true" />
+					</Command>
+					<Command name="unacknowledgedWrite" mode="async"
+						shortDescription="WRITE.request only">
+						<Argument name="memoryID" type="WriteMemoryIDType" mode="in" />
+						<Argument name="memoryAddress" type="WriteMemoryAddressType"
+							mode="in" />
+						<Argument name="data" type="WriteDataType" mode="in"
+							dataUnit="true" />
+					</Command>
+					<Command name="readModifyWrite" mode="sync"
+						shortDescription="READ/MODIFY/WRITE.request and MEMORY_ACCESS_RESULT.indication primitives">
+						<Argument name="memoryID" type="RmwMemoryIDType" mode="in" />
+						<Argument name="memoryAddress" type="RmwMemoryAddressType"
+							mode="in" />
+						<Argument name="mask" type="RmwDataType" mode="in" />
+						<Argument name="data" type="RmwDataType" mode="inout"
+							dataUnit="true" />
+					</Command>
+					<Command name="unacknowledgedReadModifyWrite" mode="async"
+						shortDescription="READ/MODIFY/WRITE.request only">
+						<Argument name="memoryID" type="RmwMemoryIDType" mode="in" />
+						<Argument name="memoryAddress" type="RmwMemoryAddressType"
+							mode="in" />
+						<Argument name="mask" type="RmwDataType" mode="in" />
+						<Argument name="data" type="RmwDataType" mode="in"
+							dataUnit="true" />
+					</Command>
+				</CommandSet>
+			</Interface>
+			<Interface name="SYNCInterfaceType" level="subnetwork"
+				shortDescription="SOIS SUBNETWORK SYNCHRONISATION SERVICE from 853.0-M-1">
+				<LongDescription>
+					The SOIS Subnetwork Synchronisation Service
+					provides a means for a
+					user entity to
+					maintain knowledge of time
+					which is common to all data systems on the
+					subnetwork.
+				</LongDescription>
+				<GenericTypeSet>
+					<GenericType name="TimeType" />
+					<GenericType name="EventIdType" />
+					<GenericType name="EventDataType" />
+				</GenericTypeSet>
+				<CommandSet>
+					<Command name="time" mode="sync">
+						<LongDescription>
+							The TIME.request primitive shall be used to
+							request the service to
+							retrieve time data from
+							the SOIS Subnetwork
+							Synchronisation Service provider.
+
+							Receipt of the TIME.request
+							primitive shall cause the SOIS Subnetwork
+							Synchronisation
+							Service
+							provider to retrieve the time.
+
+							The TIME.indication shall be used
+							to pass time data to the
+							subnetwork user entity.
+
+							The response of
+							the user entity to a TIME.indication primitive is
+							unspecified.
+						</LongDescription>
+						<Argument name="time" type="TimeType" mode="out"
+							shortDescription="TIME.request and TIME.indication primitives" />
+					</Command>
+					<Command name="eventRequest" mode="async"
+						shortDescription="EVENT.request primitive only">
+						<LongDescription>
+							The EVENT.request shall be used by a user entity
+							to request
+							notification or cessation of notification of a
+							subnetwork event.
+
+							Receipt of the EVENT.request primitive shall
+							cause the SOIS
+							Subnetwork Synchronisation
+							Service provider to
+							notify or cease to notify the user entity of the
+							specified event.
+
+						</LongDescription>
+						<Argument name="eventID" type="EventIdType" mode="in" />
+						<Argument name="startOrStop" type="StartStop" mode="in" />
+					</Command>
+					<Command name="eventIndication" mode="async"
+						shortDescription="EVENT.indication primitive only">
+						<LongDescription>
+							The EVENT.indication shall be used to notify a
+							subnetwork event to
+							the user entity.
+
+							The response of the user
+							entity to an EVENT.indication primitive is
+							unspecified.
+						</LongDescription>
+						<Argument name="eventID" type="EventIdType" mode="out" />
+						<Argument name="time" type="TimeType" mode="out" />
+						<Argument name="data" type="EventDataType" mode="out"
+							dataUnit="true" />
+					</Command>
+				</CommandSet>
+			</Interface>
+		</DeclaredInterfaceSet>
+	</Package>
+</PackageFile>

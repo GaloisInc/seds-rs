@@ -48,6 +48,9 @@ impl<'de> Visitor<'de> for DataTypeVisitor {
                 "StringDataType" => {
                     data_types.push(DataType::StringDataType(map.next_value()?));
                 }
+                "SubRangeDataType" => {
+                    data_types.push(DataType::SubRangeDataType(map.next_value()?));
+                }
                 _ => return Err(de::Error::unknown_field(&key, &[])),
             }
         }

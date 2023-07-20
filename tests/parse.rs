@@ -50,3 +50,9 @@ fn test_parsing_basic() {
 fn test_parsing_cfe() {
     test_directory("eds/cFE");
 }
+
+/// test parsing SANA EDS files
+#[test]
+fn test_parsing_sana() {
+    test_directory("eds/SEDSDoTForSANA");
+}

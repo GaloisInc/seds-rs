@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.ccsds.org/schema/sois/seds">
+  <Package name="DOD/MILBUS/MILSTD1553" shortDescription="Definitions from US DOD MIL-STD-1553B">
+    <DataTypeSet>
+      <IntegerDataType name="ADDRESS" shortDescription="5-bit address">
+        <IntegerDataEncoding encoding="unsigned" sizeInBits="5"/>
+        <Range>
+          <MinMaxRange max="31" min="0" rangeType="inclusiveMinInclusiveMax"/>
+        </Range>
+      </IntegerDataType>
+      <ContainerDataType abstract="true" name="BC_TO_RT_TRANSFER" shortDescription="The Bus Controller sends one 16-bit receive command word, immediately followed by 1 to 32 16-bit data words. The selected Remote Terminal then sends a single 16-bit Status word.">
+        <EntryList>
+          <Entry name="rt" shortDescription="The address of the Remote Terminal" type="ADDRESS"/>
+          <FixedValueEntry fixedValue="false" name="txFlag" shortDescription="0 for receive (i.e. (BC to RT) and 1 for transmit (i.e. RT to BC)" type="CCSDS/SOIS/SEDS/BOOLEAN"/>
+          <Entry name="sa" shortDescription="The location (sub-address) to hold or get data on the Terminal" type="ADDRESS"/>
+          <LengthEntry name="numberOfDataWords" type="CCSDS/SOIS/SEDS/UINT8">
+            <IntegerDataEncoding encoding="unsigned" sizeInBits="5"/>
+            <ValidRange>
+              <MinMaxRange max="31" min="0" rangeType="inclusiveMinInclusiveMax"/>
+            </ValidRange>
+            <SplineCalibrator>
+              <SplinePoint calibrated="34.0" order="1" raw="0.0"/>
+              <SplinePoint calibrated="3.0" order="1" raw="1.0"/>
+              <SplinePoint calibrated="33.0" order="1" raw="31.0"/>
+            </SplineCalibrator>
+          </LengthEntry>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType abstract="true" name="RT_TO_BC_TRANSFER" shortDescription="The Bus Controller sends one transmit command word to a Remote Terminal. The Remote Terminal then sends a single Status word, immediately followed by 1 to 32 words.">
+        <EntryList>
+          <Entry name="rt" shortDescription="The address of the Remote Terminal" type="ADDRESS"/>
+          <FixedValueEntry fixedValue="true" name="txFlag" shortDescription="0 for receive (i.e. (BC to RT) and 1 for transmit (i.e. RT to BC)" type="CCSDS/SOIS/SEDS/BOOLEAN"/>
+          <Entry name="sa" shortDescription="The location (sub-address) to hold or get data on the Terminal" type="ADDRESS"/>
+          <LengthEntry name="numberOfDataWords" type="CCSDS/SOIS/SEDS/UINT8">
+            <IntegerDataEncoding encoding="unsigned" sizeInBits="5"/>
+            <ValidRange>
+              <MinMaxRange max="31" min="0" rangeType="inclusiveMinInclusiveMax"/>
+            </ValidRange>
+            <SplineCalibrator>
+              <SplinePoint calibrated="34.0" order="1" raw="0.0"/>
+              <SplinePoint calibrated="3.0" order="1" raw="1.0"/>
+              <SplinePoint calibrated="33.0" order="1" raw="31.0"/>
+            </SplineCalibrator>
+          </LengthEntry>
+        </EntryList>
+      </ContainerDataType>
+      <ContainerDataType abstract="true" name="MODE_COMMAND" shortDescription="The Bus Controller sends one command word with a Sub-address of 0 or 31 signifying a Mode Code type command.">
+        <EntryList>
+          <Entry name="rt" shortDescription="The address of the Remote Terminal" type="ADDRESS"/>
+          <Entry name="txFlag" shortDescription="0 for receive (i.e. (BC to RT) and 1 for transmit (i.e. RT to BC)" type="CCSDS/SOIS/SEDS/BOOLEAN"/>
+          <Entry name="sa" shortDescription="The location (sub-address) to hold or get data on the Terminal" type="ADDRESS"/>
+          <Entry name="modeCode" type="CCSDS/SOIS/SEDS/UINT8">
+            <IntegerDataEncoding encoding="unsigned" sizeInBits="5"/>
+            <ValidRange>
+              <MinMaxRange max="31" min="0" rangeType="inclusiveMinInclusiveMax"/>
+            </ValidRange>
+          </Entry>
+        </EntryList>
+      </ContainerDataType>
+    </DataTypeSet>
+  </Package>
+</PackageFile>

@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds"
+						 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+						 xsi:schemaLocation="
+						 http://www.ccsds.org/schema/sois/seds c:/github/ccsds.sois/seds/schema/seds.xsd
+						 ">
+	<!--
+						 http://www.ccsds.org/schema/sois/seds https://sanaregistry.org/files/sois/seds.xsd
+						 ">
+	-->
+	<Package name="CCSDS/SOIS/modops"/>
+	<Metadata>
+		<Category name="operatingMode" memberOf="ModelOfOperation.Enumeration"
+			shortDescription="The operatingMode enumerates the modes of operation of a device.">
+			<MetadataValueSet>
+				<StringValue name="notOperational" value="hasA" shortDescription="The device is idle.">
+					<LongDescription>
+						The device has power and it can report housekeeping which includes this status.
+						Any other functions of the device are inactive.
+					</LongDescription>
+				</StringValue>
+				<StringValue name="operating" value="hasA" shortDescription="The device is operating."/>
+			</MetadataValueSet>
+		</Category>
+		<Category name="starTrackerMode" shortDescription="The operatingMode enumerates the modes of operation of a star tracker.">
+			<MetadataValueSet>
+				<StringValue name="operatingMode" value="isA"/>
+				<StringValue name="acquiring" value="hasA"
+										shortDescription="The star tracker is comparing the image in its focal plane to known configurations of stars, but has not yet recognized the image."/>
+				<StringValue name="tracking" value="hasA"
+										shortDescription="The star tracker has recognized the configuration of stars in its image, and is reporting its attitude."/>
+				<StringValue name="reportingRates" value="hasA"
+										shortDescription="The star tracker is reporting the angular rate vector.  This condition implies that the star tracker is tracking."/>
+			</MetadataValueSet>
+		</Category>
+		<Category name="controllerOperatingMode" shortDescription="operating mode for a controller">
+			<MetadataValueSet>
+				<StringValue name="operatingMode" value="isA"/>
+				<StringValue name="controlling" value="hasA" shortDescription="The device is actively attempting to achieve its set point."/>
+				<StringValue name="inBand" value="hasA" shortDescription="The device is within tolerance of its set point."/>
+			</MetadataValueSet>
+		</Category>
+		<Category name="differenceConvention" memberOf="ModelOfOperation">
+			<LongDescription>
+				Variables that represent a difference between values of measureable quantities are called “relative” variables.
+				This term identifies the convention for computing the difference.
+				Use Cases:
+				Specify that the change in speed reported by a single-axis accelerometer is the difference between
+				the speed at the time of reporting and the speed at the time of the previous report.
+			</LongDescription>
+			<MetadataValueSet>
+				<StringValue name="comparison" value="hasA">
+					<LongDescription>
+						The “comparison” term identifies the difference convention for variables without a specific absolute reference frame.
+						Use Cases:
+						Specify that the voltage reported by a voltage meter is a difference in potential without a reference ground.
+					</LongDescription>
+				</StringValue>
+				<StringValue name="delta" value="hasA">
+					<LongDescription>
+						The “delta” term identifies a difference between the value of a variable at one time compared to the value at a prior time.
+						For measurements, the prior time is the time that the variable was last reported, or since initialization.
+						For commanded values, the prior time is the time of the current command.
+						Use Cases:
+						Identify the change in speed reported by an accelerometer.
+						Identify the elapsed time since the last report of a measurement from a sensor.
+						Specify the time during which a command parameter is valid.
+					</LongDescription>
+				</StringValue>
+				<StringValue name="gradient" value="hasA">
+					<LongDescription>
+						The “gradient” term identifies a difference computed as the ratio of a delta variable to a path variable.
+						Such a variable is an average obtained by dividing the differences over the same reporting interval.
+						Use Cases:
+						Identify the rate of change of atmospheric density with altitude at a particular time and place.
+					</LongDescription>
+				</StringValue>
+				<StringValue name="path" value="hasA">
+					<LongDescription>
+						The “path” term identifies a difference between the value of a variable at one point on a path
+						and the value at a prior point on the path.
+						The path is the continuously changing location and orientation of the device frame for the variable
+						relative to the reference frame for the variable.
+						The prior point is the location at the time of the prior report or command.
+						Use Cases:
+						Identify the change in the Earth’s magnetic field reported by a magnetometer during the flight
+						of the vehicle on which it is mounted.
+					</LongDescription>
+				</StringValue>
+				<StringValue name="ratio" value="hasA">
+					<LongDescription>
+						The “ratio” term indicates that a variable is a quotient of two quantities.
+					</LongDescription>
+				</StringValue>
+				<StringValue name="sinceEpoch" value="hasA">
+					<LongDescription>
+						The “sinceEpoch” term identifies the amount of time that has elapsed since a calendar epoch,
+						so the data item that it describes is a date and time.
+						Use Cases:
+						Provide a time stamp on housekeeping data.
+						Specify the time when an action should be performed.
+					</LongDescription>
+				</StringValue>
+				<StringValue name="sinceSync" value="hasA">
+					<LongDescription>
+						The “sinceSync” term identifies the amount of time that has elapsed since the last synchronization signal.
+						Use Cases:
+						Identify the time at which a measurement was reported by a star tracker,
+						relative to the last synchronization sent to the star tracker.
+					</LongDescription>
+				</StringValue>
+			</MetadataValueSet>
+		</Category>
+		<Category name="relationToTimestamp" memberOf="ModelOfOperation">
+			<LongDescription>
+				When a time stamp appears in a relation with other data items,
+				it may be important to a designer of a control system to know how the time stamp relates to
+				the age of the other data items in the relation.
+				Use Cases:
+				Enable a design of a control system to estimate the delay between measurement of a data value
+				and the time when the control system obtains the data item.
+			</LongDescription>
+			<MetadataValueSet>
+				<StringValue name="acquiring" value="hasA">
+					<LongDescription>
+						The "acquiring" relation to timestamp indicates that the timestamp is simultaneous with the acquisition of a datum.
+					</LongDescription>
+				</StringValue>
+				<StringValue name="generation" value="hasA">
+					<LongDescription>
+						The "generation" relation to timestamp indicates that the timestamp is simultaneous with the generation of a datum.
+					</LongDescription>
+				</StringValue>
+				<StringValue name="sending" value="hasA">
+					<LongDescription>
+						The "sending" relation to timestamp indicates that the timestamp is the time when the message that contains it was sent.
+					</LongDescription>
+				</StringValue>
+			</MetadataValueSet>
+		</Category>
+		<Category name="statusConvention" memberOf="ModelOfOperation">
+			<LongDescription>
+				The “status convention” describes how a data item represents the quality of function of a device.
+				Use Cases:
+				Determine whether the data reported by a sensor can be trusted.
+			</LongDescription>
+			<MetadataValueSet>
+				<StringValue name="binaryStatus" value="hasA">
+					<LongDescription>
+						The binary status convention indicates whether a device is functioning correctly or erroneously.
+						The data item has the value 0 if no error is being detected, and it has the value 1 if an error is present.
+						Typically, the binary representation of such a variable would be bit or unsigned integer.
+						Use Cases:
+						The SOIS accelerometer interface uses this convention to report device status.
+					</LongDescription>
+				</StringValue>
+				<StringValue name="qualityFraction" value="hasA">
+					<LongDescription>
+						The quality fraction status convention indicates a fractional quality of service,
+						with zero representing complete failure and 1 representing completely successful operation.
+						The method of computing this value is an algorithm that varies from device to device,
+						and is explained in natural language in an unstructured text field in an electronic data sheet.
+						Use Cases:
+						Specify the quality of data produced by a star tracker.
+					</LongDescription>
+				</StringValue>
+				<StringValue name="ternaryStatus" value="hasA" shortDescription="A status enumeration with three states">
+					<LongDescription>
+						The ternary status convention adds a warning state to the binary status.  The three states follow:
+						•	OK – no error detected
+						•	Warning – action (such as restart) is not needed
+						•	Severe – action (such as restart) is needed
+						Use Cases:
+						Distinguish minor errors from major errors.
+					</LongDescription>
+				</StringValue>
+			</MetadataValueSet>
+		</Category>
+		<Category name="healthStatus" memberOf="ModelOfOperation.Enumeration"
+			shortDescription="enumeration of states of health of a device">
+			<MetadataValueSet>
+				<StringValue name="good" value="hasA"
+					shortDescription="The device is operating correctly, with no errors detected."/>
+				<StringValue name="warning" value="hasA"
+					shortDescription="Some errors have been detected, but reset is not required."/>
+				<StringValue name="severeWarning" value="hasA"
+					shortDescription="Errors have been detected, and reset is recommended."/>
+			</MetadataValueSet>
+		</Category>
+	</Metadata>
+</PackageFile>
