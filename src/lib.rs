@@ -14,4 +14,5 @@
 // #![deny(missing_docs)]
 
 pub mod eds;
+pub mod expr;
 pub mod parse;
