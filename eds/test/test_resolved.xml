@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds">
+  <Package name="TestPackage" shortDescription="NASA Core Flight System Executive Services">
+    <DataTypeSet>
+      <IntegerDataType name="int8" shortDescription="Signed 8 bit integer">
+        <IntegerDataEncoding sizeInBits="8" encoding="twosComplement"  byteOrder="bigEndian" />
+        <Range>
+          <MinMaxRange max="127" min="-128" rangeType="inclusiveMinInclusiveMax"/>
+        </Range>
+      </IntegerDataType>
+   </DataTypeSet>
+</Package>
+</PackageFile>
