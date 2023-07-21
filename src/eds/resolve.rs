@@ -1,40 +1,53 @@
-use std::collections::HashMap;
-use std::error::Error;
+use crate::eds::raw;
+use crate::eds::resolved;
+use crate::expr::ExpressionContext;
 
-/// Represents types that can be resolved
-pub trait Resolve {
-    /// Resolves all expressions in the object, using the provided namespace to look up variables.
-    /// Returns a resolved version of the object, or an error if a variable could not be found or an expression could not be evaluated.
-    fn resolve(self, namespace: &HashMap<String, String>) -> Result<Self, Box<dyn Error>>
-    where
-        Self: Sized;
+/// trait to convert a raw EDS component to a resolved EDS component
+pub trait Resolve<T> {
+    fn resolve(&self, ectx: &ExpressionContext) -> T;
 }
 
-// Implement Resolve for your types. Here is an example for NamedEntityType:
-impl Resolve for NamedEntityType {
-    fn resolve(self, namespace: &HashMap<String, String>) -> Result<Self, Box<dyn Error>> {
-        // If the name field is an expression that can be found in the namespace, resolve it
-        let name = match namespace.get(&self.name) {
-            Some(val) => val.clone(),
-            None => self.name,  // If not an expression, keep the original value
-        };
-
-        // If the short_description field is an expression that can be found in the namespace, resolve it
-        let short_description = match self.short_description {
-            Some(desc) => match namespace.get(&desc) {
-                Some(val) => Some(val.clone()),
-                None => Some(desc),  // If not an expression, keep the original value
-            },
-            None => None,
-        };
-
-        // Do the same for long_description...
-
-        // Return a new object with resolved fields
-        Ok(NamedEntityType {
-            name,
-            short_description,
-            // ... other fields ...
-        })
+impl Resolve<resolved::PackageFile> for raw::PackageFile {
+    fn resolve(&self, ectx: &ExpressionContext) -> resolved::PackageFile {
+        resolved::PackageFile {
+            package: self.package.iter().map(|p| p.resolve(ectx)).collect(),
+        }
     }
+}
+
+impl Resolve<resolved::Package> for raw::Package {
+    fn resolve(&self, ectx: &ExpressionContext) -> resolved::Package {
+        resolved::Package {
+            name_entity_type: self.name_entity_type.resolve(ectx),
+            data_type_set: resolved::DataTypeSet {
+                data_types: Vec::new(),
+            },
+        }
+    }
+}
+
+impl Resolve<resolved::NamedEntityType> for raw::NamedEntityType {
+    fn resolve(&self, ectx: &ExpressionContext) -> resolved::NamedEntityType {
+        resolved::NamedEntityType {
+            name: resolved::Identifier(self.name.clone()),
+            short_description: self.short_description.clone(),
+            long_description: match &self.long_description {
+                Some(ld) => Some(ld.resolve(ectx)),
+                None => None,
+            },
+        }
+    }
+}
+
+impl Resolve<resolved::LongDescription> for raw::LongDescription {
+    fn resolve(&self, ectx: &ExpressionContext) -> resolved::LongDescription {
+        resolved::LongDescription {
+            text: self.text.clone(),
+        }
+    }
+}
+
+pub fn resolve_package_file(package_file: &raw::PackageFile) -> resolved::PackageFile {
+    let ectx = ExpressionContext::new();
+    package_file.resolve(&ectx)
 }

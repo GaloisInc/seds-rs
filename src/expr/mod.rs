@@ -64,6 +64,13 @@ fn fetch_variable(namespace: &NamespaceValue, path: &[&str]) -> Result<String, E
 }
 
 impl ExpressionContext {
+    /// create a new empty namespace
+    pub fn new() -> Self {
+        ExpressionContext {
+            namespace: NamespaceValue::Namespace(HashMap::new()),
+        }
+    }
+
     /// create a namespace from a nested JSON dictionary
     pub fn from_json(json: &JsonValue) -> Option<ExpressionContext> {
         let namespace = json_to_namespace(json);
