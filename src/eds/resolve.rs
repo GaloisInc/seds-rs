@@ -1,51 +1,125 @@
+use evalexpr::EvalexprError;
+
 use crate::eds::raw;
 use crate::eds::resolved;
 use crate::expr::ExpressionContext;
+use crate::expr::NamespaceError;
 
 use super::raw::IntegerDataEncoding;
 use super::resolved::Identifier;
 use super::resolved::Literal;
 
+/// Errors that can occur during resolution
+#[derive(Debug)]
+pub enum ResolveError {
+    ExpressionError(EvalexprError),
+    ExpressionContextError(NamespaceError),
+    InvalidEncoding(String),
+    InvalidByteOrder(String),
+    InvalidSizeInBits(String),
+    InvalidExpressionString(String),
+}
+
+fn string_to_encoding(
+    s: &String,
+    ectx: &ExpressionContext,
+) -> Result<resolved::IntegerEncoding, ResolveError> {
+    let encoding_eval = ectx
+        .eval_expression(s)
+        .map_err(|e| ResolveError::ExpressionContextError(e))?;
+    // convert Value to string
+    let encoding_string = encoding_eval
+        .as_string()
+        .map_err(|e| ResolveError::ExpressionError(e))?;
+    match encoding_string.as_str() {
+        "unsigned" => Ok(resolved::IntegerEncoding::Unsigned),
+        "signMagnitude" => Ok(resolved::IntegerEncoding::SignMagnitude),
+        "onesComplement" => Ok(resolved::IntegerEncoding::OnesComplement),
+        "twosComplement" => Ok(resolved::IntegerEncoding::TwosComplement),
+        "binaryCodedDecimal" => Ok(resolved::IntegerEncoding::BinaryCodedDecimal),
+        _ => Err(ResolveError::InvalidEncoding(encoding_string)),
+    }
+}
+
+fn string_to_byte_order(
+    s: &String,
+    ectx: &ExpressionContext,
+) -> Result<resolved::ByteOrder, ResolveError> {
+    let bo_eval = ectx
+        .eval_expression(s)
+        .map_err(|e| ResolveError::ExpressionContextError(e))?;
+    // convert Value to string
+    let bo_string = bo_eval
+        .as_string()
+        .map_err(|e| ResolveError::ExpressionError(e))?;
+    match bo_string.as_str() {
+        "littleEndian" => Ok(resolved::ByteOrder::LittleEndian),
+        "bigEndian" => Ok(resolved::ByteOrder::BigEndian),
+        _ => Err(ResolveError::InvalidByteOrder(bo_string)),
+    }
+}
+
+fn string_to_size_in_bits(s: &String, ectx: &ExpressionContext) -> Result<usize, ResolveError> {
+    let sib_eval = ectx
+        .eval_expression(s)
+        .map_err(|e| ResolveError::ExpressionContextError(e))?;
+    // convert Value to string
+    let sib_ustring = sib_eval.to_string();
+    let sib_result = sib_ustring.parse::<usize>();
+    match sib_result {
+        Err(_) => Err(ResolveError::InvalidSizeInBits(sib_ustring)),
+        Ok(sib_usize) => Ok(sib_usize),
+    }
+}
+
 /// trait to convert a raw EDS component to a resolved EDS component
 pub trait Resolve<T> {
-    fn resolve(&self, ectx: &ExpressionContext) -> T;
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<T, ResolveError>;
 }
 
 impl Resolve<resolved::PackageFile> for raw::PackageFile {
-    fn resolve(&self, ectx: &ExpressionContext) -> resolved::PackageFile {
-        resolved::PackageFile {
-            package: self.package.iter().map(|p| p.resolve(ectx)).collect(),
-        }
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::PackageFile, ResolveError> {
+        let package = self
+            .package
+            .iter()
+            .map(|p| p.resolve(ectx))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(resolved::PackageFile { package })
     }
 }
 
 impl Resolve<resolved::Package> for raw::Package {
-    fn resolve(&self, ectx: &ExpressionContext) -> resolved::Package {
-        resolved::Package {
-            name_entity_type: self.name_entity_type.resolve(ectx),
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::Package, ResolveError> {
+        Ok(resolved::Package {
+            name_entity_type: self.name_entity_type.resolve(ectx)?,
             data_type_set: match self.data_type_set {
-                Some(ref dts) => dts.resolve(ectx),
+                Some(ref dts) => dts.resolve(ectx)?,
                 None => resolved::DataTypeSet {
                     data_types: Vec::new(),
                 },
             },
-        }
+        })
     }
 }
 
 impl Resolve<resolved::DataTypeSet> for raw::DataTypeSet {
-    fn resolve(&self, ectx: &ExpressionContext) -> resolved::DataTypeSet {
-        resolved::DataTypeSet {
-            data_types: self.data_types.iter().map(|dt| dt.resolve(ectx)).collect(),
-        }
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::DataTypeSet, ResolveError> {
+        let data_types = self
+            .data_types
+            .iter()
+            .map(|p| p.resolve(ectx))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(resolved::DataTypeSet {
+            data_types: data_types,
+        })
     }
 }
 
 impl Resolve<resolved::DataType> for raw::DataType {
-    fn resolve(&self, ectx: &ExpressionContext) -> resolved::DataType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::DataType, ResolveError> {
         match self {
             raw::DataType::IntegerDataType(dt) => {
-                resolved::DataType::IntegerDataType(dt.resolve(ectx))
+                Ok(resolved::DataType::IntegerDataType(dt.resolve(ectx)?))
             }
             _ => panic!("not implemented"),
         }
@@ -53,8 +127,8 @@ impl Resolve<resolved::DataType> for raw::DataType {
 }
 
 impl Resolve<resolved::IntegerDataType> for raw::IntegerDataType {
-    fn resolve(&self, ectx: &ExpressionContext) -> resolved::IntegerDataType {
-        resolved::IntegerDataType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::IntegerDataType, ResolveError> {
+        Ok(resolved::IntegerDataType {
             name: Identifier(self.name_entity_type.name.clone()),
             short_description: self
                 .name_entity_type
@@ -62,7 +136,7 @@ impl Resolve<resolved::IntegerDataType> for raw::IntegerDataType {
                 .clone()
                 .unwrap_or("".to_string()),
             integer_data_encoding: match self.encoding {
-                Some(ref ide) => ide.resolve(ectx),
+                Some(ref ide) => ide.resolve(ectx)?,
                 None => resolved::IntegerDataEncoding {
                     size_in_bits: 0,
                     encoding: resolved::IntegerEncoding::Unsigned,
@@ -76,70 +150,47 @@ impl Resolve<resolved::IntegerDataType> for raw::IntegerDataType {
                     range_type: resolved::MinMaxRangeType::AtLeast,
                 },
             },
-        }
+        })
     }
 }
 
 impl Resolve<resolved::IntegerDataEncoding> for IntegerDataEncoding {
-    fn resolve(&self, ectx: &ExpressionContext) -> resolved::IntegerDataEncoding {
-        resolved::IntegerDataEncoding {
-            size_in_bits: {
-                let sib_eval = ectx.eval_expression(&self.size_in_bits).unwrap();
-                // convert Value to string
-                let sib_ustring = sib_eval.to_string();
-                let sib_usize = sib_ustring.parse::<usize>().unwrap();
-                sib_usize
-            },
-            encoding: {
-                let encoding_eval = ectx.eval_expression(&self.encoding).unwrap();
-                // convert Value to string
-                let encoding_string = encoding_eval.as_string().unwrap();
-                println!("encoding_string: {}", encoding_string.as_str());
-                match encoding_string.as_str() {
-                    "unsigned" => resolved::IntegerEncoding::Unsigned,
-                    "signMagnitude" => resolved::IntegerEncoding::SignMagnitude,
-                    "onesComplement" => resolved::IntegerEncoding::OnesComplement,
-                    "twosComplement" => resolved::IntegerEncoding::TwosComplement,
-                    "binaryCodedDecimal" => resolved::IntegerEncoding::BinaryCodedDecimal,
-                    _ => panic!("invalid encoding {}", encoding_string.as_str()),
-                }
-            },
-            byte_order: {
-                let byte_order_eval = ectx.eval_expression(&self.byte_order).unwrap();
-                // convert Value to string
-                let byte_order_string = byte_order_eval.as_string().unwrap();
-                match byte_order_string.as_str() {
-                    "littleEndian" => resolved::ByteOrder::LittleEndian,
-                    "bigEndian" => resolved::ByteOrder::BigEndian,
-                    _ => panic!("invalid byte order"),
-                }
-            },
-        }
+    fn resolve(
+        &self,
+        ectx: &ExpressionContext,
+    ) -> Result<resolved::IntegerDataEncoding, ResolveError> {
+        Ok(resolved::IntegerDataEncoding {
+            size_in_bits: string_to_size_in_bits(&self.size_in_bits, ectx)?,
+            encoding: string_to_encoding(&self.encoding, ectx)?,
+            byte_order: string_to_byte_order(&self.byte_order, ectx)?,
+        })
     }
 }
 
 impl Resolve<resolved::NamedEntityType> for raw::NamedEntityType {
-    fn resolve(&self, ectx: &ExpressionContext) -> resolved::NamedEntityType {
-        resolved::NamedEntityType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::NamedEntityType, ResolveError> {
+        Ok(resolved::NamedEntityType {
             name: Identifier(self.name.clone()),
             short_description: self.short_description.clone(),
             long_description: match &self.long_description {
-                Some(ld) => Some(ld.resolve(ectx)),
+                Some(ld) => Some(ld.resolve(ectx)?),
                 None => None,
             },
-        }
+        })
     }
 }
 
 impl Resolve<resolved::LongDescription> for raw::LongDescription {
-    fn resolve(&self, ectx: &ExpressionContext) -> resolved::LongDescription {
-        resolved::LongDescription {
+    fn resolve(&self, _: &ExpressionContext) -> Result<resolved::LongDescription, ResolveError> {
+        Ok(resolved::LongDescription {
             text: self.text.clone(),
-        }
+        })
     }
 }
 
-pub fn resolve_package_file(package_file: &raw::PackageFile) -> resolved::PackageFile {
+pub fn resolve_package_file(
+    package_file: &raw::PackageFile,
+) -> Result<resolved::PackageFile, ResolveError> {
     let ectx = ExpressionContext::new();
     package_file.resolve(&ectx)
 }
