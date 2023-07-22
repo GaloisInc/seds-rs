@@ -17,6 +17,7 @@ pub enum ResolveError {
     InvalidEncoding(String),
     InvalidByteOrder(String),
     InvalidSizeInBits(String),
+    InvalidFalseValue(String),
     InvalidExpressionString(String),
 }
 
@@ -72,6 +73,21 @@ fn string_to_size_in_bits(s: &String, ectx: &ExpressionContext) -> Result<usize,
     }
 }
 
+fn string_to_false_value(s: &String, ectx: &ExpressionContext) -> Result<bool, ResolveError> {
+    let s_eval = ectx
+        .eval_expression(s)
+        .map_err(|e| ResolveError::ExpressionContextError(e))?;
+    // convert Value to string
+    let s_string = s_eval
+        .as_string()
+        .map_err(|e| ResolveError::ExpressionError(e))?;
+    match s_string.as_str() {
+        "zeroIsFalse" => Ok(true),
+        "nonZeroIsFalse" => Ok(false),
+        _ => Err(ResolveError::InvalidFalseValue(s_string)),
+    }
+}
+
 /// trait to convert a raw EDS component to a resolved EDS component
 pub trait Resolve<T> {
     fn resolve(&self, ectx: &ExpressionContext) -> Result<T, ResolveError>;
@@ -121,8 +137,41 @@ impl Resolve<resolved::DataType> for raw::DataType {
             raw::DataType::IntegerDataType(dt) => {
                 Ok(resolved::DataType::IntegerDataType(dt.resolve(ectx)?))
             }
+            raw::DataType::BooleanDataType(dt) => {
+                Ok(resolved::DataType::BooleanDataType(dt.resolve(ectx)?))
+            }
             _ => panic!("not implemented"),
         }
+    }
+}
+
+impl Resolve<resolved::BooleanDataType> for raw::BooleanDataType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::BooleanDataType, ResolveError> {
+        Ok(resolved::BooleanDataType {
+            name_entity_type: self.name_entity_type.resolve(ectx)?,
+            boolean_data_encoding: match self.encoding {
+                Some(ref bde) => bde.resolve(ectx)?,
+                None => resolved::BooleanDataEncoding {
+                    size_in_bits: 1,
+                    false_value: true,
+                },
+            },
+        })
+    }
+}
+
+impl Resolve<resolved::BooleanDataEncoding> for raw::BooleanDataEncoding {
+    fn resolve(
+        &self,
+        ectx: &ExpressionContext,
+    ) -> Result<resolved::BooleanDataEncoding, ResolveError> {
+        Ok(resolved::BooleanDataEncoding {
+            size_in_bits: string_to_size_in_bits(&self.size_in_bits, ectx)?,
+            false_value: match self.false_value {
+                Some(ref fv) => string_to_false_value(fv, ectx)?,
+                None => true,
+            },
+        })
     }
 }
 

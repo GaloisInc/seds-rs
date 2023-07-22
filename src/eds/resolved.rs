@@ -234,7 +234,7 @@ pub struct Dimension {
 #[derive(Debug, Default, PartialEq)]
 pub struct BooleanDataType {
     pub name_entity_type: NamedEntityType,
-    pub boolean_data_encoding: Option<BooleanDataEncoding>,
+    pub boolean_data_encoding: BooleanDataEncoding,
 }
 
 /// BooleanDataEncoding defines the size in bits of a boolean data type
