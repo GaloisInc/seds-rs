@@ -330,7 +330,7 @@ pub struct FloatDataEncoding {
     #[serde(rename = "sizeInBits", default)]
     pub size_in_bits: Expression,
     #[serde(rename = "byteOrder", default)]
-    pub byte_order: Expression,
+    pub byte_order: Option<Expression>, // is this option correct?
     #[serde(rename = "encodingAndPrecision", default)]
     pub encoding_and_precision: Expression,
 }

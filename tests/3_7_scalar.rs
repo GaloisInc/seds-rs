@@ -43,7 +43,7 @@ fn test_3_7_2() {
     for data_type in data_type_set.data_types {
         match data_type {
             DataType::FloatDataType(data) => {
-                let data_string = data.encoding.unwrap().byte_order;
+                let data_string = data.encoding.unwrap().byte_order.unwrap();
                 assert!(
                     data_string == "bigEndian".to_string()
                         || data_string == "littleEndian".to_string()

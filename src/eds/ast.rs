@@ -156,7 +156,7 @@ pub enum DataType {
 /// EnumeratedDataType defines an enumerated data type
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct EnumeratedDataType {
-    pub name_field_type: NamedEntityType,
+    pub name_entity_type: NamedEntityType,
     pub encoding: IntegerDataEncoding,
     pub enumeration_list: EnumerationList,
 }
@@ -188,7 +188,7 @@ pub struct EnumerationList {
 pub struct Enumeration {
     pub label: Identifier,
     pub value: Literal,
-    pub short_description: String,
+    pub short_description: Option<String>,
 }
 
 /// ContainerDataType defines a container data type
@@ -272,7 +272,7 @@ pub struct PaddingEntry {
 /// ArrayDataType defines an array data type
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct ArrayDataType {
-    pub name_field_type: NamedEntityType,
+    pub name_entity_type: NamedEntityType,
     pub data_type_ref: QualifiedName,
     pub dimension_list: DimensionList,
 }
@@ -484,7 +484,7 @@ pub struct ListEntry {
 /// SubRangeDataType defines a sub range data type
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct SubRangeDataType {
-    pub base_type: String,
+    pub base_type: QualifiedName,
     pub name_entity_type: NamedEntityType,
     pub unit: String,
     pub range: Range,

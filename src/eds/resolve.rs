@@ -32,7 +32,7 @@ fn eval_to_string(s: &String, ectx: &ExpressionContext) -> Result<String, Resolv
     // convert Value to string
     match encoding_eval.as_string() {
         Ok(s) => Ok(s),
-        Err(e) => Ok(encoding_eval.to_string()),
+        Err(_) => Ok(encoding_eval.to_string()),
     }
 }
 
@@ -241,8 +241,93 @@ impl Resolve<ast::DataType> for raw::DataType {
             raw::DataType::ContainerDataType(dt) => {
                 Ok(ast::DataType::ContainerDataType(dt.resolve(ectx)?))
             }
-            _ => panic!("not implemented"),
+            raw::DataType::EnumeratedDataType(dt) => {
+                Ok(ast::DataType::EnumeratedDataType(dt.resolve(ectx)?))
+            }
+            raw::DataType::ArrayDataType(dt) => Ok(ast::DataType::ArrayDataType(dt.resolve(ectx)?)),
+            raw::DataType::SubRangeDataType(dt) => {
+                Ok(ast::DataType::SubRangeDataType(dt.resolve(ectx)?))
+            }
+            r => panic!("{:?} not implemented", r),
         }
+    }
+}
+
+impl Resolve<ast::SubRangeDataType> for raw::SubRangeDataType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::SubRangeDataType, ResolveError> {
+        Ok(ast::SubRangeDataType {
+            name_entity_type: self.name_entity_type.resolve(ectx)?,
+            base_type: ast::QualifiedName(eval_to_string(&self.base_type, ectx)?),
+            unit: eval_to_string(&self.unit, ectx)?,
+            range: self.range.resolve(ectx)?,
+        })
+    }
+}
+
+impl Resolve<ast::ArrayDataType> for raw::ArrayDataType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::ArrayDataType, ResolveError> {
+        Ok(ast::ArrayDataType {
+            name_entity_type: self.name_entity_type.resolve(ectx)?,
+            data_type_ref: ast::QualifiedName(eval_to_string(&self.data_type_ref, ectx)?),
+            dimension_list: self.dimension_list.resolve(ectx)?,
+        })
+    }
+}
+
+impl Resolve<ast::DimensionList> for raw::DimensionList {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::DimensionList, ResolveError> {
+        let dimension = self
+            .dimension
+            .iter()
+            .map(|d| d.resolve(ectx))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(ast::DimensionList { dimension })
+    }
+}
+
+impl Resolve<ast::Dimension> for raw::Dimension {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::Dimension, ResolveError> {
+        Ok(ast::Dimension {
+            size: string_to_usize(&self.size, ectx)?,
+        })
+    }
+}
+
+impl Resolve<ast::EnumeratedDataType> for raw::EnumeratedDataType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::EnumeratedDataType, ResolveError> {
+        Ok(ast::EnumeratedDataType {
+            name_entity_type: self.name_entity_type.resolve(ectx)?,
+            encoding: match self.encoding {
+                Some(ref e) => e.resolve(ectx)?,
+                None => ast::IntegerDataEncoding {
+                    encoding: ast::IntegerEncoding::Unsigned,
+                    size_in_bits: 8,
+                    byte_order: ast::ByteOrder::LittleEndian,
+                },
+            },
+            enumeration_list: self.enumeration_list.resolve(ectx)?,
+        })
+    }
+}
+
+impl Resolve<ast::EnumerationList> for raw::EnumerationList {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::EnumerationList, ResolveError> {
+        let enumeration = self
+            .enumeration
+            .iter()
+            .map(|e| e.resolve(ectx))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(ast::EnumerationList { enumeration })
+    }
+}
+
+impl Resolve<ast::Enumeration> for raw::Enumeration {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::Enumeration, ResolveError> {
+        Ok(ast::Enumeration {
+            label: Identifier(eval_to_string(&self.label, ectx)?),
+            value: Literal(eval_to_string(&self.value, ectx)?),
+            short_description: self.short_description.clone(),
+        })
     }
 }
 
@@ -469,7 +554,10 @@ impl Resolve<ast::FloatDataEncoding> for raw::FloatDataEncoding {
                 &self.encoding_and_precision,
                 ectx,
             )?,
-            byte_order: string_to_byte_order(&self.byte_order, ectx)?,
+            byte_order: match self.byte_order {
+                Some(ref bo) => string_to_byte_order(bo, ectx)?,
+                None => ast::ByteOrder::LittleEndian,
+            },
         })
     }
 }
