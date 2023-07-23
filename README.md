@@ -37,7 +37,7 @@ graph LR
 ```
 *SEDS Concept Map*
 
-The `serde-rs` crate structures the process of reading and manipulating SEDS files into a series of modeling steps. The following diagram shows the compilation process of `serde-rs`:
+The `seds-rs` crate structures the process of reading and manipulating SEDS files into a series of modeling steps. The following diagram shows the compilation process of `seds-rs`:
 ```mermaid
 graph LR
     SEDS([SEDS XMLs]) --> Parser[Serde Parser]
@@ -48,7 +48,7 @@ graph LR
     Refined --> Codegen[Code Generator]
     Refined --> Docgen[Documentation Generator]
 ```
-*Compilation Process of `serde-rs`*
+*Compilation Process of `seds-rs`*
 
 * **Raw Models:** Parse SEDS files into a high-level, Rust-friendly model. This model is close to the XML structure of the SEDS file. At this level, expressions are represented as strings, and type references are not yet resolved.
 * **Refined Models:** After parsing, a SEDS file can be "resolved" into a more detailed model. This involves evaluating expressions, replacing type references with their actual types, and other refinements based on the specific SEDS format and requirements.
