@@ -49,16 +49,18 @@ fn fetch_variable(namespace: &NamespaceValue, path: &[&str]) -> Result<String, E
         NamespaceValue::Namespace(inner) if !tail.is_empty() => inner
             .get(head[0])
             .and_then(|next| fetch_variable(next, tail).ok())
-            .ok_or_else(|| EvalexprError::VariableIdentifierNotFound(head[0].to_string())),
+            .ok_or_else(|| {
+                EvalexprError::VariableIdentifierNotFound(format!("{:?}", path).to_string())
+            }),
         NamespaceValue::Namespace(inner) if tail.is_empty() => match inner.get(head[0]) {
             Some(NamespaceValue::Value(value)) => Ok(value.clone()),
             _ => Err(EvalexprError::VariableIdentifierNotFound(
-                head[0].to_string(),
+                format!("{:?}", path).to_string(),
             )),
         },
         NamespaceValue::Value(value) if tail.is_empty() => Ok(value.clone()),
         _ => Err(EvalexprError::VariableIdentifierNotFound(
-            head[0].to_string(),
+            format!("{:?}", path).to_string(),
         )),
     }
 }
@@ -97,7 +99,8 @@ impl ExpressionContext {
         // Check and replace all placeholders first
         let mut final_expression = String::from(expression);
         for caps in re.captures_iter(expression) {
-            match self.get(&caps[1].split('/').collect::<Vec<_>>()) {
+            let path = &caps[1].split('/').collect::<Vec<_>>();
+            match self.get(path) {
                 Ok(value) => {
                     final_expression = final_expression.replace(&caps[0], &value);
                 }

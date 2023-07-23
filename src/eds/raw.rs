@@ -293,7 +293,7 @@ pub struct IntegerDataEncoding {
     #[serde(rename = "encoding", default)]
     pub encoding: Expression,
     #[serde(rename = "byteOrder", default)]
-    pub byte_order: Expression,
+    pub byte_order: Option<Expression>,
 }
 
 /// Range defines an interval of inclusive or exclusive minimum and maximum values
@@ -450,8 +450,6 @@ pub struct LengthEntry {
     pub name_entity_type: NamedEntityType,
     #[serde(rename = "type")]
     pub type_: String,
-    #[serde(rename = "shortDescription")]
-    pub short_description: Option<String>,
     #[serde(rename = "PolynomialCalibrator")]
     pub calibration: Option<PolynomialCalibrator>,
 }
@@ -473,8 +471,8 @@ pub struct SplineCalibrator {
 
 #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Term {
-    pub coefficient: String,
-    pub exponent: String,
+    pub coefficient: Expression,
+    pub exponent: Expression,
 }
 
 /// ErrorControlEntry specifies an entry whose value is constrained, or derived,

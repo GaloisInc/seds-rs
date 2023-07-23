@@ -52,10 +52,10 @@ fn test_namespace_eval_expression_not_found() {
 #[test]
 fn test_namespace_eval_nested_expression() {
     let json = serde_json::json!({
-        "a": "1.0",
-        "level1": {
-            "b": "2.0",
-            "level2": {
+        "TEST_MISSION": "1.0",
+        "CFE_MISSION": {
+            "V_1": "2.0",
+            "SUBSYS": {
                 "c": "3.0"
             }
         },
@@ -63,8 +63,12 @@ fn test_namespace_eval_nested_expression() {
     let namespace = ExpressionContext::from_json(&json).unwrap();
 
     assert_eq!(
+        namespace.eval_expression("${CFE_MISSION/V_1}").unwrap(),
+        evalexpr::Value::from(2.0)
+    );
+    assert_eq!(
         namespace
-            .eval_expression("(${a} / ${level1/b}) ^ ${level1/level2/c}")
+            .eval_expression("(${TEST_MISSION} / ${CFE_MISSION/V_1}) ^ ${CFE_MISSION/SUBSYS/c}")
             .unwrap(),
         evalexpr::Value::from(1.0 / 8.0)
     );

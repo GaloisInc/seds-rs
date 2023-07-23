@@ -21,6 +21,7 @@ pub enum ResolveError {
     InvalidEncodingAndPrecision(String),
     InvalidRangeType(String),
     InvalidCharacter(String),
+    InvalidErrorCorrectionType(String),
     InvalidExpressionString(String),
 }
 
@@ -29,9 +30,10 @@ fn eval_to_string(s: &String, ectx: &ExpressionContext) -> Result<String, Resolv
         .eval_expression(s)
         .map_err(|e| ResolveError::ExpressionContextError(e))?;
     // convert Value to string
-    encoding_eval
-        .as_string()
-        .map_err(|e| ResolveError::ExpressionError(e))
+    match encoding_eval.as_string() {
+        Ok(s) => Ok(s),
+        Err(e) => Ok(encoding_eval.to_string()),
+    }
 }
 
 fn eval_to_i64(s: &String, ectx: &ExpressionContext) -> Result<i64, ResolveError> {
@@ -117,6 +119,20 @@ fn string_to_encoding_and_precision(
         "MILSTD_1750A_simple" => Ok(ast::FloatEncodingAndPrecision::MILSTD1770ASimple),
         "MILSTD_1750A_extended" => Ok(ast::FloatEncodingAndPrecision::MILSTD1770AExtended),
         _ => Err(ResolveError::InvalidEncodingAndPrecision(s_string)),
+    }
+}
+
+fn string_to_ect(
+    s: &String,
+    ectx: &ExpressionContext,
+) -> Result<ast::ErrorControlType, ResolveError> {
+    let s_string = eval_to_string(s, ectx)?;
+    match s_string.as_str() {
+        "CRC16_CCITT" => Ok(ast::ErrorControlType::CRC16CCITT),
+        "CRC8" => Ok(ast::ErrorControlType::CRC8),
+        "CHECKSUM" => Ok(ast::ErrorControlType::CHECKSUM),
+        "CHECKSUM_LONGITUDINAL" => Ok(ast::ErrorControlType::CHECKSUMLONGITUDINAL),
+        _ => Err(ResolveError::InvalidErrorCorrectionType(s_string)),
     }
 }
 
@@ -222,8 +238,206 @@ impl Resolve<ast::DataType> for raw::DataType {
             raw::DataType::BooleanDataType(dt) => {
                 Ok(ast::DataType::BooleanDataType(dt.resolve(ectx)?))
             }
+            raw::DataType::ContainerDataType(dt) => {
+                Ok(ast::DataType::ContainerDataType(dt.resolve(ectx)?))
+            }
             _ => panic!("not implemented"),
         }
+    }
+}
+
+impl Resolve<ast::ContainerDataType> for raw::ContainerDataType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::ContainerDataType, ResolveError> {
+        Ok(ast::ContainerDataType {
+            name_entity_type: self.name_entity_type.resolve(ectx)?,
+            _abstract: match self._abstract {
+                Some(ref a) => string_to_boolean(a, ectx)?,
+                None => false,
+            },
+            base_type: match self.base_type {
+                Some(ref bt) => Some(eval_to_string(bt, ectx)?),
+                None => None,
+            },
+            entry_list: match self.entry_list {
+                Some(ref el) => Some(el.resolve(ectx)?),
+                None => None,
+            },
+            constraint_set: match self.constraint_set {
+                Some(ref cs) => Some(cs.resolve(ectx)?),
+                None => None,
+            },
+            trailer_entry_list: match self.trailer_entry_list {
+                Some(ref tel) => Some(tel.resolve(ectx)?),
+                None => None,
+            },
+        })
+    }
+}
+
+impl Resolve<ast::EntryList> for raw::EntryList {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::EntryList, ResolveError> {
+        let entries = self
+            .entries
+            .iter()
+            .map(|e| e.resolve(ectx))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(ast::EntryList { entries })
+    }
+}
+
+impl Resolve<ast::ConstraintSet> for raw::ConstraintSet {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::ConstraintSet, ResolveError> {
+        let constraints = self
+            .constraints
+            .iter()
+            .map(|c| c.resolve(ectx))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(ast::ConstraintSet { constraints })
+    }
+}
+
+impl Resolve<ast::Constraint> for raw::Constraint {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::Constraint, ResolveError> {
+        match self {
+            raw::Constraint::RangeConstraint(c) => {
+                Ok(ast::Constraint::RangeConstraint(c.resolve(ectx)?))
+            }
+            raw::Constraint::TypeConstraint(c) => {
+                Ok(ast::Constraint::TypeConstraint(c.resolve(ectx)?))
+            }
+            raw::Constraint::ValueConstraint(c) => {
+                Ok(ast::Constraint::ValueConstraint(c.resolve(ectx)?))
+            }
+        }
+    }
+}
+
+impl Resolve<ast::RangeConstraint> for raw::RangeConstraint {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::RangeConstraint, ResolveError> {
+        Ok(ast::RangeConstraint {
+            entry: Identifier(eval_to_string(&self.entry, ectx)?),
+            range: self.range.resolve(ectx)?,
+        })
+    }
+}
+
+impl Resolve<ast::TypeConstraint> for raw::TypeConstraint {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::TypeConstraint, ResolveError> {
+        Ok(ast::TypeConstraint {
+            entry: Identifier(eval_to_string(&self.entry, ectx)?),
+            type_: ast::QualifiedName(eval_to_string(&self.type_, ectx)?),
+        })
+    }
+}
+
+impl Resolve<ast::ValueConstraint> for raw::ValueConstraint {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::ValueConstraint, ResolveError> {
+        Ok(ast::ValueConstraint {
+            entry: Identifier(eval_to_string(&self.entry, ectx)?),
+            value: Literal(self.value.clone()),
+        })
+    }
+}
+
+impl Resolve<ast::EntryElement> for raw::EntryElement {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::EntryElement, ResolveError> {
+        match self {
+            raw::EntryElement::Entry(e) => Ok(ast::EntryElement::Entry(e.resolve(ectx)?)),
+            raw::EntryElement::PaddingEntry(e) => {
+                Ok(ast::EntryElement::PaddingEntry(e.resolve(ectx)?))
+            }
+            raw::EntryElement::LengthEntry(e) => {
+                Ok(ast::EntryElement::LengthEntry(e.resolve(ectx)?))
+            }
+            raw::EntryElement::ListEntry(e) => Ok(ast::EntryElement::ListEntry(e.resolve(ectx)?)),
+            raw::EntryElement::ErrorControlEntry(e) => {
+                Ok(ast::EntryElement::ErrorControlEntry(e.resolve(ectx)?))
+            }
+            raw::EntryElement::FixedValueEntry(e) => {
+                Ok(ast::EntryElement::FixedValueEntry(e.resolve(ectx)?))
+            }
+        }
+    }
+}
+
+impl Resolve<ast::Entry> for raw::Entry {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::Entry, ResolveError> {
+        Ok(ast::Entry {
+            name_entity_type: self.name_entity_type.resolve(ectx)?,
+            type_: ast::QualifiedName(eval_to_string(&self.type_, ectx)?),
+        })
+    }
+}
+
+impl Resolve<ast::PaddingEntry> for raw::PaddingEntry {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::PaddingEntry, ResolveError> {
+        Ok(ast::PaddingEntry {
+            size_in_bits: string_to_usize(&self.size_in_bits, ectx)?,
+            short_description: self.short_description.clone(),
+        })
+    }
+}
+
+impl Resolve<ast::LengthEntry> for raw::LengthEntry {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::LengthEntry, ResolveError> {
+        Ok(ast::LengthEntry {
+            name_entity_type: self.name_entity_type.resolve(ectx)?,
+            type_: ast::QualifiedName(eval_to_string(&self.type_, ectx)?),
+            calibration: match self.calibration {
+                Some(ref c) => Some(c.resolve(ectx)?),
+                None => None,
+            },
+        })
+    }
+}
+
+impl Resolve<ast::PolynomialCalibrator> for raw::PolynomialCalibrator {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::PolynomialCalibrator, ResolveError> {
+        Ok(ast::PolynomialCalibrator {
+            term: self
+                .term
+                .iter()
+                .map(|t| t.resolve(ectx))
+                .collect::<Result<Vec<_>, _>>()?,
+        })
+    }
+}
+
+impl Resolve<ast::Term> for raw::Term {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::Term, ResolveError> {
+        Ok(ast::Term {
+            coefficient: Literal(eval_to_string(&self.coefficient, ectx)?),
+            exponent: Literal(eval_to_string(&self.exponent, ectx)?),
+        })
+    }
+}
+
+impl Resolve<ast::ListEntry> for raw::ListEntry {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::ListEntry, ResolveError> {
+        Ok(ast::ListEntry {
+            name_entity_type: self.name_entity_type.resolve(ectx)?,
+            list_length_field: string_to_usize(&self.list_length_field, ectx)?,
+        })
+    }
+}
+
+impl Resolve<ast::ErrorControlEntry> for raw::ErrorControlEntry {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::ErrorControlEntry, ResolveError> {
+        Ok(ast::ErrorControlEntry {
+            name_entity_type: self.name_entity_type.resolve(ectx)?,
+            type_: ast::QualifiedName(eval_to_string(&self.type_, ectx)?),
+            error_control_type: string_to_ect(&self.error_control_type, ectx)?,
+        })
+    }
+}
+
+impl Resolve<ast::FixedValueEntry> for raw::FixedValueEntry {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::FixedValueEntry, ResolveError> {
+        Ok(ast::FixedValueEntry {
+            name_entity_type: self.name_entity_type.resolve(ectx)?,
+            type_: ast::QualifiedName(eval_to_string(&self.type_, ectx)?),
+            fixed_value: Literal(self.fixed_value.clone()),
+        })
     }
 }
 
@@ -362,7 +576,10 @@ impl Resolve<ast::IntegerDataEncoding> for IntegerDataEncoding {
         Ok(ast::IntegerDataEncoding {
             size_in_bits: string_to_usize(&self.size_in_bits, ectx)?,
             encoding: string_to_int_encoding(&self.encoding, ectx)?,
-            byte_order: string_to_byte_order(&self.byte_order, ectx)?,
+            byte_order: match self.byte_order {
+                Some(ref bo) => string_to_byte_order(bo, ectx)?,
+                None => ast::ByteOrder::LittleEndian,
+            },
         })
     }
 }
@@ -386,11 +603,4 @@ impl Resolve<ast::LongDescription> for raw::LongDescription {
             text: self.text.clone(),
         })
     }
-}
-
-pub fn resolve_package_file(
-    package_file: &raw::PackageFile,
-) -> Result<ast::PackageFile, ResolveError> {
-    let ectx = ExpressionContext::new();
-    package_file.resolve(&ectx)
 }

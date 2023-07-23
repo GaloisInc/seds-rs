@@ -52,8 +52,8 @@ fn test_3_7_2() {
             DataType::IntegerDataType(data) => {
                 let data_string = data.encoding.unwrap().byte_order;
                 assert!(
-                    data_string == "bigEndian".to_string()
-                        || data_string == "littleEndian".to_string()
+                    data_string == Some("bigEndian".to_string())
+                        || data_string == Some("littleEndian".to_string())
                 )
             }
             _ => (),

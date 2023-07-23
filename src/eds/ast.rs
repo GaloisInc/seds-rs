@@ -226,7 +226,7 @@ pub struct RangeConstraint {
 /// TypeConstraint specifies the data type of a container entry
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct TypeConstraint {
-    pub type_: String,
+    pub type_: QualifiedName,
     pub entry: Identifier,
 }
 
@@ -257,7 +257,7 @@ pub enum EntryElement {
 /// Entry element defines a field within a container
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Entry {
-    name_entity_type: NamedEntityType,
+    pub name_entity_type: NamedEntityType,
     pub type_: QualifiedName,
 }
 
@@ -266,7 +266,7 @@ pub struct Entry {
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct PaddingEntry {
     pub size_in_bits: usize,
-    pub short_description: String,
+    pub short_description: Option<String>,
 }
 
 /// ArrayDataType defines an array data type
@@ -435,10 +435,9 @@ pub struct ParameterMap {
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct LengthEntry {
-    pub name: Identifier,
+    pub name_entity_type: NamedEntityType,
     pub type_: QualifiedName,
-    pub short_description: String,
-    pub polynomial_calibrator: PolynomialCalibrator,
+    pub calibration: Option<PolynomialCalibrator>,
 }
 
 /// PolynomialCalibrator calibration that would be required to take the raw value represented by the data
@@ -458,7 +457,7 @@ pub struct Term {
 /// based on the contents of the container in which it is present.
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct ErrorControlEntry {
-    pub named_entity_type: NamedEntityType,
+    pub name_entity_type: NamedEntityType,
     pub type_: QualifiedName,
     pub error_control_type: ErrorControlType,
 }
@@ -466,7 +465,7 @@ pub struct ErrorControlEntry {
 /// FixedValueEntry within a container contains a fixed value
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct FixedValueEntry {
-    pub named_entity_type: NamedEntityType,
+    pub name_entity_type: NamedEntityType,
     pub type_: QualifiedName,
 
     /// value to which the container entry should be fixed
@@ -478,7 +477,8 @@ pub struct FixedValueEntry {
 /// TODO: ListEntry
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct ListEntry {
-    // TODO
+    pub name_entity_type: NamedEntityType,
+    pub list_length_field: usize,
 }
 
 /// SubRangeDataType defines a sub range data type
