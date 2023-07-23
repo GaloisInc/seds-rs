@@ -1,13 +1,13 @@
 use evalexpr::EvalexprError;
 
 use crate::eds::raw;
-use crate::eds::resolved;
+use crate::eds::ast;
 use crate::expr::ExpressionContext;
 use crate::expr::NamespaceError;
 
 use super::raw::IntegerDataEncoding;
-use super::resolved::Identifier;
-use super::resolved::Literal;
+use super::ast::Identifier;
+use super::ast::Literal;
 
 /// Errors that can occur during resolution
 #[derive(Debug)]
@@ -47,14 +47,14 @@ fn eval_to_i64(s: &String, ectx: &ExpressionContext) -> Result<i64, ResolveError
 fn string_to_int_encoding(
     s: &String,
     ectx: &ExpressionContext,
-) -> Result<resolved::IntegerEncoding, ResolveError> {
+) -> Result<ast::IntegerEncoding, ResolveError> {
     let encoding_string = eval_to_string(s, ectx)?;
     match encoding_string.as_str() {
-        "unsigned" => Ok(resolved::IntegerEncoding::Unsigned),
-        "signMagnitude" => Ok(resolved::IntegerEncoding::SignMagnitude),
-        "onesComplement" => Ok(resolved::IntegerEncoding::OnesComplement),
-        "twosComplement" => Ok(resolved::IntegerEncoding::TwosComplement),
-        "binaryCodedDecimal" => Ok(resolved::IntegerEncoding::BinaryCodedDecimal),
+        "unsigned" => Ok(ast::IntegerEncoding::Unsigned),
+        "signMagnitude" => Ok(ast::IntegerEncoding::SignMagnitude),
+        "onesComplement" => Ok(ast::IntegerEncoding::OnesComplement),
+        "twosComplement" => Ok(ast::IntegerEncoding::TwosComplement),
+        "binaryCodedDecimal" => Ok(ast::IntegerEncoding::BinaryCodedDecimal),
         _ => Err(ResolveError::InvalidEncoding(encoding_string)),
     }
 }
@@ -62,11 +62,11 @@ fn string_to_int_encoding(
 fn string_to_str_encoding(
     s: &String,
     ectx: &ExpressionContext,
-) -> Result<resolved::StringEncoding, ResolveError> {
+) -> Result<ast::StringEncoding, ResolveError> {
     let encoding_string = eval_to_string(s, ectx)?;
     match encoding_string.as_str() {
-        "ASCII" => Ok(resolved::StringEncoding::ASCII),
-        "UTF-8" => Ok(resolved::StringEncoding::UTF8),
+        "ASCII" => Ok(ast::StringEncoding::ASCII),
+        "UTF-8" => Ok(ast::StringEncoding::UTF8),
         _ => Err(ResolveError::InvalidEncoding(encoding_string)),
     }
 }
@@ -74,11 +74,11 @@ fn string_to_str_encoding(
 fn string_to_byte_order(
     s: &String,
     ectx: &ExpressionContext,
-) -> Result<resolved::ByteOrder, ResolveError> {
+) -> Result<ast::ByteOrder, ResolveError> {
     let bo_string = eval_to_string(s, ectx)?;
     match bo_string.as_str() {
-        "littleEndian" => Ok(resolved::ByteOrder::LittleEndian),
-        "bigEndian" => Ok(resolved::ByteOrder::BigEndian),
+        "littleEndian" => Ok(ast::ByteOrder::LittleEndian),
+        "bigEndian" => Ok(ast::ByteOrder::BigEndian),
         _ => Err(ResolveError::InvalidByteOrder(bo_string)),
     }
 }
@@ -108,14 +108,14 @@ fn string_to_boolean(s: &String, ectx: &ExpressionContext) -> Result<bool, Resol
 fn string_to_encoding_and_precision(
     s: &String,
     ectx: &ExpressionContext,
-) -> Result<resolved::FloatEncodingAndPrecision, ResolveError> {
+) -> Result<ast::FloatEncodingAndPrecision, ResolveError> {
     let s_string = eval_to_string(s, ectx)?;
     match s_string.as_str() {
-        "IEEE754_2008_single" => Ok(resolved::FloatEncodingAndPrecision::IEEE7542008Single),
-        "IEEE754_2008_double" => Ok(resolved::FloatEncodingAndPrecision::IEEE7542008Double),
-        "IEEE754_2008_quadruple" => Ok(resolved::FloatEncodingAndPrecision::IEEE7542008Quadruple),
-        "MILSTD_1750A_simple" => Ok(resolved::FloatEncodingAndPrecision::MILSTD1770ASimple),
-        "MILSTD_1750A_extended" => Ok(resolved::FloatEncodingAndPrecision::MILSTD1770AExtended),
+        "IEEE754_2008_single" => Ok(ast::FloatEncodingAndPrecision::IEEE7542008Single),
+        "IEEE754_2008_double" => Ok(ast::FloatEncodingAndPrecision::IEEE7542008Double),
+        "IEEE754_2008_quadruple" => Ok(ast::FloatEncodingAndPrecision::IEEE7542008Quadruple),
+        "MILSTD_1750A_simple" => Ok(ast::FloatEncodingAndPrecision::MILSTD1770ASimple),
+        "MILSTD_1750A_extended" => Ok(ast::FloatEncodingAndPrecision::MILSTD1770AExtended),
         _ => Err(ResolveError::InvalidEncodingAndPrecision(s_string)),
     }
 }
@@ -123,17 +123,17 @@ fn string_to_encoding_and_precision(
 fn string_to_range_type(
     s: &String,
     ectx: &ExpressionContext,
-) -> Result<resolved::MinMaxRangeType, ResolveError> {
+) -> Result<ast::MinMaxRangeType, ResolveError> {
     let s_string = eval_to_string(s, ectx)?;
     match s_string.as_str() {
-        "atLeast" => Ok(resolved::MinMaxRangeType::AtLeast),
-        "atMost" => Ok(resolved::MinMaxRangeType::AtMost),
-        "greaterThan" => Ok(resolved::MinMaxRangeType::GreaterThan),
-        "lessThan" => Ok(resolved::MinMaxRangeType::LessThan),
-        "exclusiveMinExclusiveMax" => Ok(resolved::MinMaxRangeType::ExclusiveMinExclusiveMax),
-        "exclusiveMinInclusiveMax" => Ok(resolved::MinMaxRangeType::ExclusiveMinInclusiveMax),
-        "inclusiveMinExclusiveMax" => Ok(resolved::MinMaxRangeType::InclusiveMinExclusiveMax),
-        "inclusiveMinInclusiveMax" => Ok(resolved::MinMaxRangeType::InclusiveMinInclusiveMax),
+        "atLeast" => Ok(ast::MinMaxRangeType::AtLeast),
+        "atMost" => Ok(ast::MinMaxRangeType::AtMost),
+        "greaterThan" => Ok(ast::MinMaxRangeType::GreaterThan),
+        "lessThan" => Ok(ast::MinMaxRangeType::LessThan),
+        "exclusiveMinExclusiveMax" => Ok(ast::MinMaxRangeType::ExclusiveMinExclusiveMax),
+        "exclusiveMinInclusiveMax" => Ok(ast::MinMaxRangeType::ExclusiveMinInclusiveMax),
+        "inclusiveMinExclusiveMax" => Ok(ast::MinMaxRangeType::InclusiveMinExclusiveMax),
+        "inclusiveMinInclusiveMax" => Ok(ast::MinMaxRangeType::InclusiveMinInclusiveMax),
         _ => Err(ResolveError::InvalidRangeType(s_string)),
     }
 }
@@ -158,24 +158,24 @@ pub trait Resolve<T> {
     fn resolve(&self, ectx: &ExpressionContext) -> Result<T, ResolveError>;
 }
 
-impl Resolve<resolved::PackageFile> for raw::PackageFile {
-    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::PackageFile, ResolveError> {
+impl Resolve<ast::PackageFile> for raw::PackageFile {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::PackageFile, ResolveError> {
         let package = self
             .package
             .iter()
             .map(|p| p.resolve(ectx))
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(resolved::PackageFile { package })
+        Ok(ast::PackageFile { package })
     }
 }
 
-impl Resolve<resolved::Package> for raw::Package {
-    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::Package, ResolveError> {
-        Ok(resolved::Package {
+impl Resolve<ast::Package> for raw::Package {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::Package, ResolveError> {
+        Ok(ast::Package {
             name_entity_type: self.name_entity_type.resolve(ectx)?,
             data_type_set: match self.data_type_set {
                 Some(ref dts) => dts.resolve(ectx)?,
-                None => resolved::DataTypeSet {
+                None => ast::DataTypeSet {
                     data_types: Vec::new(),
                 },
             },
@@ -187,58 +187,58 @@ impl Resolve<resolved::Package> for raw::Package {
     }
 }
 
-impl Resolve<resolved::MetaData> for raw::MetaData {
-    fn resolve(&self, _: &ExpressionContext) -> Result<resolved::MetaData, ResolveError> {
-        Ok(resolved::MetaData {
+impl Resolve<ast::MetaData> for raw::MetaData {
+    fn resolve(&self, _: &ExpressionContext) -> Result<ast::MetaData, ResolveError> {
+        Ok(ast::MetaData {
             creation_date: self.creation_date.clone(),
             creator: self.creator.clone(),
         })
     }
 }
 
-impl Resolve<resolved::DataTypeSet> for raw::DataTypeSet {
-    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::DataTypeSet, ResolveError> {
+impl Resolve<ast::DataTypeSet> for raw::DataTypeSet {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::DataTypeSet, ResolveError> {
         let data_types = self
             .data_types
             .iter()
             .map(|p| p.resolve(ectx))
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(resolved::DataTypeSet {
+        Ok(ast::DataTypeSet {
             data_types: data_types,
         })
     }
 }
 
-impl Resolve<resolved::DataType> for raw::DataType {
-    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::DataType, ResolveError> {
+impl Resolve<ast::DataType> for raw::DataType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::DataType, ResolveError> {
         match self {
             raw::DataType::IntegerDataType(dt) => {
-                Ok(resolved::DataType::IntegerDataType(dt.resolve(ectx)?))
+                Ok(ast::DataType::IntegerDataType(dt.resolve(ectx)?))
             }
             raw::DataType::FloatDataType(dt) => {
-                Ok(resolved::DataType::FloatDataType(dt.resolve(ectx)?))
+                Ok(ast::DataType::FloatDataType(dt.resolve(ectx)?))
             }
             raw::DataType::StringDataType(dt) => {
-                Ok(resolved::DataType::StringDataType(dt.resolve(ectx)?))
+                Ok(ast::DataType::StringDataType(dt.resolve(ectx)?))
             }
             raw::DataType::BooleanDataType(dt) => {
-                Ok(resolved::DataType::BooleanDataType(dt.resolve(ectx)?))
+                Ok(ast::DataType::BooleanDataType(dt.resolve(ectx)?))
             }
             _ => panic!("not implemented"),
         }
     }
 }
 
-impl Resolve<resolved::FloatDataType> for raw::FloatDataType {
-    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::FloatDataType, ResolveError> {
-        Ok(resolved::FloatDataType {
+impl Resolve<ast::FloatDataType> for raw::FloatDataType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::FloatDataType, ResolveError> {
+        Ok(ast::FloatDataType {
             name_entity_type: self.name_entity_type.resolve(ectx)?,
             encoding: match self.encoding {
                 Some(ref fde) => fde.resolve(ectx)?,
-                None => resolved::FloatDataEncoding {
+                None => ast::FloatDataEncoding {
                     size_in_bits: 0,
-                    encoding_and_precision: resolved::FloatEncodingAndPrecision::IEEE7542008Single,
-                    byte_order: resolved::ByteOrder::LittleEndian,
+                    encoding_and_precision: ast::FloatEncodingAndPrecision::IEEE7542008Single,
+                    byte_order: ast::ByteOrder::LittleEndian,
                 },
             },
             range: match self.range {
@@ -249,12 +249,12 @@ impl Resolve<resolved::FloatDataType> for raw::FloatDataType {
     }
 }
 
-impl Resolve<resolved::FloatDataEncoding> for raw::FloatDataEncoding {
+impl Resolve<ast::FloatDataEncoding> for raw::FloatDataEncoding {
     fn resolve(
         &self,
         ectx: &ExpressionContext,
-    ) -> Result<resolved::FloatDataEncoding, ResolveError> {
-        Ok(resolved::FloatDataEncoding {
+    ) -> Result<ast::FloatDataEncoding, ResolveError> {
+        Ok(ast::FloatDataEncoding {
             size_in_bits: string_to_usize(&self.size_in_bits, ectx)?,
             encoding_and_precision: string_to_encoding_and_precision(
                 &self.encoding_and_precision,
@@ -265,17 +265,17 @@ impl Resolve<resolved::FloatDataEncoding> for raw::FloatDataEncoding {
     }
 }
 
-impl Resolve<resolved::Range> for raw::Range {
-    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::Range, ResolveError> {
-        Ok(resolved::Range {
+impl Resolve<ast::Range> for raw::Range {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::Range, ResolveError> {
+        Ok(ast::Range {
             min_max_range: self.min_max_range.resolve(ectx)?,
         })
     }
 }
 
-impl Resolve<resolved::MinMaxRange> for raw::MinMaxRange {
-    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::MinMaxRange, ResolveError> {
-        Ok(resolved::MinMaxRange {
+impl Resolve<ast::MinMaxRange> for raw::MinMaxRange {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::MinMaxRange, ResolveError> {
+        Ok(ast::MinMaxRange {
             min: Literal(self.min.clone()),
             max: Literal(self.max.clone()),
             range_type: string_to_range_type(&self.range_type, ectx)?,
@@ -283,15 +283,15 @@ impl Resolve<resolved::MinMaxRange> for raw::MinMaxRange {
     }
 }
 
-impl Resolve<resolved::StringDataType> for raw::StringDataType {
-    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::StringDataType, ResolveError> {
-        Ok(resolved::StringDataType {
+impl Resolve<ast::StringDataType> for raw::StringDataType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::StringDataType, ResolveError> {
+        Ok(ast::StringDataType {
             name_entity_type: self.name_entity_type.resolve(ectx)?,
             length: string_to_usize(&self.length, ectx)?,
             encoding: match self.encoding {
                 Some(ref sde) => sde.resolve(ectx)?,
-                None => resolved::StringDataEncoding {
-                    encoding: resolved::StringEncoding::ASCII,
+                None => ast::StringDataEncoding {
+                    encoding: ast::StringEncoding::ASCII,
                     termination_character: None,
                 },
             },
@@ -303,15 +303,15 @@ impl Resolve<resolved::StringDataType> for raw::StringDataType {
     }
 }
 
-impl Resolve<resolved::StringDataEncoding> for raw::StringDataEncoding {
+impl Resolve<ast::StringDataEncoding> for raw::StringDataEncoding {
     fn resolve(
         &self,
         ectx: &ExpressionContext,
-    ) -> Result<resolved::StringDataEncoding, ResolveError> {
-        Ok(resolved::StringDataEncoding {
+    ) -> Result<ast::StringDataEncoding, ResolveError> {
+        Ok(ast::StringDataEncoding {
             encoding: match self.encoding {
                 Some(ref se) => string_to_str_encoding(se, ectx)?,
-                None => resolved::StringEncoding::ASCII,
+                None => ast::StringEncoding::ASCII,
             },
             termination_character: match &self.termination_character {
                 Some(tc) => Some(string_to_tc(tc, ectx)?),
@@ -321,13 +321,13 @@ impl Resolve<resolved::StringDataEncoding> for raw::StringDataEncoding {
     }
 }
 
-impl Resolve<resolved::BooleanDataType> for raw::BooleanDataType {
-    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::BooleanDataType, ResolveError> {
-        Ok(resolved::BooleanDataType {
+impl Resolve<ast::BooleanDataType> for raw::BooleanDataType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::BooleanDataType, ResolveError> {
+        Ok(ast::BooleanDataType {
             name_entity_type: self.name_entity_type.resolve(ectx)?,
             encoding: match self.encoding {
                 Some(ref bde) => bde.resolve(ectx)?,
-                None => resolved::BooleanDataEncoding {
+                None => ast::BooleanDataEncoding {
                     size_in_bits: 1,
                     false_value: true,
                 },
@@ -336,12 +336,12 @@ impl Resolve<resolved::BooleanDataType> for raw::BooleanDataType {
     }
 }
 
-impl Resolve<resolved::BooleanDataEncoding> for raw::BooleanDataEncoding {
+impl Resolve<ast::BooleanDataEncoding> for raw::BooleanDataEncoding {
     fn resolve(
         &self,
         ectx: &ExpressionContext,
-    ) -> Result<resolved::BooleanDataEncoding, ResolveError> {
-        Ok(resolved::BooleanDataEncoding {
+    ) -> Result<ast::BooleanDataEncoding, ResolveError> {
+        Ok(ast::BooleanDataEncoding {
             size_in_bits: string_to_usize(&self.size_in_bits, ectx)?,
             false_value: match self.false_value {
                 Some(ref fv) => string_to_false_value(fv, ectx)?,
@@ -351,16 +351,16 @@ impl Resolve<resolved::BooleanDataEncoding> for raw::BooleanDataEncoding {
     }
 }
 
-impl Resolve<resolved::IntegerDataType> for raw::IntegerDataType {
-    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::IntegerDataType, ResolveError> {
-        Ok(resolved::IntegerDataType {
+impl Resolve<ast::IntegerDataType> for raw::IntegerDataType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::IntegerDataType, ResolveError> {
+        Ok(ast::IntegerDataType {
             name_entity_type: self.name_entity_type.resolve(ectx)?,
             encoding: match self.encoding {
                 Some(ref ide) => ide.resolve(ectx)?,
-                None => resolved::IntegerDataEncoding {
+                None => ast::IntegerDataEncoding {
                     size_in_bits: 0,
-                    encoding: resolved::IntegerEncoding::Unsigned,
-                    byte_order: resolved::ByteOrder::LittleEndian,
+                    encoding: ast::IntegerEncoding::Unsigned,
+                    byte_order: ast::ByteOrder::LittleEndian,
                 },
             },
             range: self.range.resolve(ectx)?,
@@ -368,12 +368,12 @@ impl Resolve<resolved::IntegerDataType> for raw::IntegerDataType {
     }
 }
 
-impl Resolve<resolved::IntegerDataEncoding> for IntegerDataEncoding {
+impl Resolve<ast::IntegerDataEncoding> for IntegerDataEncoding {
     fn resolve(
         &self,
         ectx: &ExpressionContext,
-    ) -> Result<resolved::IntegerDataEncoding, ResolveError> {
-        Ok(resolved::IntegerDataEncoding {
+    ) -> Result<ast::IntegerDataEncoding, ResolveError> {
+        Ok(ast::IntegerDataEncoding {
             size_in_bits: string_to_usize(&self.size_in_bits, ectx)?,
             encoding: string_to_int_encoding(&self.encoding, ectx)?,
             byte_order: string_to_byte_order(&self.byte_order, ectx)?,
@@ -381,9 +381,9 @@ impl Resolve<resolved::IntegerDataEncoding> for IntegerDataEncoding {
     }
 }
 
-impl Resolve<resolved::NamedEntityType> for raw::NamedEntityType {
-    fn resolve(&self, ectx: &ExpressionContext) -> Result<resolved::NamedEntityType, ResolveError> {
-        Ok(resolved::NamedEntityType {
+impl Resolve<ast::NamedEntityType> for raw::NamedEntityType {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::NamedEntityType, ResolveError> {
+        Ok(ast::NamedEntityType {
             name: Identifier(self.name.clone()),
             short_description: self.short_description.clone(),
             long_description: match &self.long_description {
@@ -394,9 +394,9 @@ impl Resolve<resolved::NamedEntityType> for raw::NamedEntityType {
     }
 }
 
-impl Resolve<resolved::LongDescription> for raw::LongDescription {
-    fn resolve(&self, _: &ExpressionContext) -> Result<resolved::LongDescription, ResolveError> {
-        Ok(resolved::LongDescription {
+impl Resolve<ast::LongDescription> for raw::LongDescription {
+    fn resolve(&self, _: &ExpressionContext) -> Result<ast::LongDescription, ResolveError> {
+        Ok(ast::LongDescription {
             text: self.text.clone(),
         })
     }
@@ -404,7 +404,7 @@ impl Resolve<resolved::LongDescription> for raw::LongDescription {
 
 pub fn resolve_package_file(
     package_file: &raw::PackageFile,
-) -> Result<resolved::PackageFile, ResolveError> {
+) -> Result<ast::PackageFile, ResolveError> {
     let ectx = ExpressionContext::new();
     package_file.resolve(&ectx)
 }
