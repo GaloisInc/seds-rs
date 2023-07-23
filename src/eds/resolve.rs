@@ -1,13 +1,13 @@
 use evalexpr::EvalexprError;
 
-use crate::eds::raw;
 use crate::eds::ast;
+use crate::eds::raw;
 use crate::expr::ExpressionContext;
 use crate::expr::NamespaceError;
 
-use super::raw::IntegerDataEncoding;
 use super::ast::Identifier;
 use super::ast::Literal;
+use super::raw::IntegerDataEncoding;
 
 /// Errors that can occur during resolution
 #[derive(Debug)]
@@ -215,9 +215,7 @@ impl Resolve<ast::DataType> for raw::DataType {
             raw::DataType::IntegerDataType(dt) => {
                 Ok(ast::DataType::IntegerDataType(dt.resolve(ectx)?))
             }
-            raw::DataType::FloatDataType(dt) => {
-                Ok(ast::DataType::FloatDataType(dt.resolve(ectx)?))
-            }
+            raw::DataType::FloatDataType(dt) => Ok(ast::DataType::FloatDataType(dt.resolve(ectx)?)),
             raw::DataType::StringDataType(dt) => {
                 Ok(ast::DataType::StringDataType(dt.resolve(ectx)?))
             }
@@ -250,10 +248,7 @@ impl Resolve<ast::FloatDataType> for raw::FloatDataType {
 }
 
 impl Resolve<ast::FloatDataEncoding> for raw::FloatDataEncoding {
-    fn resolve(
-        &self,
-        ectx: &ExpressionContext,
-    ) -> Result<ast::FloatDataEncoding, ResolveError> {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::FloatDataEncoding, ResolveError> {
         Ok(ast::FloatDataEncoding {
             size_in_bits: string_to_usize(&self.size_in_bits, ectx)?,
             encoding_and_precision: string_to_encoding_and_precision(
@@ -304,10 +299,7 @@ impl Resolve<ast::StringDataType> for raw::StringDataType {
 }
 
 impl Resolve<ast::StringDataEncoding> for raw::StringDataEncoding {
-    fn resolve(
-        &self,
-        ectx: &ExpressionContext,
-    ) -> Result<ast::StringDataEncoding, ResolveError> {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::StringDataEncoding, ResolveError> {
         Ok(ast::StringDataEncoding {
             encoding: match self.encoding {
                 Some(ref se) => string_to_str_encoding(se, ectx)?,
@@ -337,10 +329,7 @@ impl Resolve<ast::BooleanDataType> for raw::BooleanDataType {
 }
 
 impl Resolve<ast::BooleanDataEncoding> for raw::BooleanDataEncoding {
-    fn resolve(
-        &self,
-        ectx: &ExpressionContext,
-    ) -> Result<ast::BooleanDataEncoding, ResolveError> {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::BooleanDataEncoding, ResolveError> {
         Ok(ast::BooleanDataEncoding {
             size_in_bits: string_to_usize(&self.size_in_bits, ectx)?,
             false_value: match self.false_value {
@@ -369,10 +358,7 @@ impl Resolve<ast::IntegerDataType> for raw::IntegerDataType {
 }
 
 impl Resolve<ast::IntegerDataEncoding> for IntegerDataEncoding {
-    fn resolve(
-        &self,
-        ectx: &ExpressionContext,
-    ) -> Result<ast::IntegerDataEncoding, ResolveError> {
+    fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::IntegerDataEncoding, ResolveError> {
         Ok(ast::IntegerDataEncoding {
             size_in_bits: string_to_usize(&self.size_in_bits, ectx)?,
             encoding: string_to_int_encoding(&self.encoding, ectx)?,

@@ -53,11 +53,14 @@
 				\sa  #CFE_SB_SEND_ROUTING_INFO_CC, #CFE_SB_SEND_MAP_INFO_CC
 			</LongDescription>
 			<ConstraintSet>
-				<ValueConstraint entry="Sec.FunctionCode" value="7" />
+				<ValueConstraint entry="Payload" value="7" />
 			</ConstraintSet>
 			<EntryList>
 				<Entry type="WriteFileInfoCmd_Payload" name="Payload" />
 			</EntryList>
+			<TrailerEntryList>
+				<Entry type="WriteFileInfoCmd_Payload" name="Payload3" />
+			</TrailerEntryList>
 		</ContainerDataType>
 
 		<ContainerDataType name="WriteMapInfoCmd" baseType="CommandBase" abstract="false">
@@ -104,11 +107,24 @@
 				\sa  #CFE_SB_SEND_ROUTING_INFO_CC, #CFE_SB_SEND_PIPE_INFO_CC
 			</LongDescription>
 			<ConstraintSet>
-				<ValueConstraint entry="Sec.FunctionCode" value="8" />
+				<ValueConstraint entry="Payload2" value="8" />
 			</ConstraintSet>
 			<EntryList>
-				<Entry type="WriteFileInfoCmd_Payload" name="Payload" />
+				<Entry type="WriteFileInfoCmd_Payload" name="Payload2" />
+				<PaddingEntry sizeInBits="24" shortDescription="Spare bytes for alignment"/>
+				<ErrorControlEntry name="Checksum" type="ChecksumType" shortDescription="Checksum, calculated by ground system" errorControlType="CHECKSUM_LONGITUDINAL"/>
+				<LengthEntry name="Length" type="BASE_TYPES/uint32" shortDescription="Length of object">
+					<PolynomialCalibrator>
+						<Term coefficient="1" exponent="1" />
+						<Term coefficient="0" exponent="0" />
+					</PolynomialCalibrator>
+				</LengthEntry>
+				<ListEntry name="List" listLengthField="5" />
+				<FixedValueEntry name="SpacecraftID" type="BASE_TYPES/uint32" shortDescription="Spacecraft that generated the file" fixedValue="${CFE_MISSION/SPACECRAFT_ID}" />
 			</EntryList>
+			<TrailerEntryList>
+				<Entry type="WriteFileInfoCmd_Payload" name="Payload3" />
+			</TrailerEntryList>
 		</ContainerDataType>
 
 	</DataTypeSet>

@@ -446,19 +446,27 @@ pub struct ParameterMap {
 
 #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct LengthEntry {
-    pub name: String,
+    #[serde(flatten)]
+    pub name_entity_type: NamedEntityType,
     #[serde(rename = "type")]
     pub type_: String,
     #[serde(rename = "shortDescription")]
     pub short_description: Option<String>,
     #[serde(rename = "PolynomialCalibrator")]
-    pub polynomial_calibrator: Option<PolynomialCalibrator>,
+    pub calibration: Option<PolynomialCalibrator>,
 }
 
 /// PolynomialCalibrator calibration that would be required to take the raw value represented by the data
 /// type and convert it into the units and other semantic terms associated with the field
 #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PolynomialCalibrator {
+    #[serde(rename = "Term")]
+    pub term: Vec<Term>,
+}
+
+/// TODO
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+pub struct SplineCalibrator {
     #[serde(rename = "Term")]
     pub term: Vec<Term>,
 }
@@ -474,7 +482,7 @@ pub struct Term {
 #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct ErrorControlEntry {
     #[serde(flatten)]
-    pub named_entity_type: NamedEntityType,
+    pub name_entity_type: NamedEntityType,
     #[serde(rename = "type")]
     pub type_: String,
     #[serde(rename = "errorControlType")]
@@ -485,7 +493,7 @@ pub struct ErrorControlEntry {
 #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct FixedValueEntry {
     #[serde(flatten)]
-    pub named_entity_type: NamedEntityType,
+    pub name_entity_type: NamedEntityType,
     #[serde(rename = "type")]
     pub type_: String,
 
@@ -499,7 +507,10 @@ pub struct FixedValueEntry {
 /// TODO: ListEntry
 #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct ListEntry {
-    // TODO
+    #[serde(flatten)]
+    pub name_entity_type: NamedEntityType,
+    #[serde(rename = "listLengthField")]
+    pub list_length_field: Expression,
 }
 
 /// SubRangeDataType defines a sub range data type
