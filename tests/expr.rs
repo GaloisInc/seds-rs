@@ -20,7 +20,7 @@ fn test_namespace_get_not_found() {
 
 #[test]
 fn test_namespace_eval_expression() {
-    let json = serde_json::json!({"a": "1", "b": "2"});
+    let json = serde_json::json!({"a": "1", "b": "2", "c": "test"});
     let namespace = ExpressionContext::from_json(&json).unwrap();
 
     assert_eq!(
@@ -34,6 +34,10 @@ fn test_namespace_eval_expression() {
     assert_eq!(
         namespace.eval_expression("${a}").unwrap(),
         evalexpr::Value::from(1)
+    );
+    assert_eq!(
+        namespace.eval_expression("${c}").unwrap(),
+        evalexpr::Value::from("test")
     );
 }
 

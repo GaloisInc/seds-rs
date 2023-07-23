@@ -11,6 +11,15 @@
 					<MinMaxRange max="127" min="-128" rangeType="inclusiveMinInclusiveMax"/>
 				</Range>
 			</IntegerDataType>
+			<StringDataType name="PathName" length="128">
+				<StringDataEncoding encoding="ASCII" terminationCharacter="\n" />
+			</StringDataType>
+			<FloatDataType name="float" shortDescription="Single precision (32 bit) floating point value">
+				<FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" byteOrder="bigEndian" sizeInBits="32" />
+				<Range>
+					<PrecisionRange>single</PrecisionRange>
+				</Range>
+			</FloatDataType>
 		</DataTypeSet>
 	</Package>
 </PackageFile>
