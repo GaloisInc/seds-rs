@@ -3,6 +3,7 @@ image: rust:latest
 stages:
   - build
   - test
+  - coverage
 
 variables:
   CARGO_HOME: "$CI_PROJECT_DIR/cargo"
@@ -16,6 +17,7 @@ build_job:
   stage: build
   script:
     - rustc --version
+    - cargo install cargo-tarpaulin
     - cargo build --verbose
   artifacts:
     paths:
@@ -26,3 +28,10 @@ test_job:
   script:
     - git submodule update --init
     - cargo test --verbose -- --nocapture
+
+coverage_job:
+  stage: coverage
+  script: cargo tarpaulin
+  coverage: '/^\d+.\d+% coverage/'
+
+
