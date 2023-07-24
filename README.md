@@ -1,4 +1,5 @@
-[![](https://gitlab-ext.galois.com/space-bacn/seds-rs/badges/develop/pipeline.svg?job=test_job&style=flat-square&key_text=Cargo+Test&key_width=80)](https://gitlab-ext.galois.com/space-bacn/seds-rs/-/jobs)
+[![Tests](https://gitlab-ext.galois.com/space-bacn/seds-rs/badges/develop/pipeline.svg?job=test_job&style=flat-square&key_text=Cargo+Test&key_width=80)](https://gitlab-ext.galois.com/space-bacn/seds-rs/-/jobs)
+[![Code Coverage](https://gitlab-ext.galois.com/space-bacn/seds-rs/badges/develop/coverage.svg?name=test_job&style=flat-square&key_text=Code+Coverage&key_width=100)]()
 
 
 # `seds-rs`: a library for SOIS Electronic Data Sheets
