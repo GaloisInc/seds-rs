@@ -17,7 +17,6 @@ build_job:
   stage: build
   script:
     - rustc --version
-    - cargo install cargo-tarpaulin
     - cargo build --verbose
   artifacts:
     paths:
@@ -31,7 +30,10 @@ test_job:
 
 coverage_job:
   stage: coverage
-  script: cargo tarpaulin
+  script: 
+    - git submodule update --init
+    - cargo install cargo-tarpaulin
+    - cargo tarpaulin
   coverage: '/^\d+.\d+% coverage/'
 
 
