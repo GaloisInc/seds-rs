@@ -1,3 +1,6 @@
+[![](https://gitlab-ext.galois.com/space-bacn/seds-rs/badges/develop/pipeline.svg?job=test_job&style=flat-square&key_text=Cargo+Test&key_width=80)](https://gitlab-ext.galois.com/space-bacn/seds-rs/-/jobs)
+
+
 # `seds-rs`: a library for SOIS Electronic Data Sheets
 
 seds-rs is a Rust library designed to read and manipulate CCSDS Blue Book Standard Electronic Data Sheets (SEDS) files. These files, written in a XML format, provide a formal specification for spacecraft components and systems.
