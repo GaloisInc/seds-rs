@@ -4,6 +4,7 @@ stages:
   - build
   - test
   - coverage
+  - rcoverage
 
 variables:
   CARGO_HOME: "$CI_PROJECT_DIR/cargo"
@@ -37,3 +38,8 @@ coverage_job:
   coverage: '/^\d+.\d+% coverage/'
 
 
+rcoverage_job:
+  stage: rcoverage
+  script:
+    - cargo run --example req_coverage --  --file ./docs/SEDS.md
+  coverage: '/^\d+.\d+% coverage/'
