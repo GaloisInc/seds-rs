@@ -6,8 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0.72"
 evalexpr = "11.0.0"
 lazy_static = "1.4.0"
+proc-macro2 = "1.0.66"
+quote = "1.0.32"
 regex = "1.9.1"
 serde = {version = "1.0.171", features = ["derive"]}
 serde-xml-rs = "0.6.0"
