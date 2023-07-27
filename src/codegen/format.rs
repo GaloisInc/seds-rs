@@ -1,17 +1,20 @@
+//! Code Formatting
 use anyhow::Context;
-use std::io::{Error, Write};
+use std::io::Write;
 use std::process::{Command, Output, Stdio};
 
 use quote::ToTokens;
 
+/// run the rust formatter rustfmt on a token stream
 pub fn rustfmt(tokens: impl ToTokens) -> Result<String, anyhow::Error> {
     let tokens = tokens.into_token_stream();
+
+    // note that to string will fail
     let s = format!("{}", tokens);
 
-    println!("Wrote tokens to stdin");
-    println!("{}", s);
-
     let mut child = Command::new("rustfmt")
+        .arg("--edition")
+        .arg("2021")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())

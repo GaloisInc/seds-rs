@@ -139,6 +139,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec3b4e80fd8edee77d6fc35d59862d5765dae7512a95f49fd7bf03847c85b26a"
 
 [[package]]
+name = "heck"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "95505c38b4572b2d910cecb0281560f54b440a19336cbbcb27bf6ce6adc6f5a8"
+
+[[package]]
 name = "hermit-abi"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -273,6 +279,7 @@ dependencies = [
  "anyhow",
  "clap",
  "evalexpr",
+ "heck",
  "lazy_static",
  "proc-macro2",
  "quote",
@@ -280,6 +287,7 @@ dependencies = [
  "serde",
  "serde-xml-rs",
  "serde_json",
+ "syn",
  "walkdir",
 ]
 
@@ -334,9 +342,9 @@ checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "syn"
-version = "2.0.26"
+version = "2.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "45c3457aacde3c65315de5031ec191ce46604304d2446e803d71ade03308d970"
+checksum = "b60f673f44a8255b9c8c657daf66a596d435f2da81a555b06dc644d080ba45e0"
 dependencies = [
  "proc-macro2",
  "quote",

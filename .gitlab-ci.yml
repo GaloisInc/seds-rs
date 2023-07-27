@@ -19,21 +19,23 @@ build_job:
   script:
     - rustc --version
     - cargo build --verbose
-  artifacts:
-    paths:
-      - target/
 
 test_job:
   stage: test
   script:
     - git submodule update --init
     - cargo test --verbose -- --nocapture
+    - cargo install rustfmt
+  artifacts:
+    path:
+      - test_output/
 
 coverage_job:
   stage: coverage
   script: 
     - git submodule update --init
     - cargo install cargo-tarpaulin
+    - cargo install rustfmt
     - cargo tarpaulin
   coverage: '/^\d+.\d+% coverage/'
 
