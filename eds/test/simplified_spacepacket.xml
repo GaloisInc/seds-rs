@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="seds.xsd" ?>
 <!--
 
    NASA Docket No. GSC-18,719-1, and identified as “core Flight System: Bootes”
