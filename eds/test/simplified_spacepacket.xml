@@ -24,72 +24,101 @@
 -->
 <PackageFile xmlns="http://www.ccsds.org/schema/sois/seds"
   xmlns:xi="http://www.w3.org/2001/XInclude"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
   <Package name="CCSDS" shortDescription="CCSDS Space Packet Protocol definitions">
-    <xi:include href="./eds/cFE/modules/core_api/eds/base_types.xml" xpointer="element(/1/1)"/>
-
-    <!-- primary header definitions -->
     <DataTypeSet>
+      <!-- note that including other XMLs is apparently not valid, so we have to hardcopy elements? -->
+      <!--xi:include
+      href="./eds/cFE/modules/core_api/eds/base_types.xml" xpointer="element(/1/1)"/-->
+      <BooleanDataType name="StatusBit" shortDescription="Single true/false status bit">
+        <BooleanDataEncoding sizeInBits="1" />
+      </BooleanDataType>
+      <IntegerDataType name="uint8" shortDescription="Unsigned 8 bit integer">
+        <IntegerDataEncoding sizeInBits="8" encoding="unsigned" byteOrder="bigEndian" />
+        <Range>
+          <MinMaxRange max="255" min="0" rangeType="inclusiveMinInclusiveMax" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="uint16" shortDescription="Unsigned 16 bit integer">
+        <IntegerDataEncoding sizeInBits="16" encoding="unsigned" byteOrder="bigEndian" />
+        <Range>
+          <MinMaxRange max="65535" min="0" rangeType="inclusiveMinInclusiveMax" />
+        </Range>
+      </IntegerDataType>
+      <IntegerDataType name="uint64" shortDescription="Unsigned 64 bit integer">
+        <IntegerDataEncoding sizeInBits="64" encoding="unsigned" byteOrder="bigEndian" />
+        <Range>
+          <MinMaxRange max="18446744073709551615" min="0" rangeType="inclusiveMinInclusiveMax" />
+        </Range>
+      </IntegerDataType>
+
+
+      <!-- primary header definitions -->
+
       <IntegerDataType name="VersionId" shortDescription="Packet version number">
         <IntegerDataEncoding sizeInBits="3" encoding="unsigned" />
         <Range>
-          <MinMaxRange max="7" min="0" rangeType="inclusiveMinInclusiveMax"/>
+          <MinMaxRange max="7" min="0" rangeType="inclusiveMinInclusiveMax" />
         </Range>
       </IntegerDataType>
 
       <IntegerDataType name="SecHdrFlags" shortDescription="Packet type and secondary header flag">
         <LongDescription>
-          This field merges two fields defined in the standard - 1 bit for a packet type (Tlm vs Cmd),
+          This field merges two fields defined in the standard - 1 bit for a packet type (Tlm vs
+          Cmd),
           and one bit for the presence of the secondary header.
         </LongDescription>
         <IntegerDataEncoding sizeInBits="2" encoding="unsigned" />
         <Range>
-          <MinMaxRange max="3" min="0" rangeType="inclusiveMinInclusiveMax"/>
+          <MinMaxRange max="3" min="0" rangeType="inclusiveMinInclusiveMax" />
         </Range>
       </IntegerDataType>
 
       <IntegerDataType name="AppId" shortDescription="Application Process identifier">
-        <IntegerDataEncoding sizeInBits="11" encoding="unsigned" byteOrder="bigEndian"/>
+        <IntegerDataEncoding sizeInBits="11" encoding="unsigned" byteOrder="bigEndian" />
         <Range>
-          <MinMaxRange max="2047" min="0" rangeType="inclusiveMinInclusiveMax"/>
+          <MinMaxRange max="2047" min="0" rangeType="inclusiveMinInclusiveMax" />
         </Range>
       </IntegerDataType>
 
       <IntegerDataType name="SeqFlag" shortDescription="Sequence flags">
         <IntegerDataEncoding sizeInBits="2" encoding="unsigned" />
         <Range>
-          <MinMaxRange max="3" min="0" rangeType="inclusiveMinInclusiveMax"/>
+          <MinMaxRange max="3" min="0" rangeType="inclusiveMinInclusiveMax" />
         </Range>
       </IntegerDataType>
 
       <IntegerDataType name="SeqCount" shortDescription="Packet sequence count or packet name">
-        <IntegerDataEncoding sizeInBits="14" encoding="unsigned" byteOrder="bigEndian"/>
+        <IntegerDataEncoding sizeInBits="14" encoding="unsigned" byteOrder="bigEndian" />
         <Range>
-          <MinMaxRange max="16383" min="0" rangeType="inclusiveMinInclusiveMax"/>
+          <MinMaxRange max="16383" min="0" rangeType="inclusiveMinInclusiveMax" />
         </Range>
       </IntegerDataType>
 
       <IntegerDataType name="LengthType" shortDescription="The length of a CCSDS Space Packet">
-        <IntegerDataEncoding sizeInBits="16" encoding="unsigned" byteOrder="bigEndian"/>
+        <IntegerDataEncoding sizeInBits="16" encoding="unsigned" byteOrder="bigEndian" />
         <Range>
-          <MinMaxRange max="65535" min="0" rangeType="inclusiveMinInclusiveMax"/>
+          <MinMaxRange max="65535" min="0" rangeType="inclusiveMinInclusiveMax" />
         </Range>
       </IntegerDataType>
 
       <!--
       The Real Primary Header (version 1):
          This is the proper definition of the CCSDS primary header, with each field broken out into
-         its proper length rather than being BASE_TYPES/uint16.  However this will not be "drop-in" compatible
+         its proper length rather than being BASE_TYPES/uint16.  However this will not be "drop-in"
+      compatible
          with existing CFE/CFS application source code that expects 3 uint16 values.  However the differences
          should be addressable by changing the accessor macros in the CFE source code.
       -->
-      <ContainerDataType name="BaseHdr" shortDescription="Space packet protocol header">
+      <ContainerDataType name="BasePrimHdr" shortDescription="Space packet protocol header">
         <LongDescription>
-            The Primary message header that is present in all CCSDS Space Protocol packets
+          The Primary message header that is present in all CCSDS Space Protocol packets
         </LongDescription>
         <EntryList>
           <Entry name="VersionId" type="VersionId" shortDescription="CCSDS Version number" />
-          <Entry name="SecHdrFlags" type="SecHdrFlags" shortDescription="Secondary Header Presence and Type Flags" />
+          <Entry name="SecHdrFlags" type="SecHdrFlags"
+            shortDescription="Secondary Header Presence and Type Flags" />
           <Entry name="AppId" type="AppId" shortDescription="Packet identifier bits (stream ID)" />
           <Entry name="SeqFlag" type="SeqFlag" shortDescription="packet sequence bits" />
           <Entry name="Sequence" type="SeqCount" shortDescription="packet sequence bits" />
@@ -102,65 +131,160 @@
         </EntryList>
       </ContainerDataType>
 
+      <ContainerDataType name="PriHdr" baseType="BasePrimHdr"
+        shortDescription="Space packet protocol header version 1">
+        <ConstraintSet>
+          <ValueConstraint entry="VersionId" value="0" />
+        </ConstraintSet>
+      </ContainerDataType>
+
       <!-- secondary header definitions -->
       <IntegerDataType name="PUS" shortDescription="PUS version number">
         <IntegerDataEncoding sizeInBits="4" encoding="unsigned" />
         <Range>
-          <MinMaxRange max="31" min="0" rangeType="inclusiveMinInclusiveMax"/>
+          <MinMaxRange max="31" min="0" rangeType="inclusiveMinInclusiveMax" />
         </Range>
       </IntegerDataType>
 
       <IntegerDataType name="TimeReference" shortDescription="Spacecraft time reference status">
         <IntegerDataEncoding sizeInBits="4" encoding="unsigned" />
         <Range>
-          <MinMaxRange max="31" min="0" rangeType="inclusiveMinInclusiveMax"/>
+          <MinMaxRange max="31" min="0" rangeType="inclusiveMinInclusiveMax" />
+        </Range>
+      </IntegerDataType>
+
+      <ContainerDataType name="MessageTypeId" shortDescription="Message type ID">
+        <LongDescription>
+          Blah
+        </LongDescription>
+        <EntryList>
+          <Entry name="ServiceTypeId" type="uint8" shortDescription="Service type ID" />
+          <Entry name="MessageSubtypeId" type="uint8" shortDescription="Message subtype ID" />
+        </EntryList>
+      </ContainerDataType>
+
+      <!-- Define generic secondary packet -->
+      <ContainerDataType name="BaseSecHdr" shortDescription="Space packet generic secondary header"
+        abstract="true">
+        <EntryList>
+          <Entry name="TmTcPacketPus" type="PUS"
+            shortDescription="Telemetry or Telecommand packet PUS" />
+        </EntryList>
+      </ContainerDataType>
+
+
+      <!-- Rename to TlmUserDataField, to capture this is the sec header and payload-->
+      <ContainerDataType name="TlmSecHdr" baseType="BaseSecHdr"
+        shortDescription="Space packet telemetry secondary header">
+        <!-- TODO: some constraints on the PUS values? -->
+        <EntryList>
+          <Entry name="TimeReference" type="TimeReference" />
+          <Entry name="MessageTypeId" type="MessageTypeId" />
+          <Entry name="MessageTypeCounter" type="uint16" />
+          <Entry name="DestinationId" type="uint16" />
+          <Entry name="AbsoluteTime" type="uint64" /> <!-- TBD: use proper time format (un/segmented)
+          value, 12-16 bytes-->
+          <!-- Possibly a spare, see 7.4.3.2 Telemetry User data field -->
+        </EntryList>
+      </ContainerDataType>
+
+      <!-- Telecommand sec header -->
+      <IntegerDataType name="AckFlags" shortDescription="Ack flags">
+        <IntegerDataEncoding sizeInBits="4" encoding="unsigned" />
+        <Range>
+          <MinMaxRange max="31" min="0" rangeType="inclusiveMinInclusiveMax" />
         </Range>
       </IntegerDataType>
 
 
-
-
-
-      <ContainerDataType name="PriHdr" baseType="BaseHdr" shortDescription="Space packet protocol header version 1">
-        <ConstraintSet>
-          <ValueConstraint entry="VersionId" value="0" />
-        </ConstraintSet>
+      <ContainerDataType name="TcmSecHdr" baseType="BaseSecHdr"
+        shortDescription="Space packet telecommand secondary header">
+        <LongDescription>
+          Note that we can also have a TcmPacket which has the header, but also the message specific
+          data - need to experiment with
+          what makes the most sense. Some values in the header are not known until the packet is
+          about to be send (e.g. destination)
+        </LongDescription>
+        <!-- TODO: some constraints on the PUS values? -->
+        <EntryList>
+          <Entry name="AckFlags" type="AckFlags" />
+          <Entry name="MessageTypeId" type="MessageTypeId" />
+          <Entry name="SourceId" type="uint16" />
+          <!-- Possibly a spare, see 7.4.3.2 Telemetry User data field -->
+        </EntryList>
       </ContainerDataType>
 
+      <!-- lets try to it all together-->
       <ContainerDataType name="SpacePacket">
         <EntryList>
-          <Entry name="Hdr" type="${CCSDS_SPACEPACKET/HEADER_TYPE}" shortDescription="Primary Header" />
+          <Entry name="PrimaryHdr" type="BasePrimHdr" shortDescription="Primary Header" />
+          <!-- hoping that using a generic type this can be then represented as an enum,
+            so multiple secondary headers can be inserted -->
+          <Entry name="SecondaryHdr" type="BaseSecHdr" shortDescription="Primary Header" />
+          <!-- payload -->
+          <!-- TODO: we need support for Array types -->
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType baseType="SpacePacket" name="CommandPacket" shortDescription="Complete Command Packet Header">
+      <!-- BACN specific application messages -->
+      <!-- TC to TA1 -->
+      <ContainerDataType name="SetPATMode" baseType="TcmSecHdr">
+        <LongDescription>
+          Configure TA1 to perform acquisition using in-band/out-of-band/beaconless mode
+        </LongDescription>
         <ConstraintSet>
-          <ValueConstraint entry="Hdr.SecHdrFlags" value="3" />
+          <ValueConstraint entry="MessageTypeId" value="0x1" />
         </ConstraintSet>
-        <!--EntryList>
-            <Entry name="Sec" type="CmdSecHdr" shortDescription="Command Secondary Header" />
-         </EntryList-->
-      </ContainerDataType>
-
-      <ContainerDataType baseType="SpacePacket" name="TelemetryPacket" shortDescription="Complete Telemetry Packet Header">
-        <ConstraintSet>
-          <ValueConstraint entry="Hdr.SecHdrFlags" value="1" />
-        </ConstraintSet>
-        <!--EntryList>
-            <Entry name="Sec" type="TlmSecHdr" shortDescription="Telemetry Secondary Header" />
-         </EntryList-->
-      </ContainerDataType>
-
-      <ContainerDataType name="PacketContainer" shortDescription="A buffer capable of storing any Space Packet">
         <EntryList>
-          <Entry name="Data" type="SpacePacket" shortDescription="Packet Content" />
+          <Entry name="cmd" type="PatMode" />
         </EntryList>
       </ContainerDataType>
 
+      <EnumeratedDataType name="PatMode" shortDescription="PAT modes">
+        <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+        <EnumerationList>
+          <!-- Fun, I cannot specify hex values in enum types... -->
+          <Enumeration label="InBand" value="0" shortDescription="Lorem Ipsum" />
+          <Enumeration label="OutOfBand" value="136" shortDescription="Lorem Ipsum" />
+          <Enumeration label="Beaconless" value="254" shortDescription="Lorem Ipsum" />
+        </EnumerationList>
+      </EnumeratedDataType>
 
+      <ContainerDataType name="EnableLaser" baseType="TcmSecHdr">
+        <LongDescription>
+          Command to enable/disable laser emission through the aperture.
+          1 - enable, 0 - disable
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="MessageTypeId" value="0x2" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry name="cmd" type="StatusBit" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="SetTerminalPolarization" baseType="TcmSecHdr">
+        <LongDescription>
+          Lorem ipsum
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="MessageTypeId" value="0x3" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry name="cmd" type="PolarizationMode" />
+        </EntryList>
+      </ContainerDataType>
+
+      <EnumeratedDataType name="PolarizationMode" shortDescription="Lorem Ipsum">
+        <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+        <EnumerationList>
+          <Enumeration label="LHCP" value="0x44" shortDescription="Lorem Ipsum" />
+          <Enumeration label="RHCP" value="0x88" shortDescription="Lorem Ipsum" />
+          <Enumeration label="DualPool" value="0xAA" shortDescription="Lorem Ipsum" />
+        </EnumerationList>
+      </EnumeratedDataType>
 
 
     </DataTypeSet>
-
   </Package>
 </PackageFile>
