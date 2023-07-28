@@ -23,9 +23,9 @@ build_job:
 test_job:
   stage: test
   script:
+    - rustup component add rustfmt
     - git submodule update --init
     - cargo test --verbose -- --nocapture
-    - rustup component add rustfmt
   artifacts:
     paths:
       - test_output/
@@ -33,9 +33,9 @@ test_job:
 coverage_job:
   stage: coverage
   script: 
+    - rustup component add rustfmt
     - git submodule update --init
     - cargo install cargo-tarpaulin
-    - rustup component add rustfmt
     - cargo tarpaulin
   coverage: '/^\d+.\d+% coverage/'
 
