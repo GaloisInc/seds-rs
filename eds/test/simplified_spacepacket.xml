@@ -18,45 +18,53 @@
    limitations under the License.
 
     Purpose:
-      This describes objects as defined by CCSDS book 133 Space Packet Protocol
-      and utilized by the Core Flight System (cFS)
+      This describes objects as defined by CCSDS 133.0-B-2 Space Packet Protocol
+      standard
 
 -->
-<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds">
+<PackageFile
+  xmlns="http://www.ccsds.org/schema/sois/seds"
+	xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
 <Package name="CCSDS" shortDescription="CCSDS Space Packet Protocol definitions">
+<xi:include href="./eds/cFE/modules/core_api/eds/base_types.xml" xpointer="element(/1/1)"/>
 
+  <!-- primary header definitions -->
    <DataTypeSet>
-      <IntegerDataType name="VersionId" shortDescription="The first 16 bits of a CCSDS Space Packet Header">
+      <IntegerDataType name="VersionId" shortDescription="Packet version number">
         <IntegerDataEncoding sizeInBits="3" encoding="unsigned" />
         <Range>
           <MinMaxRange max="7" min="0" rangeType="inclusiveMinInclusiveMax"/>
         </Range>
       </IntegerDataType>
 
-      <BooleanDataType name="SingleBitFlag" shortDescription="A single bit indicating true/false" />
-
-      <IntegerDataType name="SecHdrFlags" shortDescription="The first 16 bits of a CCSDS Space Packet Header">
+      <IntegerDataType name="SecHdrFlags" shortDescription="Packet type and secondary header flag">
+        <LongDescription>
+          This field merges two fields defined in the standard - 1 bit for a packet type (Tlm vs Cmd),
+          and one bit for the presence of the secondary header.
+        </LongDescription>
         <IntegerDataEncoding sizeInBits="2" encoding="unsigned" />
         <Range>
           <MinMaxRange max="3" min="0" rangeType="inclusiveMinInclusiveMax"/>
         </Range>
       </IntegerDataType>
 
-      <IntegerDataType name="AppId" shortDescription="The first 16 bits of a CCSDS Space Packet Header">
+      <IntegerDataType name="AppId" shortDescription="Application Process identifier">
         <IntegerDataEncoding sizeInBits="11" encoding="unsigned" byteOrder="bigEndian"/>
         <Range>
           <MinMaxRange max="2047" min="0" rangeType="inclusiveMinInclusiveMax"/>
         </Range>
       </IntegerDataType>
 
-      <IntegerDataType name="SeqFlag" shortDescription="The first 16 bits of a CCSDS Space Packet Header">
+      <IntegerDataType name="SeqFlag" shortDescription="Sequence flags">
         <IntegerDataEncoding sizeInBits="2" encoding="unsigned" />
         <Range>
           <MinMaxRange max="3" min="0" rangeType="inclusiveMinInclusiveMax"/>
         </Range>
       </IntegerDataType>
 
-      <IntegerDataType name="SeqCount" shortDescription="The first 16 bits of a CCSDS Space Packet Header">
+      <IntegerDataType name="SeqCount" shortDescription="Packet sequence count or packet name">
         <IntegerDataEncoding sizeInBits="14" encoding="unsigned" byteOrder="bigEndian"/>
         <Range>
           <MinMaxRange max="16383" min="0" rangeType="inclusiveMinInclusiveMax"/>
@@ -67,23 +75,6 @@
         <IntegerDataEncoding sizeInBits="16" encoding="unsigned" byteOrder="bigEndian"/>
         <Range>
           <MinMaxRange max="65535" min="0" rangeType="inclusiveMinInclusiveMax"/>
-        </Range>
-      </IntegerDataType>
-
-      <IntegerDataType name="CommandCode" shortDescription="The command ID contained within a command secondary header">
-        <LongDescription>
-          Command codes in CFE range are 7 bits (0-127).  The most significant bit (codes 128-255) are reserved.
-        </LongDescription>
-        <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
-        <Range>
-          <MinMaxRange rangeType="atMost" max="127" />
-        </Range>
-      </IntegerDataType>
-
-      <IntegerDataType name="ChecksumType" shortDescription="The checksum of a command packet">
-        <IntegerDataEncoding sizeInBits="8" encoding="unsigned" byteOrder="bigEndian"/>
-        <Range>
-          <MinMaxRange max="255" min="0" rangeType="inclusiveMinInclusiveMax"/>
         </Range>
       </IntegerDataType>
 
@@ -101,10 +92,10 @@
          <EntryList>
             <Entry name="VersionId" type="VersionId" shortDescription="CCSDS Version number" />
             <Entry name="SecHdrFlags" type="SecHdrFlags" shortDescription="Secondary Header Presence and Type Flags" />
-            <Entry name="AppId" type="AppId" shortDescription="Packet identifier word (stream ID)" />
-            <Entry name="SeqFlag" type="SeqFlag" shortDescription="packet sequence word" />
-            <Entry name="Sequence" type="SeqCount" shortDescription="packet sequence word" />
-            <LengthEntry name="Length" type="LengthType" shortDescription="packet length word">
+            <Entry name="AppId" type="AppId" shortDescription="Packet identifier bits (stream ID)" />
+            <Entry name="SeqFlag" type="SeqFlag" shortDescription="packet sequence bits" />
+            <Entry name="Sequence" type="SeqCount" shortDescription="packet sequence bits" />
+            <LengthEntry name="Length" type="LengthType" shortDescription="packet data length">
                 <PolynomialCalibrator>
                     <Term coefficient="1" exponent="1" />
                     <Term coefficient="7" exponent="0" />
@@ -113,87 +104,29 @@
          </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="PriHdr" baseType="BaseHdr" shortDescription="Space packet protocol header version 1">
-         <ConstraintSet>
-           <ValueConstraint entry="VersionId" value="0" />
-         </ConstraintSet>
-      </ContainerDataType>
-
-      <IntegerDataType name="SubsystemId" shortDescription="Subsystem ID value">
-        <IntegerDataEncoding sizeInBits="9" encoding="unsigned"  byteOrder="bigEndian"/>
-        <Range>
-          <MinMaxRange max="511" min="0" rangeType="inclusiveMinInclusiveMax"/>
-        </Range>
-      </IntegerDataType>
-
-      <IntegerDataType name="SystemId" shortDescription="System ID value">
-        <IntegerDataEncoding sizeInBits="16" encoding="unsigned"  byteOrder="bigEndian"/>
-        <Range>
-          <MinMaxRange max="65535" min="0" rangeType="inclusiveMinInclusiveMax"/>
-        </Range>
-      </IntegerDataType>
-
-      <IntegerDataType name="EdsVersionId" shortDescription="EDS data type identification data">
-        <IntegerDataEncoding sizeInBits="5" encoding="unsigned" />
+    <!-- secondary header definitions -->
+    <IntegerDataType name="PUS" shortDescription="PUS version number">
+        <IntegerDataEncoding sizeInBits="4" encoding="unsigned" />
         <Range>
           <MinMaxRange max="31" min="0" rangeType="inclusiveMinInclusiveMax"/>
         </Range>
       </IntegerDataType>
 
-      <ContainerDataType name="APIDqualifiers" shortDescription="Space packet APID qualifier header">
-        <LongDescription>
-           The APID qualifier header extension that is present in CCSDS version 2
-        </LongDescription>
-        <EntryList>
-          <Entry name="EdsVersionId" type="EdsVersionId" shortDescription="EDS-specific datatype identifier" />
-          <Entry name="Endian" type="SingleBitFlag" shortDescription="Reserved, always set FALSE" />
-          <Entry name="Playback" type="SingleBitFlag" shortDescription="Set to TRUE if data is playback, FALSE for realtime" />
-          <Entry name="SubsystemId" type="SubsystemId" shortDescription="Mission-defined usage" />
-          <Entry name="SystemId" type="SystemId" shortDescription="Mission-defined usage" />
-        </EntryList>
-      </ContainerDataType>
-
-      <!--
-      The APID qualifier (aka Version 2) Primary Header:
-         This is the same as the version 1 primary header but extended with APID qualifier data
-      -->
-      <ContainerDataType name="APIDQHdr" baseType="BaseHdr" shortDescription="Space packet protocol v2 header">
-         <LongDescription>
-            The APID qualified primary header that is present in all CCSDS Space Protocol version 2 packets
-         </LongDescription>
-         <ConstraintSet>
-           <ValueConstraint entry="VersionId" value="1" />
-         </ConstraintSet>
-         <EntryList>
-           <Entry name="ApidQ" type="APIDqualifiers" shortDescription="APID qualifiers" />
-         </EntryList>
-      </ContainerDataType>
-
-      <ContainerDataType name="CmdSecHdr" shortDescription="Secondary header for commands">
-         <LongDescription>
-            The secondary message header that is present in all cFE command messages
-         </LongDescription>
-         <EntryList>
-            <Entry name="Command" type="CommandCode" shortDescription="Command Identifier Word" />
-            <ErrorControlEntry name="Checksum" type="ChecksumType" shortDescription="Checksum, calculated by ground system" errorControlType="CHECKSUM_LONGITUDINAL"/>
-         </EntryList>
-      </ContainerDataType>
-
-      <IntegerDataType name="uint32" shortDescription="Unsigned 32 bit integer">
-        <IntegerDataEncoding sizeInBits="32" encoding="unsigned" byteOrder="${CFE_MISSION/DATA_BYTE_ORDER}" />
+    <IntegerDataType name="TimeReference" shortDescription="Spacecraft time reference status">
+        <IntegerDataEncoding sizeInBits="4" encoding="unsigned" />
         <Range>
-          <MinMaxRange max="4294967295" min="0" rangeType="inclusiveMinInclusiveMax"/>
+          <MinMaxRange max="31" min="0" rangeType="inclusiveMinInclusiveMax"/>
         </Range>
-      </IntegerDataType>
-      
-      <ContainerDataType name="TlmSecHdr" shortDescription="Secondary header for telemetry">
-         <LongDescription>
-            The secondary message header that is present in all cFE telemetry messages
-         </LongDescription>
-         <EntryList>
-            <Entry name="Seconds" type="uint32" shortDescription="Time since epoch, in seconds" />
-            <Entry name="Subseconds" type="uint32" shortDescription="Time since epoch, in subseconds" />
-         </EntryList>
+    </IntegerDataType>
+
+
+
+
+
+      <ContainerDataType name="PriHdr" baseType="BaseHdr" shortDescription="Space packet protocol header version 1">
+         <ConstraintSet>
+           <ValueConstraint entry="VersionId" value="0" />
+         </ConstraintSet>
       </ContainerDataType>
 
       <ContainerDataType name="SpacePacket">
@@ -206,18 +139,18 @@
          <ConstraintSet>
            <ValueConstraint entry="Hdr.SecHdrFlags" value="3" />
          </ConstraintSet>
-         <EntryList>
+         <!--EntryList>
             <Entry name="Sec" type="CmdSecHdr" shortDescription="Command Secondary Header" />
-         </EntryList>
+         </EntryList-->
       </ContainerDataType>
 
       <ContainerDataType baseType="SpacePacket" name="TelemetryPacket" shortDescription="Complete Telemetry Packet Header">
          <ConstraintSet>
            <ValueConstraint entry="Hdr.SecHdrFlags" value="1" />
          </ConstraintSet>
-         <EntryList>
+         <!--EntryList>
             <Entry name="Sec" type="TlmSecHdr" shortDescription="Telemetry Secondary Header" />
-         </EntryList>
+         </EntryList-->
       </ContainerDataType>
 
       <ContainerDataType name="PacketContainer" shortDescription="A buffer capable of storing any Space Packet" >
@@ -225,6 +158,8 @@
             <Entry name="Data" type="SpacePacket" shortDescription="Packet Content" />
          </EntryList>
       </ContainerDataType>
+
+
 
 
    </DataTypeSet>
