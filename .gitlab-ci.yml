@@ -27,7 +27,7 @@ test_job:
     - cargo test --verbose -- --nocapture
     - cargo install rustfmt
   artifacts:
-    path:
+    paths:
       - test_output/
 
 coverage_job:
