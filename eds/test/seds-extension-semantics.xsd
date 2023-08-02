@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:seds="http://www.ccsds.org/schema/sois/seds"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.ccsds.org/schema/sois/seds"
+    elementFormDefault="qualified" attributeFormDefault="unqualified"
+    version="1.0">
+	<xs:simpleType name="ExtErrorControlType">
+		<xs:annotation>
+			<xs:documentation>Local types of error control algorithm</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="localErrorControl" />
+			<!-- At least one entry is defined here, because schema validation does not occur on some systems with an empty enumeration. -->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ExtEncodingRulesType">
+		<xs:annotation>
+			<xs:documentation>
+				Local types of encoding rules for composite data types
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="localEncodingRules" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ExtEncodingAndPrecisionType">
+		<xs:annotation>
+			<xs:documentation>Local types of encoding and precision for floating point numbers</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="localEncodingAndPrecision" />
+			<!-- At least one entry is defined here, because schema validation does not occur on some systems with an empty enumeration. -->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ExtIntegerEncodingType">
+		<xs:annotation>
+			<xs:documentation>Local types of encoding for integers</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="localIntegerEncoding" />
+			<!-- At least one entry is defined here, because schema validation does not occur on some systems with an empty enumeration. -->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ExtStringEncodingType">
+		<xs:annotation>
+			<xs:documentation>Local types of encoding for strings</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="localStringEncoding" />
+			<!-- At least one entry is defined here, because schema validation does not occur on some systems with an empty enumeration. -->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ExtMathOperatorsType">
+		<xs:annotation>
+			<xs:documentation>Local math operators</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="localMathOperator" />
+			<!-- At least one entry is defined here, because schema validation does not occur on some systems with an empty enumeration. -->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ExtQuantityKind">
+		<xs:annotation>
+			<xs:documentation>Local quantity kinds</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="localQK" />
+			<!-- At least one entry is defined here, because schema validation does not occur on some systems with an empty enumeration. -->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ExtUnit">
+		<xs:annotation>
+			<xs:documentation>Local units</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="localUnit" />
+			<!-- At least one entry is defined here, because schema validation does not occur on some systems with an empty enumeration. -->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:attributeGroup name="ExtensionSemanticsAttributeGroup">
+		<!-- Add attributes required by a project here.
+		SEDS that use these ad hoc attributes lack standard support for interoperability across agencies. -->
+	</xs:attributeGroup>
+</xs:schema>
