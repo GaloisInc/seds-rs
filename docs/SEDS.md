@@ -108,3 +108,66 @@ of a type corresponding to table 3-1.
 - [ ] **3.10.22** If a LengthEntry element has a calibration (see 3.11.7), that calibration shall be used to map between the length in bytes of the container and the value of the entry, according to the formula: container length in bytes = calibration(entry raw value).
 - [ ] **3.10.23** Any calibration specified for a LengthEntry shall be reversible, that is, a linear polynomial, or spline, with all points of degree 1.
 - [x] **3.10.24** An ErrorControlEntry element within a container shall specify an entry whose value is constrained, or derived, based on the contents of the container in which it is present.  In addition to a subset of the attributes and elements supported for a regular container entry, it has the mandatory attribute type, which is one of the values specified in the DoT for errorControlType as illustrated in table 3-3.
+
+## Elements
+
+![SEDS structure](key-elements.png)
+
+## Core Flight System Modules
+
+* `./modules/core_api/eds/base_types.xml`
+  * *Standard type definitions for Core Flight System*
+  * standard types, plus a definition of a pointer (MemReference)
+  * referenced in many other packages (`BASE_TYPES`)
+  * basically identical to `./modules/core_private/eds/base_types.xml` base types
+
+* `./modules/core_api/eds/config.xml`
+  * contains packages for various services config
+  * it is not a SED itself (no schema constraints)
+  * * basically identical to `./modules/core_private/eds/config.xml` config
+
+* `./modules/resourceid/eds/cfe_resourceid.xml`
+  * a dummy XML
+
+* `./modules/core_api/eds/ccsds_spacepacket.xml`
+  * *CCSDS Space Packet Protocol definitions*
+  * almost conforms to the Space Packet specs
+  * includes some *newer* (Pink book version?) Space Packet features (v2 header)
+
+* `./modules/sb/eds/cfe_sb.xml`
+  * *NASA Core Flight System Software Bus*
+  * A large number or command message definitions (`<DataTypeSet>`)
+  * defines *Interfaces* (`<DeclaredInterfaceSet>`)!
+  * defines a set of components (`<ComponentSet>`), which provide or require interfaces
+
+* `./modules/es/eds/cfe_es.xml`
+  * *NASA Core Flight System Executive Services*
+  * Application Message definitions (`<DataTypeSet>`)
+  * defines a component (`<Component>`), with required interfaces
+  * references `cfe_sb.xml`
+
+* `./modules/core_api/eds/cfe_fs.xml`
+  * *NASA Core Flight System File Services*
+  * defines application messages for *File Services*
+  * identical with `./modules/fs/eds/cfe_fs.xml`
+
+* `./modules/evs/eds/cfe_evs.xml`
+  * *NASA Core Flight System Event Services*
+  * a large file, defines application messages (Commands and Telemetry) for *Event Services*
+  * defines a component (`<Component>`), with required interfaces
+
+* `./modules/time/eds/cfe_time.xml`
+  * *NASA Core Flight System Time Services*
+  * defines application messages for *Time Services*
+  * defines a component (`<Component>`), with required interfaces
+
+* `./modules/tbl/eds/cfe_tbl.xml`
+  * *NASA Core Flight System Table Services*
+  * defines application messages for *Table Services*
+  * defines a component (`<Component>`), with required interfaces
+
+* `./modules/cfe_testcase/eds/cfe_testcase.xml`
+  * *CFE Functional Test (FT) Application Package*
+  * *data types* and *components* for a functional test
+  * rather minimal
+
