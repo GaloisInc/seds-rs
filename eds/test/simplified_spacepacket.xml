@@ -32,9 +32,9 @@
       <!-- note that including other XMLs is apparently not valid, so we have to hardcopy elements? -->
       <!--xi:include
       href="./eds/cFE/modules/core_api/eds/base_types.xml" xpointer="element(/1/1)"/-->
-      <BooleanDataType name="StatusBit" shortDescription="Single true/false status bit">
-        <BooleanDataEncoding sizeInBits="1" />
-      </BooleanDataType>
+        <BooleanDataType name="StatusBit" shortDescription="Single true/false status bit">
+          <BooleanDataEncoding sizeInBits="1" />
+        </BooleanDataType>
       <IntegerDataType name="uint8" shortDescription="Unsigned 8 bit integer">
         <IntegerDataEncoding sizeInBits="8" encoding="unsigned" byteOrder="bigEndian" />
         <Range>
@@ -236,20 +236,20 @@
         <ConstraintSet>
           <ValueConstraint entry="MessageTypeId" value="0x1" />
         </ConstraintSet>
-        <EntryList>
+        <!--EntryList>
           <Entry name="cmd" type="PatMode" />
-        </EntryList>
+        </EntryList-->
       </ContainerDataType>
 
-      <EnumeratedDataType name="PatMode" shortDescription="PAT modes">
+      <!-- Fun, I cannot specify hex values in enum types... -->
+      <!--EnumeratedDataType name="PatMode" shortDescription="PAT modes">
         <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
         <EnumerationList>
-          <!-- Fun, I cannot specify hex values in enum types... -->
           <Enumeration label="InBand" value="0" shortDescription="Lorem Ipsum" />
           <Enumeration label="OutOfBand" value="136" shortDescription="Lorem Ipsum" />
           <Enumeration label="Beaconless" value="254" shortDescription="Lorem Ipsum" />
         </EnumerationList>
-      </EnumeratedDataType>
+      </EnumeratedDataType-->
 
       <ContainerDataType name="EnableLaser" baseType="TcmSecHdr">
         <LongDescription>
@@ -259,9 +259,9 @@
         <ConstraintSet>
           <ValueConstraint entry="MessageTypeId" value="0x2" />
         </ConstraintSet>
-        <EntryList>
+        <!--EntryList>
           <Entry name="cmd" type="StatusBit" />
-        </EntryList>
+        </EntryList-->
       </ContainerDataType>
 
       <ContainerDataType name="SetTerminalPolarization" baseType="TcmSecHdr">
@@ -271,19 +271,19 @@
         <ConstraintSet>
           <ValueConstraint entry="MessageTypeId" value="0x3" />
         </ConstraintSet>
-        <EntryList>
+        <!--EntryList>
           <Entry name="cmd" type="PolarizationMode" />
-        </EntryList>
+        </EntryList-->
       </ContainerDataType>
 
-      <EnumeratedDataType name="PolarizationMode" shortDescription="Lorem Ipsum">
+      <!--EnumeratedDataType name="PolarizationMode" shortDescription="Lorem Ipsum">
         <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
         <EnumerationList>
           <Enumeration label="LHCP" value="0x44" shortDescription="Lorem Ipsum" />
           <Enumeration label="RHCP" value="0x88" shortDescription="Lorem Ipsum" />
           <Enumeration label="DualPool" value="0xAA" shortDescription="Lorem Ipsum" />
         </EnumerationList>
-      </EnumeratedDataType>
+      </EnumeratedDataType-->
 
 
     </DataTypeSet>

@@ -58,7 +58,13 @@ appears;
                                     Exit state should be an "error state" if errors are not explicitly handled.
                                 </LongDescription>
                             </ExitState>
-                            <State name="S1"></State>
+                            <State name="S1">
+                                <OnEntry activity="Act1">
+                                    <LongDescription>
+                                        Here we call an activity that sends a command...
+                                    </LongDescription>
+                                </OnEntry>
+                            </State>
                             <State name="S2"></State>
                             <Transition fromState="S1" toState="S2" name="T1">
                                 <OnCommandPrimitive interface="xxx" command="Cmd1Reset"></OnCommandPrimitive>
