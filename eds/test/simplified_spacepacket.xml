@@ -229,7 +229,7 @@
 
       <!-- BACN specific application messages -->
       <!-- TC to TA1 -->
-      <ContainerDataType name="SetPATMode" baseType="TcmSecHdr">
+      <ContainerDataType name="SetTorpedoMode" baseType="TcmSecHdr">
         <LongDescription>
           Configure TA1 to perform acquisition using in-band/out-of-band/beaconless mode
         </LongDescription>
@@ -237,12 +237,12 @@
           <ValueConstraint entry="MessageTypeId" value="0x1" />
         </ConstraintSet>
         <!--EntryList>
-          <Entry name="cmd" type="PatMode" />
+          <Entry name="cmd" type="TorpedoMode" />
         </EntryList-->
       </ContainerDataType>
 
       <!-- Fun, I cannot specify hex values in enum types... -->
-      <!--EnumeratedDataType name="PatMode" shortDescription="PAT modes">
+      <!--EnumeratedDataType name="TorpedoMode" shortDescription="PAT modes">
         <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
         <EnumerationList>
           <Enumeration label="InBand" value="0" shortDescription="Lorem Ipsum" />
@@ -251,7 +251,7 @@
         </EnumerationList>
       </EnumeratedDataType-->
 
-      <ContainerDataType name="EnableLaser" baseType="TcmSecHdr">
+      <ContainerDataType name="EnablePhasers" baseType="TcmSecHdr">
         <LongDescription>
           Command to enable/disable laser emission through the aperture.
           1 - enable, 0 - disable
@@ -264,7 +264,7 @@
         </EntryList-->
       </ContainerDataType>
 
-      <ContainerDataType name="SetTerminalPolarization" baseType="TcmSecHdr">
+      <ContainerDataType name="SetWarpFieldPolarization" baseType="TcmSecHdr">
         <LongDescription>
           Lorem ipsum
         </LongDescription>
@@ -279,9 +279,9 @@
       <!--EnumeratedDataType name="PolarizationMode" shortDescription="Lorem Ipsum">
         <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
         <EnumerationList>
-          <Enumeration label="LHCP" value="0x44" shortDescription="Lorem Ipsum" />
-          <Enumeration label="RHCP" value="0x88" shortDescription="Lorem Ipsum" />
-          <Enumeration label="DualPool" value="0xAA" shortDescription="Lorem Ipsum" />
+          <Enumeration label="Right" value="0x44" shortDescription="Lorem Ipsum" />
+          <Enumeration label="Left" value="0x88" shortDescription="Lorem Ipsum" />
+          <Enumeration label="RightLeft" value="0xAA" shortDescription="Lorem Ipsum" />
         </EnumerationList>
       </EnumeratedDataType-->
 
