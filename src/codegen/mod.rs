@@ -8,7 +8,7 @@ use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, TokenStreamExt};
 
 use crate::eds::ast::{
-    BooleanDataType, ContainerDataType, DataType, EntryElement, Identifier, IntegerDataType,
+    BooleanDataType, ContainerDataType, DataType, EntryElement, IntegerDataType,
     NamedEntityType, Package, PackageFile,
 };
 
@@ -17,9 +17,36 @@ use syn::parse::Error as SynError;
 
 type TypeRefs<'a> = HashMap<String, &'a DataType>;
 
+
+pub struct RustTypeItem<'a> {
+    pub ident: Ident,
+    pub data_type: &'a DataType,
+}
+
+pub struct RustTypeRefs<'a> {
+    type_refs: HashMap<String, RustTypeItem<'a>>,
+}
+
+
+impl<'a> RustTypeRefs<'a> {
+    pub fn lookup_type(&self, name: &String) -> Result<&'a DataType, RustCodegenError> {
+        let lu = self.type_refs.get(name);
+        match lu {
+            Some(t) => Ok(t.data_type),
+            None => Err(RustCodegenError::InvalidType(name.clone())),
+        }
+    }
+}
+
+/// RustCodegenError is the error type for the Rust code generator
 #[derive(Debug)]
 pub enum RustCodegenError {
     InvalidIdentifier(SynError),
+    InvalidType(String),
+    InvalidBitSize(usize),
+    UnsupportedDataType(DataType),
+    UnsupportedEntryElement(EntryElement),
+    MultiplePackageFiles,
 }
 
 /// build the doc string from a NamedEntityType
@@ -54,16 +81,30 @@ fn get_doc_string(name: Option<&NamedEntityType>, name_entity_type: &NamedEntity
     description
 }
 
+/// format an identifier to snake_case
 fn format_snake_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
     let ident_str = ident.to_string();
     let snake_case = ident_str.to_snake_case();
     syn::parse_str(&snake_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
 }
 
+/// format an identifier to PascalCase
 fn format_pascal_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
     let ident_str = ident.to_string();
     let pascal_case = ident_str.to_pascal_case();
     syn::parse_str(&pascal_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
+}
+  
+/// get the closest, larger unsize type for a given size in bits
+fn uint_nearest(size_in_bits: &usize) -> Result<TokenStream, RustCodegenError> {
+    match size_in_bits {
+        0..=8 => Ok(quote! { u8 }),
+        9..=16 => Ok(quote! { u16 }),
+        17..=32 => Ok(quote! { u32 }),
+        33..=64 => Ok(quote! { u64 }),
+        65..=128 => Ok(quote! { u128 }),
+        size => Err(RustCodegenError::InvalidBitSize(*size)),
+    }
 }
 
 /// Trait to Implement Field Generation for a Struct
@@ -71,7 +112,7 @@ pub trait ToRustField {
     fn to_rust_field(
         &self,
         name: Option<&NamedEntityType>,
-        type_refs: &TypeRefs,
+        type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError>;
 }
 
@@ -79,7 +120,7 @@ pub trait ToRustStruct {
     fn to_rust_struct(
         &self,
         name: Option<&NamedEntityType>,
-        type_refs: &TypeRefs,
+        type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError>;
 }
 
@@ -98,7 +139,7 @@ impl ToRustMod for PackageFile {
         } else if self.package.len() == 1 {
             self.package[0].to_rust_mod(name)
         } else {
-            panic!("Multiple Packages not supported")
+           Err(RustCodegenError::MultiplePackageFiles) 
         }
     }
 }
@@ -107,30 +148,48 @@ impl ToRustMod for Package {
     fn to_rust_mod(&self, name: Option<&NamedEntityType>) -> Result<TokenStream, RustCodegenError> {
         let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
         // build type references map
-        let mut type_refs: HashMap<String, &DataType> = HashMap::new();
+        let mut type_refs: HashMap<String, RustTypeItem> = HashMap::new();
         for datatype in self.data_type_set.data_types.iter() {
             let ret = match datatype {
                 DataType::IntegerDataType(dt) => {
-                    type_refs.insert(dt.name_entity_type.name.0.clone(), datatype)
+                    let item = RustTypeItem {
+                        ident: format_pascal_case(&format_ident!("{}", dt.name_entity_type.name.0))?,
+                        data_type: datatype,
+                    };
+                    type_refs.insert(dt.name_entity_type.name.0.clone(), item)
                 }
                 DataType::BooleanDataType(dt) => {
-                    type_refs.insert(dt.name_entity_type.name.0.clone(), datatype)
+                    let item = RustTypeItem {
+                        ident: format_pascal_case(&format_ident!("{}", dt.name_entity_type.name.0))?,
+                        data_type: datatype,
+                    };
+                    type_refs.insert(dt.name_entity_type.name.0.clone(), item)
                 }
                 DataType::ContainerDataType(dt) => {
-                    type_refs.insert(dt.name_entity_type.name.0.clone(), datatype)
+                    let item = RustTypeItem {
+                        ident: format_pascal_case(&format_ident!("{}", dt.name_entity_type.name.0))?,
+                        data_type: datatype,
+                    };
+                    type_refs.insert(dt.name_entity_type.name.0.clone(), item)
                 }
-                dt => panic!("Unsupported DataType {:?}", dt),
+                dt => return Err(RustCodegenError::UnsupportedDataType(dt.clone())),
             };
             if ret.is_some() {
                 panic!("Duplicate DataType")
             }
         }
 
+        let rust_types = RustTypeRefs {
+            type_refs: type_refs,
+        };
+
         let mut structs = TokenStream::new();
+        let description = get_doc_string(name, &self.name_entity_type); 
         for dt in self.data_type_set.data_types.iter() {
-            structs.extend(dt.to_rust_struct(None, &type_refs)?);
+            structs.extend(dt.to_rust_struct(None, &rust_types)?);
         }
         Ok(quote!(
+            #[doc = #description]
             pub mod #sname {
                 use deku::{DekuRead, DekuWrite, DekuContainerWrite, DekuUpdate};
 
@@ -144,13 +203,13 @@ impl ToRustStruct for DataType {
     fn to_rust_struct(
         &self,
         name: Option<&NamedEntityType>,
-        type_refs: &TypeRefs,
+        type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError> {
         match self {
             DataType::IntegerDataType(dt) => dt.to_rust_struct(name, type_refs),
             DataType::BooleanDataType(dt) => dt.to_rust_struct(name, type_refs),
             DataType::ContainerDataType(dt) => dt.to_rust_struct(name, type_refs),
-            dt => panic!("Unsupported DataType {:?}", dt),
+            dt => Err(RustCodegenError::UnsupportedDataType(dt.clone())),
         }
     }
 }
@@ -159,13 +218,13 @@ impl ToRustField for DataType {
     fn to_rust_field(
         &self,
         name: Option<&NamedEntityType>,
-        type_refs: &TypeRefs,
+        type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError> {
         match self {
             DataType::IntegerDataType(dt) => dt.to_rust_field(name, type_refs),
             DataType::BooleanDataType(dt) => dt.to_rust_field(name, type_refs),
             DataType::ContainerDataType(dt) => dt.to_rust_field(name, type_refs),
-            dt => panic!("Unsupported DataType {:?}", dt),
+            dt => Err(RustCodegenError::UnsupportedDataType(dt.clone())),
         }
     }
 }
@@ -174,17 +233,10 @@ impl ToRustField for IntegerDataType {
     fn to_rust_field(
         &self,
         name: Option<&NamedEntityType>,
-        _type_refs: &TypeRefs,
+        _type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError> {
         let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
-        let ty = match self.encoding.size_in_bits {
-            0..=8 => quote! { u8 },
-            9..=16 => quote! { u16 },
-            17..=32 => quote! { u32 },
-            33..=64 => quote! { u64 },
-            65..=128 => quote! { u128 },
-            _ => panic!("Unsupported Integer Size"),
-        };
+        let ty = uint_nearest(&self.encoding.size_in_bits)?;
         let sib = format!("{}", self.encoding.size_in_bits);
         let endian = match self.encoding.byte_order {
             crate::eds::ast::ByteOrder::BigEndian => quote! { "big" },
@@ -197,23 +249,18 @@ impl ToRustField for IntegerDataType {
             pub #sname: #ty,
         })
     }
+
+
 }
 
 impl ToRustField for BooleanDataType {
     fn to_rust_field(
         &self,
         name: Option<&NamedEntityType>,
-        _type_refs: &TypeRefs,
+        _type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError> {
         let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
-        let ty = match self.encoding.size_in_bits {
-            0..=8 => quote! { u8 },
-            9..=16 => quote! { u16 },
-            17..=32 => quote! { u32 },
-            33..=64 => quote! { u64 },
-            65..=128 => quote! { u128 },
-            _ => panic!("Unsupported Integer Size"),
-        };
+        let ty = uint_nearest(&self.encoding.size_in_bits)?;
         let sib = format!("{}", self.encoding.size_in_bits);
         let description = get_doc_string(name, &self.name_entity_type);
         Ok(quote! {
@@ -238,7 +285,7 @@ impl ToRustStruct for IntegerDataType {
     fn to_rust_struct(
         &self,
         name: Option<&NamedEntityType>,
-        type_refs: &TypeRefs,
+        type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError> {
         let sname = format_pascal_case(&get_name(name, &self.name_entity_type))?;
         let field = self.to_rust_field(Some(&NamedEntityType::new("value")), type_refs)?;
@@ -259,7 +306,7 @@ impl ToRustStruct for BooleanDataType {
     fn to_rust_struct(
         &self,
         name: Option<&NamedEntityType>,
-        type_refs: &TypeRefs,
+        type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError> {
         let sname = format_pascal_case(&get_name(name, &self.name_entity_type))?;
         let field = self.to_rust_field(Some(&NamedEntityType::new("value")), type_refs)?;
@@ -281,7 +328,7 @@ fn _get_datatype_name(dt: &DataType) -> Ident {
         DataType::IntegerDataType(dt) => dt.name_entity_type.name.0.to_string(),
         DataType::BooleanDataType(dt) => dt.name_entity_type.name.0.to_string(),
         DataType::ContainerDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        _ => panic!("Unsupported EntryElement"),
+        dt => panic!("Unsupported datatype: {:?}", dt),
     };
     format_ident!("{}", name)
 }
@@ -289,13 +336,13 @@ fn _get_datatype_name(dt: &DataType) -> Ident {
 impl ToRustField for ContainerDataType {
     fn to_rust_field(
         &self,
-        name: Option<&NamedEntityType>,
-        type_refs: &TypeRefs,
+        _: Option<&NamedEntityType>,
+        type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError> {
         let mut fields = TokenStream::new();
         match &self.base_type {
             Some(bt) => {
-                let type_ = *type_refs.get(bt).unwrap();
+                let type_ = type_refs.lookup_type(&bt)?;
                 let tref = _get_datatype_name(&type_);
                 let base_field = quote!(
                     pub base: #tref,
@@ -309,9 +356,10 @@ impl ToRustField for ContainerDataType {
                 for entry in entries.entries.iter() {
                     match entry {
                         EntryElement::Entry(entry) => {
-                            let type_ = *type_refs.get(&entry.type_.0).unwrap();
-                            let name = &format_snake_case(&format_ident!("{}", entry.name_entity_type.name.0)).unwrap();
-                            let tref = format_pascal_case(&_get_datatype_name(&type_)).unwrap();
+                            // get type or return invalidtype
+                            let type_ = type_refs.lookup_type(&entry.type_.0)?;
+                            let name = &format_snake_case(&format_ident!("{}", entry.name_entity_type.name.0))?;
+                            let tref = format_pascal_case(&_get_datatype_name(&type_))?;
                             let description = get_doc_string(Some(&entry.name_entity_type), &entry.name_entity_type);
                             let field = quote! {
                                 #[doc = #description]
@@ -319,7 +367,10 @@ impl ToRustField for ContainerDataType {
                             };
                             fields.append_all(field);
                         }
-                        _ => println!("Unsupported EntryElement"),
+                        // TODO: handle length entry and error control entry
+                        EntryElement::LengthEntry(_) => (),
+                        EntryElement::ErrorControlEntry(_) => (),
+                        ee => return Err(RustCodegenError::UnsupportedEntryElement(ee.clone())),
                     }
                 }
             }
@@ -335,7 +386,7 @@ impl ToRustStruct for ContainerDataType {
     fn to_rust_struct(
         &self,
         name: Option<&NamedEntityType>,
-        type_refs: &TypeRefs,
+        type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError> {
         let sname = format_pascal_case(&get_name(name, &self.name_entity_type))?;
         let fields = self.to_rust_field(name, type_refs)?;
