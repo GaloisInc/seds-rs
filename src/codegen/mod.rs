@@ -36,6 +36,14 @@ impl<'a> RustTypeRefs<'a> {
             None => Err(RustCodegenError::InvalidType(name.clone())),
         }
     }
+
+    pub fn lookup_ident(&self, name: &String) -> Result<&Ident, RustCodegenError> {
+        let lu = self.type_refs.get(name);
+        match lu {
+            Some(t) => Ok(&t.ident),
+            None => Err(RustCodegenError::InvalidType(name.clone())),
+        }
+    }
 }
 
 /// RustCodegenError is the error type for the Rust code generator
@@ -287,7 +295,7 @@ impl ToRustStruct for IntegerDataType {
         name: Option<&NamedEntityType>,
         type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError> {
-        let sname = format_pascal_case(&get_name(name, &self.name_entity_type))?;
+        let sname = type_refs.lookup_ident(&get_name(name, &self.name_entity_type).to_string())?;
         let field = self.to_rust_field(Some(&NamedEntityType::new("value")), type_refs)?;
         let description = get_doc_string(name, &self.name_entity_type);
         let traits = get_traits();
@@ -308,7 +316,7 @@ impl ToRustStruct for BooleanDataType {
         name: Option<&NamedEntityType>,
         type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError> {
-        let sname = format_pascal_case(&get_name(name, &self.name_entity_type))?;
+        let sname = type_refs.lookup_ident(&get_name(name, &self.name_entity_type).to_string())?;
         let field = self.to_rust_field(Some(&NamedEntityType::new("value")), type_refs)?;
         let description = get_doc_string(name, &self.name_entity_type);
         let traits = get_traits();
@@ -359,7 +367,7 @@ impl ToRustField for ContainerDataType {
                             // get type or return invalidtype
                             let type_ = type_refs.lookup_type(&entry.type_.0)?;
                             let name = &format_snake_case(&format_ident!("{}", entry.name_entity_type.name.0))?;
-                            let tref = format_pascal_case(&_get_datatype_name(&type_))?;
+                            let tref = type_refs.lookup_ident(&_get_datatype_name(&type_).to_string())?;
                             let description = get_doc_string(Some(&entry.name_entity_type), &entry.name_entity_type);
                             let field = quote! {
                                 #[doc = #description]
@@ -388,7 +396,7 @@ impl ToRustStruct for ContainerDataType {
         name: Option<&NamedEntityType>,
         type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError> {
-        let sname = format_pascal_case(&get_name(name, &self.name_entity_type))?;
+        let sname = type_refs.lookup_ident(&get_name(name, &self.name_entity_type).to_string())?;
         let fields = self.to_rust_field(name, type_refs)?;
         let description = get_doc_string(name, &self.name_entity_type);
         let traits = get_traits();
