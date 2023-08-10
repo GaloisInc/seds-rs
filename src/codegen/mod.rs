@@ -15,20 +15,20 @@ use crate::eds::ast::{
 use heck::{ToPascalCase, ToSnakeCase};
 use syn::parse::Error as SynError;
 
-type TypeRefs<'a> = HashMap<String, &'a DataType>;
-
-
+/// Type Information (Rust Identifier, SEDS DataType) to Store While Traversing the AST
 pub struct RustTypeItem<'a> {
     pub ident: Ident,
     pub data_type: &'a DataType,
 }
 
+/// Rust Type Refs Available to Traverser of the AST
 pub struct RustTypeRefs<'a> {
     type_refs: HashMap<String, RustTypeItem<'a>>,
 }
 
 
 impl<'a> RustTypeRefs<'a> {
+    /// Lookup a type by name
     pub fn lookup_type(&self, name: &String) -> Result<&'a DataType, RustCodegenError> {
         let lu = self.type_refs.get(name);
         match lu {
@@ -37,6 +37,7 @@ impl<'a> RustTypeRefs<'a> {
         }
     }
 
+    /// Lookup an identifier by name
     pub fn lookup_ident(&self, name: &String) -> Result<&Ident, RustCodegenError> {
         let lu = self.type_refs.get(name);
         match lu {
@@ -54,6 +55,7 @@ pub enum RustCodegenError {
     InvalidBitSize(usize),
     UnsupportedDataType(DataType),
     UnsupportedEntryElement(EntryElement),
+    ConflictingDataType(DataType),
     MultiplePackageFiles,
 }
 
@@ -124,6 +126,7 @@ pub trait ToRustField {
     ) -> Result<TokenStream, RustCodegenError>;
 }
 
+/// Trait to Implement Struct Generation
 pub trait ToRustStruct {
     fn to_rust_struct(
         &self,
@@ -132,6 +135,7 @@ pub trait ToRustStruct {
     ) -> Result<TokenStream, RustCodegenError>;
 }
 
+/// Trait to Implement Module Generation
 pub trait ToRustMod {
     fn to_rust_mod(&self, name: Option<&NamedEntityType>) -> Result<TokenStream, RustCodegenError>;
 }
@@ -156,6 +160,7 @@ impl ToRustMod for Package {
     fn to_rust_mod(&self, name: Option<&NamedEntityType>) -> Result<TokenStream, RustCodegenError> {
         let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
         // build type references map
+        // TODO: this is ugly
         let mut type_refs: HashMap<String, RustTypeItem> = HashMap::new();
         for datatype in self.data_type_set.data_types.iter() {
             let ret = match datatype {
@@ -182,8 +187,9 @@ impl ToRustMod for Package {
                 }
                 dt => return Err(RustCodegenError::UnsupportedDataType(dt.clone())),
             };
-            if ret.is_some() {
-                panic!("Duplicate DataType")
+            match ret {
+                Some(dt) => return Err(RustCodegenError::ConflictingDataType(dt.data_type.clone())),
+                None => (),
             }
         }
 
@@ -279,12 +285,14 @@ impl ToRustField for BooleanDataType {
     }
 }
 
+/// Get Deku traits for a codegen struct
 fn get_traits() -> TokenStream {
     quote! {
         #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
     }
 }
 
+/// Resolve name from an optional NamedEntityType and a NamedEntityType
 fn get_name(opt_name: Option<&NamedEntityType>, name: &NamedEntityType) -> Ident {
     format_ident!("{}", opt_name.unwrap_or(&name).name.0.to_string())
 }
@@ -331,12 +339,18 @@ impl ToRustStruct for BooleanDataType {
     }
 }
 
+/// Get the name of a datatype
 fn _get_datatype_name(dt: &DataType) -> Ident {
     let name = match dt {
         DataType::IntegerDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::FloatDataType(dt) => dt.name_entity_type.name.0.to_string(),
         DataType::BooleanDataType(dt) => dt.name_entity_type.name.0.to_string(),
         DataType::ContainerDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        dt => panic!("Unsupported datatype: {:?}", dt),
+        DataType::StringDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::EnumeratedDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::ArrayDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::SubRangeDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::NoneDataType => "None".to_string(),
     };
     format_ident!("{}", name)
 }
