@@ -194,7 +194,7 @@ impl ToRustField for IntegerDataType {
         Ok(quote! {
             #[doc = #description]
             #[deku(bits = #sib, endian = #endian)]
-            #sname: #ty,
+            pub #sname: #ty,
         })
     }
 }
@@ -219,7 +219,7 @@ impl ToRustField for BooleanDataType {
         Ok(quote! {
             #[doc = #description]
             #[deku(bits = #sib)]
-            #sname: #ty,
+            pub #sname: #ty,
         })
     }
 }
@@ -276,6 +276,16 @@ impl ToRustStruct for BooleanDataType {
     }
 }
 
+fn _get_datatype_name(dt: &DataType) -> Ident {
+    let name = match dt {
+        DataType::IntegerDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::BooleanDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::ContainerDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        _ => panic!("Unsupported EntryElement"),
+    };
+    format_ident!("{}", name)
+}
+
 impl ToRustField for ContainerDataType {
     fn to_rust_field(
         &self,
@@ -286,7 +296,11 @@ impl ToRustField for ContainerDataType {
         match &self.base_type {
             Some(bt) => {
                 let type_ = *type_refs.get(bt).unwrap();
-                fields.extend(type_.to_rust_field(name, type_refs)?);
+                let tref = _get_datatype_name(&type_);
+                let base_field = quote!(
+                    pub base: #tref,
+                );
+                fields.extend(base_field); 
             }
             None => (),
         }
@@ -296,13 +310,13 @@ impl ToRustField for ContainerDataType {
                     match entry {
                         EntryElement::Entry(entry) => {
                             let type_ = *type_refs.get(&entry.type_.0).unwrap();
-                            let name = &entry.name_entity_type.name.0;
-                            let name_entity = NamedEntityType {
-                                name: Identifier(name.clone()),
-                                short_description: entry.name_entity_type.short_description.clone(),
-                                long_description: entry.name_entity_type.long_description.clone(),
+                            let name = &format_snake_case(&format_ident!("{}", entry.name_entity_type.name.0)).unwrap();
+                            let tref = format_pascal_case(&_get_datatype_name(&type_)).unwrap();
+                            let description = get_doc_string(Some(&entry.name_entity_type), &entry.name_entity_type);
+                            let field = quote! {
+                                #[doc = #description]
+                                pub #name: #tref,
                             };
-                            let field = type_.to_rust_field(Some(&name_entity), type_refs)?;
                             fields.append_all(field);
                         }
                         _ => println!("Unsupported EntryElement"),
