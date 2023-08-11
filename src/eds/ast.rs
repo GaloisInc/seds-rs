@@ -489,3 +489,14 @@ pub struct SubRangeDataType {
     pub unit: String,
     pub range: Range,
 }
+
+/// convenience function for creating ast
+impl NamedEntityType {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: Identifier(name.to_string()),
+            short_description: None,
+            long_description: None,
+        }
+    }
+}

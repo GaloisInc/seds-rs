@@ -19,19 +19,21 @@ build_job:
   script:
     - rustc --version
     - cargo build --verbose
-  artifacts:
-    paths:
-      - target/
 
 test_job:
   stage: test
   script:
+    - rustup component add rustfmt
     - git submodule update --init
     - cargo test --verbose -- --nocapture
+  artifacts:
+    paths:
+      - test_output/
 
 coverage_job:
   stage: coverage
   script: 
+    - rustup component add rustfmt
     - git submodule update --init
     - cargo install cargo-tarpaulin
     - cargo tarpaulin
