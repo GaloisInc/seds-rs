@@ -20,6 +20,11 @@ build_job:
     - rustc --version
     - cargo build --verbose
 
+validate_job:
+  stage: test
+  script:
+    - ./validate.sh
+
 test_job:
   stage: test
   script:
