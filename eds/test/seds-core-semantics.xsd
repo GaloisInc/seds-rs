@@ -1,0 +1,1380 @@
+<xs:schema targetNamespace="http://www.ccsds.org/schema/sois/seds"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:seds="http://www.ccsds.org/schema/sois/seds"
+	elementFormDefault="qualified"
+>
+	<xs:simpleType name="DoTQuantityKind">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="celsiusTemperatureQK"/>
+			<xs:enumeration value="energyQK">
+				<xs:annotation>
+					<xs:documentation>Energy is also known as work and quantity of heat.
+Energy has the same units as torque, which is a different quantity kind.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="lengthQK"/>
+			<xs:enumeration value="massQK"/>
+			<xs:enumeration value="powerQK"/>
+			<xs:enumeration value="thermodynamicTemperatureQK"/>
+			<xs:enumeration value="timeQK"/>
+			<xs:enumeration value="velocityQK"/>
+			<xs:enumeration value="acousticPowerQK">
+				<xs:annotation>
+					<xs:documentation>Acoustic power measures the energy of sound in matter.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="amountOfMolecularSpeciesQK">
+				<xs:annotation>
+					<xs:documentation>The amount of a substance is correlated with the number of molecules of that substance that are present.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="angleQK">
+				<xs:annotation>
+					<xs:documentation>Angle measures the arc separation of two rays at some standard radius from their common point of origin.  There is a choice between two angles, each of which is the difference between a full revolution and the other.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="angularRateQK">
+				<xs:annotation>
+					<xs:documentation>An angular rate is a measure of speed of rotation.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="areaQK"/>
+			<xs:enumeration value="astronomicalMagnitudeQK">
+				<xs:annotation>
+					<xs:documentation>Astronomical magnitude provides a logarithmic comparison of apparent magnitudes of stars and other visible objects.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="capacitanceQK">
+				<xs:annotation>
+					<xs:documentation>Capacitance is the amount of charge that can be stored in a capacitor per change in electrical potential across the input to the device.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="dataRateQK">
+				<xs:annotation>
+					<xs:documentation>Data rate quantity kind is the rate of transfer of information per time.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="dynamicViscosityQK"/>
+			<xs:enumeration value="electricChargeDensityQK"/>
+			<xs:enumeration value="electricChargeQK"/>
+			<xs:enumeration value="electricConductancePerDistanceQK"/>
+			<xs:enumeration value="electricConductanceQK"/>
+			<xs:enumeration value="electricCurrentDensityQK">
+				<xs:annotation>
+					<xs:documentation>Electric current density is the same as electric current, but normalized per cross section area through which the current flow.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="electricCurrentQK">
+				<xs:annotation>
+					<xs:documentation>Electric current is a measure of the amount of electrical charge flowing through a known cross section per time.  The default interpretation of cross section is the cross section of a wire in an electrical circuit, perpendicular to the path of the wire.  For current through other media, the cross section must be explained separately.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="electricDipoleMomentQK"/>
+			<xs:enumeration value="electricDisplacementQK"/>
+			<xs:enumeration value="electricPotentialGradientQK">
+				<xs:annotation>
+					<xs:documentation>An electric potential gradient can be used to estimate the chance of dielectric failure.  This quantity kind is also known as electric field strength.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="electricPotentialQK">
+				<xs:annotation>
+					<xs:documentation>Electric potential measures the energy that would be gained by an electric charge moving from the point of measurement to the reference point, which has zero potential.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="electricResistanceQK"/>
+			<xs:enumeration value="entropyQK">
+				<xs:annotation>
+					<xs:documentation>Entropy may also be called "heat capacity".</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="forceQK"/>
+			<xs:enumeration value="frequencyQK">
+				<xs:annotation>
+					<xs:documentation>Frequency measures the rate at which some implicitly defined event occurs.  This ontology differentiates inverse seconds from frequency, because the former has no event associated with it.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="inductanceQK"/>
+			<xs:enumeration value="informationQK">
+				<xs:annotation>
+					<xs:documentation>This quantity kind is also known as entropy.  Claude Shannon is said to have considered calling it information or uncertainty, preferring the latter because the former seemed overused.  John von Neumann advised calling it entropy, because it was already in use in statistical mechanics.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="luminanceQK">
+				<xs:annotation>
+					<xs:documentation>Luminance provides a measure of spectral flux density that is invariant along a light beam.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="luminosityQK">
+				<xs:annotation>
+					<xs:documentation>Luminosity, or luminous intensity, measures the strength of electromagnetic radiation.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="magneticDipoleMomentQK"/>
+			<xs:enumeration value="magneticFieldStrengthQK"/>
+			<xs:enumeration value="magneticFluxDensityQK"/>
+			<xs:enumeration value="magneticFluxQK"/>
+			<xs:enumeration value="magneticPoleStrengthQK"/>
+			<xs:enumeration value="percentQK"/>
+			<xs:enumeration value="permeabilityQK"/>
+			<xs:enumeration value="pixelQK">
+				<xs:annotation>
+					<xs:documentation>The pixel quantity kind represents a count of pixels.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="pressureQK"/>
+			<xs:enumeration value="quantityQK">
+				<xs:annotation>
+					<xs:documentation>The number of countable individuals of the subject class.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="solidAngleQK"/>
+			<xs:enumeration value="specificCapacitanceQK"/>
+			<xs:enumeration value="surfaceTensionQK"/>
+			<xs:enumeration value="torqueQK">
+				<xs:annotation>
+					<xs:documentation>Torque is also known as the moment of force.
+Torque has the same units as energy, which is a different quantity kind.  Torque is a vector (but is often expressed as a scalar when the axis is obvious), and energy is a scalar.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="volumeQK"/>
+			<xs:enumeration value="volumetricFlowQK">
+				<xs:annotation>
+					<xs:documentation>Volumetric flow measures the rate of passage of incompressible fluid through a portal, or the rate of sweep of space by a moving scoop.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DoTUnit">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="degreeCelsius"/>
+			<xs:enumeration value="gram"/>
+			<xs:enumeration value="inch">
+				<xs:annotation>
+					<xs:documentation>An inch is a unit derived from the SI metre, with conversion factor 0.0254 m/inch.  This conversion is consistent with the international yard agreed in 1959 by both USA and UK.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="joule"/>
+			<xs:enumeration value="kelvin"/>
+			<xs:enumeration value="kilogram"/>
+			<xs:enumeration value="metre"/>
+			<xs:enumeration value="metrePerSecond"/>
+			<xs:enumeration value="second"/>
+			<xs:enumeration value="watt"/>
+			<xs:enumeration value="aToDCount">
+				<xs:annotation>
+					<xs:documentation>An analog to digital count is a number produced by an analog-to-digital converter to measure a physical quantity.  The measurement action counts the time for the measurement transducer to reach equilibrium.
+A count represents a quantity kind that depends upon the analog process that is being measured.  For this reason, the association between count and quantity kind should ideally not be fully specified in this ontology, but should wait until the time of describing a particular device.  However, that specification may require additional syntax in a schema.  The current strategy in this ontology is to leave the specification of quantity kind to the point of description of a device, and to expect the additional syntax in the schema that uses this concept.  The alternative is to define a subclass of AToDCount for each quantity kind.  The delayed specification of quantity kind may provide a model to simplify the definition of other units.
+Typically, a count will be the basis for a conversion-based unit that converts the count into a physical quantity.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ampere">
+				<xs:annotation>
+					<xs:documentation>An ampere is one of the base units in the SI units of measure, corresonding to the quantity kind of electric current.  It represents a coulomb of electrical charge flowing through a known cross section per time.  The default interpretation of cross section is the cross section of a wire in an electrical circuit, perpendicular to the path of the wire.  For current through other media, the cross section must be explained separately.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ampere-hour">
+				<xs:annotation>
+					<xs:documentation>An ampere-hour is a measure of electric charge typically used to describe the capacity of an electric battery.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ampere-metre"/>
+			<xs:enumeration value="ampere-squareMetre"/>
+			<xs:enumeration value="amperePerMetre"/>
+			<xs:enumeration value="amperePerSquareMetre"/>
+			<xs:enumeration value="arcsecond">
+				<xs:annotation>
+					<xs:documentation>An arcsecond is 1/3600 of a degree of angle.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="arcsecondPerSecond"/>
+			<xs:enumeration value="astronomicalUnit">
+				<xs:annotation>
+					<xs:documentation>An astronomical unit is the nominal distance between Earth and Sun.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="bar">
+				<xs:annotation>
+					<xs:documentation>A bar is approximately the same a the air pressure on Earth at sea level.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="bit">
+				<xs:annotation>
+					<xs:documentation>A bit is a measure of information, uncertainty, or entropy.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="bitsPerSecond"/>
+			<xs:enumeration value="byte">
+				<xs:annotation>
+					<xs:documentation>A byte is 8 bits of information.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="candela">
+				<xs:annotation>
+					<xs:documentation>A candela is the unit of luminous intensity in the international system of units.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="coulomb"/>
+			<xs:enumeration value="coulombPerCubicMetre"/>
+			<xs:enumeration value="coulombPerSquareMetre"/>
+			<xs:enumeration value="count">
+				<xs:annotation>
+					<xs:documentation>A count is an integer that represents the number of individuals of the subject class.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="cubicMetre"/>
+			<xs:enumeration value="cubicMetrePerSecond"/>
+			<xs:enumeration value="day">
+				<xs:annotation>
+					<xs:documentation>A day is the average nominal time for the Earth to rotate from one noon to the next noon at the same geographic location.  The formal definition approximates this astronomical observation using the SI unit of second, which is based upon atomic phenomena: 86400 SI seconds = 1 day.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="debye"/>
+			<xs:enumeration value="decibel">
+				<xs:annotation>
+					<xs:documentation>A decibel is 10 times the base 10 logarithm of the ratio of a measured quantity to a reference quantity.  The quantities are generally power or intensity.  The reference quantity is often implicit in casual usage.  In this ontology, the implicit form only refers to the sound pressure level reference near the threshold of human hearing, the sound of a mosquito flying three metres away.  All other reference quantities must be stated in the name of the unit, such as dBW, in which the reference quantity is one Watt.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="decibelWatt">
+				<xs:annotation>
+					<xs:documentation>A decibel watt is 10 times the base 10 logarithm of the ratio of a measured quantity to 1 watt.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="degreeAngle">
+				<xs:annotation>
+					<xs:documentation>A degree of angle is 1/360 of one full rotation.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="electron">
+				<xs:annotation>
+					<xs:documentation>An electron is an elementary particle that carries an electric charge.  The unit of electron is the measure of the charge of one electron.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="electronsPerPixelPerSecond"/>
+			<xs:enumeration value="farad">
+				<xs:annotation>
+					<xs:documentation>A farad is the charge in Coulombs that a capacitor will accept for the potential across it to change by one volt.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="faradPerMetre"/>
+			<xs:enumeration value="henry"/>
+			<xs:enumeration value="henryPerMetre"/>
+			<xs:enumeration value="hertz">
+				<xs:annotation>
+					<xs:documentation>Hertz is the frequency of 1 event per second.  The event is not explicitly defined in the unit.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="hour">
+				<xs:annotation>
+					<xs:documentation>An hour is one 24th of a day.  The formal definition refers to the SI unit of second: 3600 SI seconds = 1 hour.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="inverseHenry"/>
+			<xs:enumeration value="inverseKelvin"/>
+			<xs:enumeration value="inverseSecond"/>
+			<xs:enumeration value="joulePerKelvin"/>
+			<xs:enumeration value="kibibyte">
+				<xs:annotation>
+					<xs:documentation>A kibibyte is a measure of digital storage designated by the International Electrotechnical Commission to be clear that it represents 1024 bytes.  The SI prefix kilo is often used casually with the same intended meaning, but the formal meaning of the SI prefix is a multiplier of 1000.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="kilogramMetreSquared"/>
+			<xs:enumeration value="kilogramPerMetre"/>
+			<xs:enumeration value="litre">
+				<xs:annotation>
+					<xs:documentation>A litre is 1/1000 of a cubic metre.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="megabitsPerSecond"/>
+			<xs:enumeration value="metrePerSecondPerSecond"/>
+			<xs:enumeration value="microsecond"/>
+			<xs:enumeration value="millisecond"/>
+			<xs:enumeration value="minute">
+				<xs:annotation>
+					<xs:documentation>A minute is one 60th of an hour.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="mole">
+				<xs:annotation>
+					<xs:documentation>A mole is a base unit in the SI units of measure.  It represents the quantity of a molecular species.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="newton"/>
+			<xs:enumeration value="newtonMetre"/>
+			<xs:enumeration value="newtonPerMetre"/>
+			<xs:enumeration value="nit">
+				<xs:annotation>
+					<xs:documentation>A nit is a measure of luminance, which is invariant along the propagation of a light beam.  It is measured in candelas per square meter.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ohm"/>
+			<xs:enumeration value="pascal"/>
+			<xs:enumeration value="pascalSecond"/>
+			<xs:enumeration value="percent">
+				<xs:annotation>
+					<xs:documentation>a percent is a ratio multiplied by 100</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="pixel">
+				<xs:annotation>
+					<xs:documentation>The pixel unit represents a count of 1 pixels.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="radian">
+				<xs:annotation>
+					<xs:documentation>A radian is a natural measure of angle.  It is the ratio of the length of the arc within the angle to the length of the radius of the arc.  There are 2pi radians in a full rotation.
+In SI units a radian would be unitless, because it is the ratio of two lengths.  In this ontology it is treated as a fundamental concept, independent of interaction with length.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="radianPerSecond">
+				<xs:annotation>
+					<xs:documentation>A radian per second is an angular rate that rotates one radian each second of time.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="siemens"/>
+			<xs:enumeration value="siemensPerMetre"/>
+			<xs:enumeration value="squareMetre"/>
+			<xs:enumeration value="stellarMagnitude">
+				<xs:annotation>
+					<xs:documentation>Stellar magnitude provides a logarithmic scale for describing the brightness of stars in which the star Vega has magnitude zero, and dimmer stars have higher magnitudes.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="steradian"/>
+			<xs:enumeration value="tesla"/>
+			<xs:enumeration value="volt">
+				<xs:annotation>
+					<xs:documentation>A volt is the unit of energy gained by one coulomb of electrical charge moving from the point of measurement to the reference point, where the potential energy is zero.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="voltPerMetre"/>
+			<xs:enumeration value="weber"/>
+			<xs:enumeration value="weberMetre"/>
+			<xs:enumeration value="weberPerMetre"/>
+			<xs:enumeration value="weberPerSquareMetre">
+				<xs:annotation>
+					<xs:documentation>A weber per square metre is also known as a tesla.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="weberPerSteradian"/>
+			<xs:enumeration value="fractionOfMaximum">
+				<xs:annotation>
+					<xs:documentation>A fraction of maximum is a number in which the value 0 represents the minimum value of a scale, and the value 1 represents the maximum value of the scale.  The minimum and maximum values of the scale must be explained separately.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="chirality">
+		<xs:annotation>
+			<xs:documentation>This term indicates the handedness of a coordinate system.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="leftHanded">
+				<xs:annotation>
+					<xs:documentation>A left-handed coordinate system has three dimensions, and the order of the presentation of positive values of the dimensions in a vector corresponds to the directions of thumb, index, and medius fingers of a human left hand.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="rightHanded">
+				<xs:annotation>
+					<xs:documentation>A right-handed coordinate system has three dimensions, and the order of the presentation of positive values of the dimensions in a vector corresponds to the directions of thumb, index, and medius fingers of a human right hand.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="coordinateType">
+		<xs:annotation>
+			<xs:documentation>The “coordinate type” term indicates how to interpret a semantic type that is an array of coordinates.  The arrays to which the coordinate type applies may be interpreted as locations in a phase space, such as position and velocity vectors.  For arrays that may be interpreted as transformation from one frame to another, such as quaternions and direction cosine matrices, the transformation type applies.
+The “coordinate type” term specifies a particular combination of the following terms:
+•	coordinate system
+•	array size
+•	unit of measure
+•	reference frame
+Some of the terms listed above may be incompletely determined by a “coordinate type” value, and so must be specified in an electronic data sheet with that “coordinate type” value when defining an item of data.  Those terms above that are completely determined by a “coordinate type” value need not be specified with that value in an electronic data sheet.  The definition of a value of the “coordinate type” term in the dictionary of terms must provide the information about the terms listed above.
+In an electronic data sheet this term is the “coordinateType” attribute of a data item.
+Use Cases:
+Interpret a semantic type that is an array of numbers.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="J2000">
+				<xs:annotation>
+					<xs:documentation>The “J2000” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = Cartesian
+•	array size = 3
+•	unit of measure = length
+•	reference frame = ECI
+The elements of the vector are interpreted as Cartesian coordinates.  This approximately inertial coordinate frame has its origin at the center of the Earth.  It is defined with the Earth's Mean Equator and Equinox at 12:00 Terrestrial Time on 1 January 2000.  The x axis points toward the mean equinox corresponding to northern spring.  The z axis points north along the earth’s spin axis.  The y axis is 90 degrees east of the x axis in the plane of the equator, such that it forms a right-handed coordinate system.
+The “unit of measure” must be specified with this coordinate type.
+Use Cases:
+Specify that a semantic type is a vector with a coordinate system that corresponds to ECI J2000.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LLA">
+				<xs:annotation>
+					<xs:documentation>The “LLA” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = latitude, longitude, altitude
+•	array size = 3
+•	unit of measure = degree, degree, meter
+•	reference frame = ECEF
+The elements of the vector are interpreted as spherical coordinates, and the two angle coordinates are treated as latitude and longitude; the radial coordinate is zero at the radius of Earth’s mean sea level.  This coordinate system has its origin at the intersection of the prime meridian and the equator.  Latitude is often marked north or south, instead of using negative angles.  Similarly, angular distance around the equator is often marked as east or west.
+Use Cases:
+Specify the semantic type of a vector location of a building on Earth that is a target of surveillance.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MOD">
+				<xs:annotation>
+					<xs:documentation>The “MOD” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = Cartesian
+•	array size = 3
+•	unit of measure = length
+•	reference frame = ECI
+The elements of the vector are interpreted as Cartesian coordinates.  This approximately inertial coordinate frame has its origin at the center of the Earth.  It is defined with the Earth's mean equator and equinox at a particular date, assumed here to be the time of the measurement.  The x axis points toward the mean equinox corresponding to northern spring.  The z axis points north along the earth’s spin axis.  The y axis is 90 degrees east of the x axis in the plane of the equator, such that it forms a right-handled coordinate system.
+The “unit of measure” must be specified with this coordinate type.
+Use Cases:
+Specify that a semantic type is a vector with a coordinate system that corresponds to ECI MOD at the time of measurement.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TOD">
+				<xs:annotation>
+					<xs:documentation>The “TOD” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = Cartesian
+•	array size = 3
+•	unit of measure = length
+•	reference frame = ECI
+The elements of the vector are interpreted as Cartesian coordinates.  This approximately inertial coordinate frame has its origin at the center of the Earth.  It is defined with the Earth's true equator and equinox at a particular date, assumed here to be the time of the measurement.  The x axis points toward the true equinox corresponding to northern spring.  The z axis points north along the earth’s spin axis.  The y axis is 90 degrees east of the x axis in the plane of the equator, such that it forms a right-handled coordinate system. 
+The “unit of measure” must be specified with this coordinate type.
+Use Cases:
+Specify that a semantic type is a vector with a coordinate system that corresponds to ECI TOD at the time of measurement.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UPS">
+				<xs:annotation>
+					<xs:documentation>The “UPS” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = latitude, longitude
+•	array size = 2
+•	unit of measure = degree
+•	reference frame = ECEF
+The elements of the vector are interpreted as universal polar stereographic coordinates.
+Use Cases:
+Specify that a semantic type is a vector location on Earth, with a coordinate system that corresponds to universal polar stereographic coordinates.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UTC">
+				<xs:annotation>
+					<xs:documentation>The “UTC” value of the “coordinate type” term specifies that a number is coordinated universal time as defined by the International Telecommunication Union and the International Astronomical Union.  The abbreviation is a compromise between “coordinated universal time” and “temps universel coordonné”.
+Use Cases:
+Represent the time obtained from a global positioning system.
+Represent the time obtained from an atomic clock.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UTM">
+				<xs:annotation>
+					<xs:documentation>The “UTM” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = latitude, longitude
+•	array size = 2
+•	unit of measure = degree
+•	reference frame = ECEF
+The elements of the vector are interpreted as universal transverse Mercator coordinates.
+Use Cases:
+Specify that a semantic type is a vector location on Earth, with a coordinate system that corresponds to universal transverse Mercator coordinates.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="latLon">
+				<xs:annotation>
+					<xs:documentation>The “LatLon” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = latitude, longitude
+•	array size = 2
+•	unit of measure = degree
+•	reference frame = ECEF
+The elements of the vector are interpreted as spherical coordinates, but only the two angle coordinates are used; the radial coordinate is fixed at the mean radius of Earth.  This coordinate system has its origin at the intersection of the prime meridian and the equator.  Latitude is often marked north or south, instead of using negative angles.  Similarly, angular distance around the equator is often marked as east or west.  Both of these directional conventions must be specified if a device uses them; the term is “latlon convention”.
+Use Cases:
+Specify the semantic type of a vector location of a ship at sea on Earth.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DtnTime">
+				<xs:annotation>
+					<xs:documentation>A DTN time is an unsigned integer indicating an interval of Unix epoch time that has elapsed since the start of the year 2000 on the Coordinated Universal Time scale, which is Unix epoch timestamp 946684800. (Note that the DTN time that equates to the current time as reported by the UNIX time() function can be derived by subtracting 946684800 from that reported time value.)  There are no leap seconds in DTN time.  See draft draft-ietf-dtn-bpbis-14.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ICRS">
+				<xs:annotation>
+					<xs:documentation>The International Celestial Reference System has its origin at the barycenter of the solar system.  The pole is defined by the International Astronomical Union models for precession and nutation.  The origin of right ascensions is the same as J2000.
+•	coordinate system = azimuth, right ascension
+•	array size = 2
+•	unit of measure quantity kind = angle
+•	reference frame = ICRF</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="toCoordinateType">
+		<xs:annotation>
+			<xs:documentation>The toCoordinateType identifies the coordinate type that results from a transformation from the coordinate system identified by the coordinateType.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="J2000">
+				<xs:annotation>
+					<xs:documentation>The “J2000” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = Cartesian
+•	array size = 3
+•	unit of measure = length
+•	reference frame = ECI
+The elements of the vector are interpreted as Cartesian coordinates.  This approximately inertial coordinate frame has its origin at the center of the Earth.  It is defined with the Earth's Mean Equator and Equinox at 12:00 Terrestrial Time on 1 January 2000.  The x axis points toward the mean equinox corresponding to northern spring.  The z axis points north along the earth’s spin axis.  The y axis is 90 degrees east of the x axis in the plane of the equator, such that it forms a right-handed coordinate system.
+The “unit of measure” must be specified with this coordinate type.
+Use Cases:
+Specify that a semantic type is a vector with a coordinate system that corresponds to ECI J2000.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LLA">
+				<xs:annotation>
+					<xs:documentation>The “LLA” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = latitude, longitude, altitude
+•	array size = 3
+•	unit of measure = degree, degree, meter
+•	reference frame = ECEF
+The elements of the vector are interpreted as spherical coordinates, and the two angle coordinates are treated as latitude and longitude; the radial coordinate is zero at the radius of Earth’s mean sea level.  This coordinate system has its origin at the intersection of the prime meridian and the equator.  Latitude is often marked north or south, instead of using negative angles.  Similarly, angular distance around the equator is often marked as east or west.
+Use Cases:
+Specify the semantic type of a vector location of a building on Earth that is a target of surveillance.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MOD">
+				<xs:annotation>
+					<xs:documentation>The “MOD” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = Cartesian
+•	array size = 3
+•	unit of measure = length
+•	reference frame = ECI
+The elements of the vector are interpreted as Cartesian coordinates.  This approximately inertial coordinate frame has its origin at the center of the Earth.  It is defined with the Earth's mean equator and equinox at a particular date, assumed here to be the time of the measurement.  The x axis points toward the mean equinox corresponding to northern spring.  The z axis points north along the earth’s spin axis.  The y axis is 90 degrees east of the x axis in the plane of the equator, such that it forms a right-handled coordinate system.
+The “unit of measure” must be specified with this coordinate type.
+Use Cases:
+Specify that a semantic type is a vector with a coordinate system that corresponds to ECI MOD at the time of measurement.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="TOD">
+				<xs:annotation>
+					<xs:documentation>The “TOD” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = Cartesian
+•	array size = 3
+•	unit of measure = length
+•	reference frame = ECI
+The elements of the vector are interpreted as Cartesian coordinates.  This approximately inertial coordinate frame has its origin at the center of the Earth.  It is defined with the Earth's true equator and equinox at a particular date, assumed here to be the time of the measurement.  The x axis points toward the true equinox corresponding to northern spring.  The z axis points north along the earth’s spin axis.  The y axis is 90 degrees east of the x axis in the plane of the equator, such that it forms a right-handled coordinate system. 
+The “unit of measure” must be specified with this coordinate type.
+Use Cases:
+Specify that a semantic type is a vector with a coordinate system that corresponds to ECI TOD at the time of measurement.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UPS">
+				<xs:annotation>
+					<xs:documentation>The “UPS” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = latitude, longitude
+•	array size = 2
+•	unit of measure = degree
+•	reference frame = ECEF
+The elements of the vector are interpreted as universal polar stereographic coordinates.
+Use Cases:
+Specify that a semantic type is a vector location on Earth, with a coordinate system that corresponds to universal polar stereographic coordinates.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UTC">
+				<xs:annotation>
+					<xs:documentation>The “UTC” value of the “coordinate type” term specifies that a number is coordinated universal time as defined by the International Telecommunication Union and the International Astronomical Union.  The abbreviation is a compromise between “coordinated universal time” and “temps universel coordonné”.
+Use Cases:
+Represent the time obtained from a global positioning system.
+Represent the time obtained from an atomic clock.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UTM">
+				<xs:annotation>
+					<xs:documentation>The “UTM” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = latitude, longitude
+•	array size = 2
+•	unit of measure = degree
+•	reference frame = ECEF
+The elements of the vector are interpreted as universal transverse Mercator coordinates.
+Use Cases:
+Specify that a semantic type is a vector location on Earth, with a coordinate system that corresponds to universal transverse Mercator coordinates.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="latLon">
+				<xs:annotation>
+					<xs:documentation>The “LatLon” value of the “coordinate type” term specifies the following information for a semantic type:
+•	coordinate system = latitude, longitude
+•	array size = 2
+•	unit of measure = degree
+•	reference frame = ECEF
+The elements of the vector are interpreted as spherical coordinates, but only the two angle coordinates are used; the radial coordinate is fixed at the mean radius of Earth.  This coordinate system has its origin at the intersection of the prime meridian and the equator.  Latitude is often marked north or south, instead of using negative angles.  Similarly, angular distance around the equator is often marked as east or west.  Both of these directional conventions must be specified if a device uses them; the term is “latlon convention”.
+Use Cases:
+Specify the semantic type of a vector location of a ship at sea on Earth.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ICRS">
+				<xs:annotation>
+					<xs:documentation>The International Celestial Reference System has its origin at the barycenter of the solar system.  The pole is defined by the International Astronomical Union models for precession and nutation.  The origin of right ascensions is the same as J2000.
+•	coordinate system = azimuth, right ascension
+•	array size = 2
+•	unit of measure quantity kind = angle
+•	reference frame = ICRF</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="differenceConvention">
+		<xs:annotation>
+			<xs:documentation>Variables that represent a difference between values of measureable quantities are called “relative” variables.  This term identifies the convention for computing the difference.
+In an electronic data sheet this term is the “differenceConvention” attribute of a data item.
+Use Cases:
+Specify that the change in speed reported by a single-axis accelerometer is the difference between the speed at the time of reporting and the speed at the time of the previous report.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="comparison">
+				<xs:annotation>
+					<xs:documentation>The “comparison” term identifies the difference convention for variables without a specific absolute reference frame.
+Use Cases:
+Specify that the voltage reported by a voltage meter is a difference in potential without a reference ground.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="delta">
+				<xs:annotation>
+					<xs:documentation>The “delta” term identifies a difference between the value of a variable at one time compared to the value at a prior time.  For measurements, the prior time is the time that the variable was last reported, or since initialization.  For commanded values, the prior time is the time of the current command.
+Use Cases:
+Identify the change in speed reported by an accelerometer.
+Identify the elapsed time since the last report of a measurement from a sensor.
+Specify the time during which a command parameter is valid.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="gradient">
+				<xs:annotation>
+					<xs:documentation>The “gradient” term identifies a difference computed as the ratio of a delta variable to a path variable.  Such a variable is an average obtained by dividing the differences over the same reporting interval.
+Use Cases:
+Identify the rate of change of atmospheric density with altitude at a particular time and place.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="path">
+				<xs:annotation>
+					<xs:documentation>The “path” term identifies a difference between the value of a variable at one point on a path and the value at a prior point on the path.  The path is the continuously changing location and orientation of the device frame for the variable relative to the reference frame for the variable.  The prior point is the location at the time of the prior report or command.
+Use Cases:
+Identify the change in the Earth’s magnetic field reported by a magnetometer during the flight of the vehicle on which it is mounted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ratio">
+				<xs:annotation>
+					<xs:documentation>The “signalNoiseRatio” term indicates that a variable is a quotient of two quantities.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="sinceEpoch">
+				<xs:annotation>
+					<xs:documentation>The “sinceEpoch” term identifies the amount of time that has elapsed since a calendar epoch, so the data item that it describes is a date and time.
+Use Cases:
+Provide a time stamp on housekeeping data.
+Specify the time when an action should be performed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="sinceSync">
+				<xs:annotation>
+					<xs:documentation>The “sinceSync” term identifies the amount of time that has elapsed since the last synchronization signal.
+Use Cases:
+Identify the time at which a measurement was reported by a star tracker, relative to the last synchronization sent to the star tracker.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="interpretation">
+		<xs:annotation>
+			<xs:documentation>The “interpretation” term identifies a broad class of data types to which an item of data belongs.
+In an electronic data sheet, this term is the “interpretation” attribute of a data item.
+Use Cases:
+Determine how to interpret the semantic type string for a data item.
+Distinguish an index from a count.
+Distinguish a transformation from a position.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="command">
+				<xs:annotation>
+					<xs:documentation>Variables with this interpretation are the verb of a command.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="difference">
+				<xs:annotation>
+					<xs:documentation>Variables with this interpretation represent a difference between one physical quantity and another on the same scale.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="mode">
+				<xs:annotation>
+					<xs:documentation>Variables with this interpretation represent a mode of operation of a device.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="name">
+				<xs:annotation>
+					<xs:documentation>Variables with this interpretation are names of objects or variables in the management model of a system.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="orbit">
+				<xs:annotation>
+					<xs:documentation>Variables with this interpretation define an orbit.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="position">
+				<xs:annotation>
+					<xs:documentation>Variables with this interpretation represent a position in phase space.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="scope">
+				<xs:annotation>
+					<xs:documentation>Variables with this interpretation represent a region or subset of a device.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="status">
+				<xs:annotation>
+					<xs:documentation>Variables with this interpretation represent a status, such as an error condition, of a device.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="transformation">
+				<xs:annotation>
+					<xs:documentation>Variables with this interpretation represent a change of coordinate systems.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="checksum">
+				<xs:annotation>
+					<xs:documentation>A checksum is a compressed form of a larger string of bits.  A checksum cannot be decompressed to recover the larger strng.  A checksum can be transmitted with the larger string in order to detect errors in transmission, if both the receiver and the sender apply the same compression algorithm to the larger string, they should expect to obtain the same checksum value.  If the receiver finds a different checksum value than was transmitted with the larger string, then a transmission error is likely.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="validityPeriod">
+				<xs:annotation>
+					<xs:documentation>This interpretation can be assigned to a time duration argument in a command, in order to define the period of time allowed for execution of the command.  Better never than late.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="purpose">
+		<xs:annotation>
+			<xs:documentation>The purpose of a semantic type determines how to apply an instance of the type.  A person may think that the purpose of a semantic type derives from its context of usage, for example, thinking that a parameter of a command must be a set-point.  However, measured values that are not set-points may also be parameters of a command.  Both set-points and measured values may appear in published data.
+The purpose may be clear for simple commands and telemetry that set a data item in a device; in those cases, the purpose attribute can be left implicit.  In some housekeeping telemetry the distinction is not so clear; both set points and measurements may appear in the same relation; in those cases, the purpose attribute must be explicit on each data item.
+In an electronic data sheet this term is the “purpose” attribute of a data item.
+Use Cases:
+Distinguish a set-point from a measurement to be controlled.
+Distinguish a central value from a measured value.
+Distinguish an adjustment from a measurement</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="action">
+				<xs:annotation>
+					<xs:documentation>A semantic type with purpose = action is a specific amount of action to be applied to the real world through an actuator.
+Use Case:
+Distinguish a torque to be applied to a reaction wheel from a stress measured by a strain gauge nearby.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="calibration">
+				<xs:annotation>
+					<xs:documentation>A semantic type with purpose = calibration represents a number that is a measurement obtained through a calibration procedure.  It is a value obtained specifically for each instance of a device.
+Use Cases:
+Distinguish an adjustment from a measurement.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="measurement">
+				<xs:annotation>
+					<xs:documentation>A semantic type with purpose = measurement is a measurement of the real world obtained by a sensor.
+Use Cases:
+Distinguish a set-point from a measurement to be controlled.
+Distinguish a central value from a measured value.
+Distinguish an adjustment from a measurement.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="nominal">
+				<xs:annotation>
+					<xs:documentation>A semantic type with purpose = nominal is a number that is a non-specific central value over all instances of a device that result from a reproducible manufacturing process.
+Use Cases:
+Distinguish a central value from a measured value.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="setPoint">
+				<xs:annotation>
+					<xs:documentation>A semantic type with purpose = set-point is a value to be achieved by a control system, or a setting to be applied to a component.
+Use Cases:
+Distinguish a set-point from a measurement to be controlled.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="referenceFrame">
+		<xs:annotation>
+			<xs:documentation>The “reference frame” term identifies the frame of reference in which a semantic type is relevant.  The generic names of frames are employed here, such as “device” and “vehicle”; these generic names do not imply a specific coordinate system.  For example, “ECI” is a value of this enumeration, while the more specific “J2000”, “TOD”, and “MOD” are reserved for the “coordinate type” enumeration.
+In an electronic data sheet this term is the “referenceFrame” attribute of a data item.
+Use Cases:
+Determine the frame in which a semantic type is represented, in order to determine what transformation is needed, if any, to represent the semantic type in a frame that is appropriate for an application.
+Determine the frame of reference that is input to a transformation of coordinates.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ECEF">
+				<xs:annotation>
+					<xs:documentation>The acronym ECEF consists of the initials of Earth-centered, Earth fixed.  Data for Earth observation frequently refer to locations on the surface of the planet.  This term identifies the frame that rotates with the Earth to describe semantic types that represent data about the surface of the earth.
+This reference frame must be accompanied by specification of coordinate type when used to describe a data item in an electronic data sheet.
+Use Cases:
+Specify the frame of latitude and longitude measurements.
+Specify an approximate frame of geosynchronous spacecraft.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ECI">
+				<xs:annotation>
+					<xs:documentation>The acronym ECI consists of the initials of Earth-centered, inertial.  The inertial frame of the Earth is generally based on the positions of remote stellar objects.  This reference frame is only approximately inertial, because of the acceleration of Earth to maintain its orbit. 
+This reference frame must be accompanied by specification of coordinate type when used to describe a data item in an electronic data sheet.
+Use Cases:
+Specify the frame of the remote stars that form the basis for attitude measurement by a star tracker.
+Specify the location of a vehicle in interplanetary flight.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LVLH">
+				<xs:annotation>
+					<xs:documentation>The acronym LVLH consists of the initials of local vertical, local horizontal.  This is the vehicle frame of an orbiter.  The LVLH frame typically uses a Cartesian coordinate type oriented so that the x axis points in the direction of flight, the z axis points toward nadir, and the y axis points to the right in the viewpoint of a person looking in the direction of flight, to make a right-handed rectangular coordinate system.
+Use Cases:
+Specify the frame from which a surveillance satellite observes the Earth.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="device">
+				<xs:annotation>
+					<xs:documentation>Most measurements and actuations are made in the frame of the instrument.  This term identifies that frame to describe semantic types that represent measurements or actuations in the frame of a device.
+Use Cases:
+Specify the frame of torque of a reaction wheel.
+Specify the frame of rotation in the transformation reported by a star tracker.
+Specify the frame of measurement of a coarse sun sensor.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="externalObject">
+				<xs:annotation>
+					<xs:documentation>The data managed by the command and data handling system of a vehicle often contains information about other objects, such as targets of surveillance or approaching vehicles.  An identifier of the external object should appear in the same aggregation relation with this reference frame, or in the electronic data sheet description of a data item.
+Use Cases:
+Exchange position and attitude information with an approaching vehicle during docking.
+Distinguish the location of a ship at sea from the nadir point of an orbiter.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="mount">
+				<xs:annotation>
+					<xs:documentation>When an instrument is attached to the structure of a spacecraft, there may be bracket that positions and orients the device relative to the vehicle.  The mount reference frame is the reference frame associated with the face of the bracket, or associated with the face of mounting point on the vehicle structure when no bracket is present.  In order to transform instrumentation measurements and actuations between device frame and vehicle frame, it is necessary to know the mounting frame as an intermediate step.
+Use Cases:
+Specify the frame in which a reaction wheel is mounted to the structure of a vehicle.
+Specify the frame in which a star tracker is mounted to the structure of a vehicle.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="transducer">
+				<xs:annotation>
+					<xs:documentation>The transducer reference frame is a special variation on the device reference frame.  Some instruments contain multiple transducers.  For example, a three-axis magnetometer may consist of three one-axis magnetometers.  Usually, the one-axis transducers are arranged parallel to the coordinate axes of the device frame, so no transformation is needed to transform from measurement frame to mount frame.  However, some devices may have multiple transducers that are not so fortuitously positioned.  In that case, it is necessary to be able to refer to the reference frame of the transducers of a device.
+Use Cases:
+Specify the frame of a coarse sun sensor in a device that contains multiple coarse sun sensors arranged to face in non-orthogonal directions.
+Specify the frame of each of the optical axes of a star tracker with multiple sights</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="vehicle">
+				<xs:annotation>
+					<xs:documentation>The vehicle reference frame is the base from which a spacecraft conducts its mission.  Relations between sensors and actuators are computed through the vehicle frame.
+Use Cases:
+Control the direction in which an articulated antenna is pointing relative to the attitude of the vehicle.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ICRF">
+				<xs:annotation>
+					<xs:documentation>The International Celestial Reference Frame is heliocentric, with the origin at the barycenter of the solar system.  The ICRF is the frame for the International Celestial Reference System.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="toFrame">
+		<xs:annotation>
+			<xs:documentation>The toFrame idenitifies the frame of reference that results from a transformation from the frame identified by the referenceFrame.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ECEF">
+				<xs:annotation>
+					<xs:documentation>The acronym ECEF consists of the initials of Earth-centered, Earth fixed.  Data for Earth observation frequently refer to locations on the surface of the planet.  This term identifies the frame that rotates with the Earth to describe semantic types that represent data about the surface of the earth.
+This reference frame must be accompanied by specification of coordinate type when used to describe a data item in an electronic data sheet.
+Use Cases:
+Specify the frame of latitude and longitude measurements.
+Specify an approximate frame of geosynchronous spacecraft.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ECI">
+				<xs:annotation>
+					<xs:documentation>The acronym ECI consists of the initials of Earth-centered, inertial.  The inertial frame of the Earth is generally based on the positions of remote stellar objects.  This reference frame is only approximately inertial, because of the acceleration of Earth to maintain its orbit. 
+This reference frame must be accompanied by specification of coordinate type when used to describe a data item in an electronic data sheet.
+Use Cases:
+Specify the frame of the remote stars that form the basis for attitude measurement by a star tracker.
+Specify the location of a vehicle in interplanetary flight.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LVLH">
+				<xs:annotation>
+					<xs:documentation>The acronym LVLH consists of the initials of local vertical, local horizontal.  This is the vehicle frame of an orbiter.  The LVLH frame typically uses a Cartesian coordinate type oriented so that the x axis points in the direction of flight, the z axis points toward nadir, and the y axis points to the right in the viewpoint of a person looking in the direction of flight, to make a right-handed rectangular coordinate system.
+Use Cases:
+Specify the frame from which a surveillance satellite observes the Earth.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="device">
+				<xs:annotation>
+					<xs:documentation>Most measurements and actuations are made in the frame of the instrument.  This term identifies that frame to describe semantic types that represent measurements or actuations in the frame of a device.
+Use Cases:
+Specify the frame of torque of a reaction wheel.
+Specify the frame of rotation in the transformation reported by a star tracker.
+Specify the frame of measurement of a coarse sun sensor.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="externalObject">
+				<xs:annotation>
+					<xs:documentation>The data managed by the command and data handling system of a vehicle often contains information about other objects, such as targets of surveillance or approaching vehicles.  An identifier of the external object should appear in the same aggregation relation with this reference frame, or in the electronic data sheet description of a data item.
+Use Cases:
+Exchange position and attitude information with an approaching vehicle during docking.
+Distinguish the location of a ship at sea from the nadir point of an orbiter.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="mount">
+				<xs:annotation>
+					<xs:documentation>When an instrument is attached to the structure of a spacecraft, there may be bracket that positions and orients the device relative to the vehicle.  The mount reference frame is the reference frame associated with the face of the bracket, or associated with the face of mounting point on the vehicle structure when no bracket is present.  In order to transform instrumentation measurements and actuations between device frame and vehicle frame, it is necessary to know the mounting frame as an intermediate step.
+Use Cases:
+Specify the frame in which a reaction wheel is mounted to the structure of a vehicle.
+Specify the frame in which a star tracker is mounted to the structure of a vehicle.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="transducer">
+				<xs:annotation>
+					<xs:documentation>The transducer reference frame is a special variation on the device reference frame.  Some instruments contain multiple transducers.  For example, a three-axis magnetometer may consist of three one-axis magnetometers.  Usually, the one-axis transducers are arranged parallel to the coordinate axes of the device frame, so no transformation is needed to transform from measurement frame to mount frame.  However, some devices may have multiple transducers that are not so fortuitously positioned.  In that case, it is necessary to be able to refer to the reference frame of the transducers of a device.
+Use Cases:
+Specify the frame of a coarse sun sensor in a device that contains multiple coarse sun sensors arranged to face in non-orthogonal directions.
+Specify the frame of each of the optical axes of a star tracker with multiple sights</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="vehicle">
+				<xs:annotation>
+					<xs:documentation>The vehicle reference frame is the base from which a spacecraft conducts its mission.  Relations between sensors and actuators are computed through the vehicle frame.
+Use Cases:
+Control the direction in which an articulated antenna is pointing relative to the attitude of the vehicle.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ICRF">
+				<xs:annotation>
+					<xs:documentation>The International Celestial Reference Frame is heliocentric, with the origin at the barycenter of the solar system.  The ICRF is the frame for the International Celestial Reference System.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="relationToTimestamp">
+		<xs:annotation>
+			<xs:documentation>When a time stamp appears in a relation with other data items, it may be important to a designer of a control system to know how the time stamp relates to the age of the other data items in the relation.
+In an electronic data sheet this term is the timeRelation attribute of a time stamp data item.
+Use Cases:
+Enable a design of a control system to estimate the delay between measurement of a data value and the time when the control system obtains the data item.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="acquiring">
+				<xs:annotation>
+					<xs:documentation>The "acquiring" relation to timestamp indicates that the timestamp is simultaneous with the acquisition of a datum.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="generation">
+				<xs:annotation>
+					<xs:documentation>The "generation" relation to timestamp indicates that the timestamp is simultaneous with the generation of a datum.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="sending">
+				<xs:annotation>
+					<xs:documentation>The "sending" relation to timestamp indicates that the timestamp is the time when the message that contains it was sent.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="statusConvention">
+		<xs:annotation>
+			<xs:documentation>The “status convention” describes how a data item represents the quality of function of a device.
+In an electronic data sheet, this term is the “statusConvention” attribute of a data item.
+Use Cases:
+Determine whether the data reported by a sensor can be trusted.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="binaryStatus">
+				<xs:annotation>
+					<xs:documentation>The binary status convention indicates whether a device is functioning correctly or erroneously.  The data item has the value 0 if no error is being detected, and it has the value 1 if an error is present.  Typically, the binary representation of such a variable would be bit or unsigned integer.
+Use Cases:
+The SOIS accelerometer interface uses this convention to report device status.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="qualityFraction">
+				<xs:annotation>
+					<xs:documentation>The quality fraction status convention indicates a fractional quality of service, with zero representing complete failure and 1 representing completely successful operation.  The method of computing this value is an algorithm that varies from device to device, and is explained in natural language in an unstructured text field in an electronic data sheet.
+Use Cases:
+Specify the quality of data produced by a star tracker.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ternaryStatus">
+				<xs:annotation>
+					<xs:documentation>The ternary status convention adds a warning state to the binary status.  The three states follow:
+•	OK – no error detected
+•	Warning – action (such as restart) is not needed
+•	Severe – action (such as restart) is needed
+Use Cases:	
+Distinguish minor errors from major errors.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="transformationType">
+		<xs:annotation>
+			<xs:documentation>The “transformation type” term indicates how to interpret a semantic type that is an array of numbers.  The arrays to which the transformation type applies may be interpreted as transformation from one frame to another, such as quaternions and direction cosine matrices.  For arrays that may be interpreted as locations in a phase space, such as position and velocity vectors, the coordinate type applies.  A coordinate type that is a vector may be treated as a transformation by adding it to other vectors, for example; such a transformation would be a called a translation.
+The “transformation type” term specifies a particular combination of the following terms:
+•	coordinate system
+•	array size
+•	unit of measure
+•	computation
+The definition of a value of the “transformation type” term must provide the information about the terms listed above.  The “reference frame” and “to frame” must be specified with the transformation type in an electronic data sheet when defining an item of data. 
+In an electronic data sheet this term is the “transformationType” attribute of a data item.
+Use Cases:
+Interpret the quaternion that is emitted by a star tracker.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="DCM">
+				<xs:annotation>
+					<xs:documentation>The “DCM” value of the “transformation type” term specifies the following information for a semantic type:
+•	coordinate system = rectangular
+•	array size = (n, n), row-major order
+•	unit of measure is not applicable
+•	the transformation is computed by matrix multiplication
+The elements of the matrix are interpreted as direction cosines.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="quaternion">
+				<xs:annotation>
+					<xs:documentation>The “Quaternion” value of the “transformation type” term specifies the following information for a semantic type:
+•	coordinate system = Cartesian.
+•	array size = 4.
+•	unit of measure is not applicable
+•	the transformation is computed by conjugation
+The four coordinates are a scalar first, followed by three vector coordinates, corresponding to the orthogonal Cartesian coordinate axes x, y, and z, with the same chirality as the coordinate system.  Chirality of the coordinate system must be specified in an electronic data sheet when using this term.
+</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="rollPitchYaw">
+				<xs:annotation>
+					<xs:documentation>The “roll-pitch-yaw” value of the “transformation type” term specifies the following information for a semantic type:
+•	coordinate system is Cartesian, right-handed
+•	array size = 3
+•	unit of measure = degree
+•	the transformation is computed by constructing a rotation based on the description below
+The three coordinates are a variant of Euler angles, based on the convention that the Cartesian coordinates of the vehicle frame are aligned with LVLH.  The three coordinates are not distances in this coordinate system; rather they are rotation angles around the axes of the coordinate system.  Roll is rotation around the direction of flight (x).  Pitch is rotation around the y axis.  Yaw is rotation around the z axis.  All these rotations use the right-handed convention for sign.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="rotationRate">
+				<xs:annotation>
+					<xs:documentation>The “rotation rate” value of the “transformation type” term specifies the following information for a semantic type:
+•	coordinate system = Cartesian
+•	array size = n
+•	unit of measure = angle / time
+•	the transformation is generally not computed, because this vector is often used directly as a measurement and as a set point for an attitude control system
+The vector represents the rate of rotation of the “to frame” relative to the “reference frame”.  The elements of the vector are the angular rates around each axis of the reference frame.  Chirality of the coordinate system must be specified in an electronic data sheet when using this term.  Unit of measure for the rate must also be specified in an electronic data sheet when using this term.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="translation">
+				<xs:annotation>
+					<xs:documentation>The “translation” value of the “transformation type” term specifies the following information for a semantic type:
+•	coordinate system = Cartesian
+•	array size = n
+•	unit of measure = length
+•	the transformation is computed by adding this vector to the vector in the reference frame
+The elements of the vector are interpreted as changes in Cartesian coordinates.  The vector is not a position, but is a translation transformation that can be applied to position vectors by adding the translation coordinates to the position coordinates.  Chirality of the coordinate system must be specified in an electronic data sheet when using this term.  The unit of measure must also be specified in an electronic data sheet when using this term.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="velocity">
+				<xs:annotation>
+					<xs:documentation>The “velocity” value of the “transformation type” term specifies the following information for a semantic type:
+•	coordinate system = Cartesian
+•	array size = n
+•	unit of measure = length / time
+•	the transformation is generally not computed, because this vector is often used directly as a measurement and as a set point for a navigation system
+The vector represents the rate of translation of the “to frame” relative to the “reference frame”.  The elements of the vector are the linear speeds along each axis of the reference frame.  Chirality of the coordinate system must be specified in an electronic data sheet when using this term.  Unit of measure for the speed must also be specified in an electronic data sheet when using this term.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DoTStringEncodingType">
+		<xs:annotation>
+			<xs:documentation>Standard types of encoding for string data.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CBORbytes">
+				<xs:annotation>
+					<xs:documentation>CBORbytes encoding uses IETF rfc 7049 with major type 2 to encode a string of bytes.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VCHAR">
+				<xs:annotation>
+					<xs:documentation>visible ASCII characters, 0x21 through 0x7e.
+See IETF RFC 5234.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DoTErrorControlType">
+		<xs:annotation>
+			<xs:documentation>Standard types of error control algorithms</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CRC16">
+				<xs:annotation>
+					<xs:documentation>See ITU-T Recommendation X.25, p. 9, section 2.2.7.4,
+International Telecommunications Union, October 1996.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CRC32">
+				<xs:annotation>
+					<xs:documentation>x^{{32}}+x^{{26}}+x^{{23}}+x^{{22}}+x^{{16}}+x^{{12}}+x^{{11}}+x^{{10}}+x^{8}+x^{7}+x^{5}+x^{4}+x^{2}+x+1</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CRC32C">
+				<xs:annotation>
+					<xs:documentation>See Castagnoli, G., Brauer, S., and M. Herrmann, "Optimization of Cyclic Redundancy-Check Codes with 24 and 32 Parity Bits", IEEE Transact. on Communications, Vol. 41, No. 6, June 1993.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DoTEncodingAndPrecisionType">
+		<xs:annotation>
+			<xs:documentation>Standard types of encoding and precision of floating point numbers.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="DummyEncodingAndPrecision">
+				<xs:annotation>
+					<xs:documentation>This is a dummy item, to avoid an empty enumeration in a derived schema.  Do not use.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DoTEncodingRulesType">
+		<xs:annotation>
+			<xs:documentation>Standard types of encoding rules for composite data types</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="DummyEncodingRules">
+				<xs:annotation>
+					<xs:documentation>This is a dummy item, to avoid an empty enumeration in a derived schema.  Do not use.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DoTMathOperatorsType">
+		<xs:annotation>
+			<xs:documentation>Standard math operators</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="DummyMathOperator">
+				<xs:annotation>
+					<xs:documentation>This is a dummy item, to avoid an empty enumeration in a derived schema.  Do not use.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DoTIntegerEncodingType">
+		<xs:annotation>
+			<xs:documentation>Standard types of integer encoding</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SDNV">
+				<xs:annotation>
+					<xs:documentation>This self-delimiting numeric value encoding scheme was adopted by Bundle Protocol in IETF RFC 5050, quoted here:
+"The SDNV encoding scheme is closely adapted from the Abstract Syntax Notation One Basic Encoding Rules for subidentifiers within an object identifier value.  A SDNV is a numeric value encoded in N octets, the last of which has its most significant bit (MSB) set to zero; the MSB of every other octet in the SDNV must be set to one.  The value encoded in an SDNV is the unsigned binary number obtained by concatenating into a single bit string the 7 least significant bits of each octet of the SDNV."</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tecOperatingMode">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="controlling">
+				<xs:annotation>
+					<xs:documentation>The controller is activiely attempting to achieve its set point.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="inBand">
+				<xs:annotation>
+					<xs:documentation>The controller is within the specified tolerance of its set point.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="notOperational">
+				<xs:annotation>
+					<xs:documentation>The device is not operating.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="healthStatus">
+		<xs:annotation>
+			<xs:documentation>This concepts enumerates the states of health of a device.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="healthGood">
+				<xs:annotation>
+					<xs:documentation>A device in good health is operating correctly, without no errors detected.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="healthSevereWarning">
+				<xs:annotation>
+					<xs:documentation>A severe health warning indicates that errors have been detected and reset is recommended.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="healthWarning">
+				<xs:annotation>
+					<xs:documentation>A health warning indicates that some errors have been detected by reset is not required.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="operatingMode">
+		<xs:annotation>
+			<xs:documentation>The operatingMode enumerates the modes of operation of a device or of a software component, which can simply be turned on or off.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="notOperational">
+				<xs:annotation>
+					<xs:documentation>The device is not operating.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="operational">
+				<xs:annotation>
+					<xs:documentation>The device is operating.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="starTrackerOperatingMode">
+		<xs:annotation>
+			<xs:documentation>The starTrackerOperatingMode enumerates the modes of operation of a star tracker.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="notOperational">
+				<xs:annotation>
+					<xs:documentation>The device is not operating.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="starTrackerAcquiring">
+				<xs:annotation>
+					<xs:documentation>The star tracker is comparing the image in its focal plane to know configurations of stars, but has not yet recognized the image.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="starTrackerReportingRates">
+				<xs:annotation>
+					<xs:documentation>The star tracker is reporting the angular rate vector.  This condition implies that the star tracker is tracking or acquiring.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="starTrackerTracking">
+				<xs:annotation>
+					<xs:documentation>The star tracker has recognized the configuration of stars in its image, and is reporting its attitude.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="enumerationNames">
+		<xs:annotation>
+			<xs:documentation>The classes derived from this class represent enumerations that may be the range of a data item in an interface described by an electronic data sheet.  The individuals in classes derived from this class are discrete concepts that are values in the range of an enumeration data item in an interface described by an electronic data sheet.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="tecOperatingMode"/>
+			<xs:enumeration value="healthStatus">
+				<xs:annotation>
+					<xs:documentation>This concepts enumerates the states of health of a device.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="operatingMode">
+				<xs:annotation>
+					<xs:documentation>The operatingMode enumerates the modes of operation of a device or of a software component, which can simply be turned on or off.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="starTrackerOperatingMode">
+				<xs:annotation>
+					<xs:documentation>The starTrackerOperatingMode enumerates the modes of operation of a star tracker.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SpWLogicalAddressRange">
+		<xs:annotation>
+			<xs:documentation>A SpWLogicalAddressRange defines a range of logical addresses that can be used to address an endpoint on a SpaceWire link.
+The syntax is low value followed by high value, separated by a colon.
+The values are unsigned integers that can fit in an octet.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]+:[0-9]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SpWProtocolId">
+		<xs:annotation>
+			<xs:documentation>A SpWProtocolId constrains the content and sequencing of data sent and received through a SpaceWire link.
+One protocol id should be specified per interface, and the the interface describes the content of data sent and received on a SpaceWire link.  The state machine of the component that interacts across the interface describes the sequencing of data sent and received.
+The format of a protocol id is an unisgned integer that fits in an octet, or one of the standard protocol names in {RMAP, CPTP}.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([0-9a-f][0-9a-f])|[0-9]+|RMAP|CPTP"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SpWReceiveRate">
+		<xs:annotation>
+			<xs:documentation>A SpWReceiveRate defines a range of transfer rates at which an endpoint can receive data through a link.
+The syntax is low value followed by high value, separated by a colon.
+The values are integers, in units of Mbit/sec.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]+:[0-9]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SpWRMAPAddressRange">
+		<xs:annotation>
+			<xs:documentation>A SpWRMAPAddressRange identifies a range of memory addresses in an endpoint that are accessible through the RMAP protocol.
+The format of this specification is a list of memory ranges separated by commas.  Each memory range consists of a low value followed by a high value followed by a memory identifier followed by a spacewire RMAP write support code, with colons between.  The values and the memory identifier are unsigned integers.  The SpaceWire RMAP write support code is a string in {"ack", "ver"}.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]+:[0-9]+:[0-9]+:(ack|ver)(,[0-9]+:[0-9]+:[0-9]:(ack|ver))*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SpWTransmitRate">
+		<xs:annotation>
+			<xs:documentation>A SpWTransmitRate defines a range of transfer rates at which an endpoint can send data through a link.
+The syntax is low value followed by high value, separated by a colon.
+The values are integers, in units of Mbit/sec.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]+:[0-9]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SpaceWireLinkEnablement">
+		<xs:annotation>
+			<xs:documentation>A SpaceWireLinkEnablement describes the mechanism to enable a SpaceWire link.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SpaceWireAlwaysEnabled"/>
+			<xs:enumeration value="SpaceWireAutoStart"/>
+			<xs:enumeration value="SpaceWireOutOfBandEnable"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SpaceWireRMAPWriteSupport">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SpaceWireRMAPWriteAcknowledged"/>
+			<xs:enumeration value="SpaceWireRMAPWriteVerified"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:attributeGroup name="CoreSemanticsAttributeGroup">
+		<xs:attribute name="chirality" type="seds:chirality"/>
+		<xs:attribute name="coordinateType" type="seds:coordinateType"/>
+		<xs:attribute name="toCoordinateType" type="seds:toCoordinateType"/>
+		<xs:attribute name="differenceConvention" type="seds:differenceConvention"/>
+		<xs:attribute name="interpretation" type="seds:interpretation"/>
+		<xs:attribute name="purpose" type="seds:purpose"/>
+		<xs:attribute name="referenceFrame" type="seds:referenceFrame"/>
+		<xs:attribute name="toFrame" type="seds:toFrame"/>
+		<xs:attribute name="relationToTimestamp" type="seds:relationToTimestamp"/>
+		<xs:attribute name="statusConvention" type="seds:statusConvention"/>
+		<xs:attribute name="transformationType" type="seds:transformationType"/>
+		<xs:attribute name="tecOperatingMode" type="seds:tecOperatingMode"/>
+		<xs:attribute name="healthStatus" type="seds:healthStatus"/>
+		<xs:attribute name="operatingMode" type="seds:operatingMode"/>
+		<xs:attribute name="starTrackerOperatingMode" type="seds:starTrackerOperatingMode"/>
+		<xs:attribute name="foreignKeyTo" type="xs:string"/>
+		<xs:attribute name="memberOf" type="xs:string"/>
+		<xs:attribute name="subject" type="xs:string"/>
+		<xs:attribute name="enumeration" type="seds:enumerationNames"/>
+		<xs:attribute name="spaceWireLinkEnablement" type="seds:SpaceWireLinkEnablement"/>
+		<xs:attribute name="spaceWireRMAPWriteSupport" type="seds:SpaceWireRMAPWriteSupport"/>
+		<xs:attribute name="spWLogicalAddressRange" type="seds:SpWLogicalAddressRange"/>
+		<xs:attribute name="spWProtocolId" type="seds:SpWProtocolId"/>
+		<xs:attribute name="spWReceiveRate" type="seds:SpWReceiveRate"/>
+		<xs:attribute name="spWRMAPAddressRange" type="seds:SpWRMAPAddressRange"/>
+		<xs:attribute name="spWTransmitRate" type="seds:SpWTransmitRate"/>
+	</xs:attributeGroup>
+</xs:schema>

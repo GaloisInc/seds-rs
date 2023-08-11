@@ -1,0 +1,2774 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:seds="http://www.ccsds.org/schema/sois/seds"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.ccsds.org/schema/sois/seds"
+	elementFormDefault="qualified" attributeFormDefault="unqualified"
+	version="1.0">
+	<xs:import namespace="http://www.w3.org/XML/1998/namespace"
+		schemaLocation="http://www.w3.org/2001/xml.xsd" />
+	<xs:include schemaLocation="seds-core-semantics.xsd" />
+	<xs:include schemaLocation="seds-extension-semantics.xsd" />
+	<!--Root Element #1 -->
+	<xs:element name="DataSheet" type="seds:DataSheetType">
+		<xs:annotation>
+			<xs:documentation>The root element of a datasheet</xs:documentation>
+		</xs:annotation>
+		<xs:key name="RootPackageNameKey">
+			<xs:selector xpath="./seds:Package" />
+			<xs:field xpath="@name" />
+		</xs:key>
+	</xs:element>
+	<!--Root Element #2 -->
+	<xs:element name="PackageFile" type="seds:PackageFileType">
+		<xs:annotation>
+			<xs:documentation>The root element of a package-file
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="DataSheetType">
+		<xs:annotation>
+			<xs:documentation>A data sheet defines the components which represent
+				the operation of a single device
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Device" type="seds:DeviceType"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="Package" type="seds:PackageType"
+				minOccurs="1" maxOccurs="unbounded">
+				<xs:key name="NamesInPackage">
+					<xs:selector
+						xpath="./seds:DeclaredInterfaceSet/seds:Interface|./seds:ComponentSet/seds:Component|./seds:ComponentSet/seds:Component/seds:DeclaredInterfaceSet/seds:Interface" />
+					<xs:field xpath="@name" />
+				</xs:key>
+				<xs:key name="TypeNamesInPackage">
+					<xs:selector
+						xpath="./seds:DataTypeSet/*|./seds:ComponentSet/seds:Component/seds:DataTypeSet/*" />
+					<xs:field xpath="@name" />
+				</xs:key>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PackageFileType">
+		<xs:annotation>
+			<xs:documentation>A data sheet defines the components which represent
+				the operation of a single device
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Package" type="seds:PackageType"
+				minOccurs="1" maxOccurs="1">
+				<xs:key name="NamesInPackage2">
+					<xs:selector
+						xpath="./seds:DeclaredInterfaceSet/seds:Interface|./seds:ComponentSet/seds:Component|./seds:ComponentSet/seds:Component/seds:DeclaredInterfaceSet/seds:Interface" />
+					<xs:field xpath="@name" />
+				</xs:key>
+				<xs:key name="TypeNamesInPackage2">
+					<xs:selector
+						xpath="./seds:DataTypeSet/*|./seds:ComponentSet/seds:Component/seds:DataTypeSet/*" />
+					<xs:field xpath="@name" />
+				</xs:key>
+			</xs:element>
+			<xs:element name="Metadata" type="seds:MetadataType"
+				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<!--Abstract Base Elements -->
+	<xs:complexType name="DescriptionType" abstract="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">An abstract type
+				definition used as the base for NamedEntityType. It
+				combines the
+				short description and long description.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="LongDescription" type="xs:string"
+				minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">The Long Description
+						is
+						intended to be used for explanatory
+						descriptions of the object
+						and
+						may include HTML markup. Long Descriptions
+						are of unbounded length.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="shortDescription" type="xs:string"
+			use="optional">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">It is strongly
+					recommended that the short description be kept under 80
+					characters
+					in length
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="NamedEntityType" abstract="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">The type definition used
+				by most elements that require a name with
+				optional descriptions.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:DescriptionType">
+				<xs:attribute name="name" type="seds:NameType"
+					use="required" />
+				<xs:attributeGroup ref="seds:CoreSemanticsAttributeGroup" />
+				<xs:attributeGroup ref="seds:ExtensionSemanticsAttributeGroup" />
+				<xs:attribute name="quantityKind" type="seds:QuantityKind"/>
+				<xs:attribute name="unit" type="seds:Unit"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="LiteralValueType">
+		<xs:annotation>
+			<xs:documentation>A literal value. The string needs to be converted
+				to a type matching the context in which the
+				literal is being applied.
+				Numerical values are assumed to be base 10 unless
+				proceeded by 0x
+				(hexadecimal), 0o
+				(octal), or 0b (binary).
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	<xs:simpleType name="NameType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Used for all unique
+				names. We need to preclude spaces, '-', '.', '/',
+				':", "[" and "]".
+				Only letters, digits and '_' are allowed
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[a-zA-Z][a-zA-Z0-9_]*" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="QualifiedNameType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">A name qualified by the
+				namespace that it exists in. Packages are
+				separated by a '/'
+				character. The last element of the qualified name is the
+				name itself,
+				everything earlier is part
+				of the namespace name.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern
+				value="([a-zA-Z][a-zA-Z0-9_]*/)*[a-zA-Z][a-zA-Z0-9_]*" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FieldRefType">
+		<xs:annotation>
+			<xs:documentation>A reference to a field, such as a variable
+				or
+				container entry. This includes referencing
+				into containers (using
+				the
+				C-like syntax `container.field`) and array
+				dimensions (using
+				C-like
+				syntax array[7]).
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern
+				value="[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*|\[[a-zA-Z0-9_]+\])*" />
+		</xs:restriction>
+	</xs:simpleType>
+	<!--Device -->
+	<xs:complexType name="DeviceType">
+		<xs:annotation>
+			<xs:documentation>The device described by this data sheet. This
+				includes the DACP and DSAP components which implement
+				the device
+				interface.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType">
+				<xs:sequence>
+					<xs:element name="Metadata" type="seds:MetadataType"
+						minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--Device Metadata -->
+	<xs:complexType name="DateMetadataValueType">
+		<xs:annotation>
+			<xs:documentation>A date metadata value</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:MetadataValueType">
+				<xs:attribute name="value" type="xs:date" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="FloatMetadataValueType">
+		<xs:annotation>
+			<xs:documentation>A floating point metadata value</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:MetadataValueType">
+				<xs:attribute name="value" type="xs:double" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="IntegerMetadataValueType">
+		<xs:annotation>
+			<xs:documentation>An integer metadata value</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:MetadataValueType">
+				<xs:attribute name="value" type="xs:long" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="MetadataCategoryType">
+		<xs:annotation>
+			<xs:documentation>A metadata category</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType">
+				<xs:sequence minOccurs="1">
+					<xs:element name="MetadataValueSet"
+						type="seds:MetadataValueSetType" maxOccurs="1" minOccurs="0">
+						<xs:key name="MetadataValueSetKey">
+							<xs:selector xpath="./*" />
+							<xs:field xpath="@name" />
+						</xs:key>
+					</xs:element>
+					<xs:element name="Category"
+						type="seds:MetadataCategoryType" maxOccurs="unbounded"
+						minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="MetadataType">
+		<xs:annotation>
+			<xs:documentation>Metadata to associate with a device.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="1">
+			<xs:element name="MetadataValueSet"
+				type="seds:MetadataValueSetType" maxOccurs="1" minOccurs="0" />
+			<xs:element name="Category"
+				type="seds:MetadataCategoryType" maxOccurs="unbounded" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MetadataValueSetType">
+		<xs:annotation>
+			<xs:documentation>A set of metadata values</xs:documentation>
+		</xs:annotation>
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="DateValue"
+				type="seds:DateMetadataValueType" />
+			<xs:element name="FloatValue"
+				type="seds:FloatMetadataValueType" />
+			<xs:element name="IntegerValue"
+				type="seds:IntegerMetadataValueType" />
+			<xs:element name="StringValue"
+				type="seds:StringMetadataValueType" />
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="MetadataValueType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>An abstract metadata value</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType" />
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="StringMetadataValueType">
+		<xs:annotation>
+			<xs:documentation>A string metadata value</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:MetadataValueType">
+				<xs:attribute name="value" type="xs:string" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--Package -->
+	<xs:complexType name="ComponentSetType">
+		<xs:annotation>
+			<xs:documentation>The set of component types defined in this
+				namespace
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Component" type="seds:ComponentType"
+				maxOccurs="unbounded">
+				<xs:key name="InterfaceNameKey">
+					<xs:selector
+						xpath="./seds:RequiredInterfaceSet/seds:Interface|./seds:ProvidedInterfaceSet/seds:Interface" />
+					<xs:field xpath="@name" />
+				</xs:key>
+				<xs:key name="ProvidedInterfaceNameKey">
+					<xs:selector
+						xpath="./seds:ProvidedInterfaceSet/seds:Interface" />
+					<xs:field xpath="@name" />
+				</xs:key>
+				<xs:key name="RequiredInterfaceNameKey">
+					<xs:selector
+						xpath="./seds:RequiredInterfaceSet/seds:Interface" />
+					<xs:field xpath="@name" />
+				</xs:key>
+				<xs:keyref name="InterfaceNameKeyRef"
+					refer="seds:InterfaceNameKey">
+					<xs:selector
+						xpath=".//seds:SendCommandPrimitive|.//seds:SendParameterPrimitive|.//seds:OnCommandPrimitive|.//seds:OnParameterPrimitive|.//seds:ParameterMap" />
+					<xs:field xpath="@interface" />
+				</xs:keyref>
+				<xs:keyref name="ProvidedInterfaceNameKeyRef"
+					refer="seds:ProvidedInterfaceNameKey">
+					<xs:selector
+						xpath=".//seds:ParameterActivityMap/seds:Provided" />
+					<xs:field xpath="@interface" />
+				</xs:keyref>
+				<xs:keyref name="RequiredInterfaceNameKeyRef"
+					refer="seds:RequiredInterfaceNameKey">
+					<xs:selector
+						xpath=".//seds:ParameterActivityMap/seds:Required" />
+					<xs:field xpath="@interface" />
+				</xs:keyref>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DataTypeSetType">
+		<xs:annotation>
+			<xs:documentation>The set of data types defined in this namespace
+			</xs:documentation>
+		</xs:annotation>
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="ArrayDataType" type="seds:ArrayDataType" />
+			<xs:element name="BinaryDataType"
+				type="seds:BinaryDataType" />
+			<xs:element name="BooleanDataType"
+				type="seds:BooleanDataType" />
+			<xs:element name="ContainerDataType"
+				type="seds:ContainerDataType">
+				<xs:key name="ContainerEntryNameKey">
+					<xs:selector
+						xpath=".//seds:LengthEntry|.//seds:ErrorControlEntry|.//seds:ListEntry|.//seds:FixedValueEntry|.//seds:Entry" />
+					<xs:field xpath="@name" />
+				</xs:key>
+			</xs:element>
+			<xs:element name="EnumeratedDataType"
+				type="seds:EnumeratedDataType" />
+			<xs:element name="FloatDataType" type="seds:FloatDataType" />
+			<xs:element name="IntegerDataType"
+				type="seds:IntegerDataType" />
+			<xs:element name="StringDataType"
+				type="seds:StringDataType" />
+			<xs:element name="SubRangeDataType"
+				type="seds:SubRangeDataType" />
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="InterfaceDeclarationSetType">
+		<xs:annotation>
+			<xs:documentation>A set of interface types
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Interface"
+				type="seds:InterfaceDeclarationType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PackageType">
+		<xs:annotation>
+			<xs:documentation>A package qualifies the names of all types and
+				interfaces defined within it
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:DescriptionType">
+				<xs:sequence>
+					<xs:element name="DataTypeSet"
+						type="seds:DataTypeSetType" minOccurs="0">
+					</xs:element>
+					<xs:element name="DeclaredInterfaceSet"
+						type="seds:InterfaceDeclarationSetType" minOccurs="0">
+					</xs:element>
+					<xs:element name="ComponentSet"
+						type="seds:ComponentSetType" minOccurs="0">
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute ref="xml:base" />
+				<xs:attribute name="name" type="seds:QualifiedNameType"
+					use="required">
+					<xs:annotation>
+						<xs:documentation>Names may be hierearchical, seperated by a
+							slash. This is enforced by a pattern.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--Generic Type and Value Handling -->
+	<xs:complexType name="GenericTypeSetType">
+		<xs:annotation>
+			<xs:documentation>The set of generic types for an interface
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="GenericType" type="seds:GenericTypeType"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GenericTypeType">
+		<xs:annotation>
+			<xs:documentation>The type for a generic type on an interface
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType">
+				<xs:attribute name="baseType"
+					type="seds:DataTypeRefType" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="GenericTypeMapSetType">
+		<xs:annotation>
+			<xs:documentation>A set of generic type mappings representing a
+				particular pattern of usage of a generic interface
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="GenericTypeMap"
+				type="seds:GenericTypeMapType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="AlternateSet"
+				type="seds:GenericAlternateSetType" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GenericTypeMapType">
+		<xs:annotation>
+			<xs:documentation>The mapping from a generic type in an abstract
+				interface to a concrete type in the usage of that interface
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:InlineFieldType">
+				<xs:attribute name="fixedValue"
+					type="seds:LiteralValueType" use="optional" />
+				<xs:attribute name="type" type="seds:DataTypeRefType"
+					use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="GenericAlternateSetType">
+		<xs:annotation>
+			<xs:documentation>A set of alternate, mutually exclusive, groups of
+				type mappings for a generic interface, based on patterns of values.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:DescriptionType">
+				<xs:sequence>
+					<xs:element name="Alternate"
+						type="seds:GenericAlternateType" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="GenericAlternateType">
+		<xs:annotation>
+			<xs:documentation>A group of generic type mappings to be used in an
+				alternate set
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="GenericTypeMap"
+				type="seds:GenericTypeMapType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<!--Data Types -->
+	<xs:complexType name="ArrayDataType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">An array of values of the
+				type referenced in 'dataTypeRef' with the
+				number of array dimensions
+				as specified in the dimension list.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:CompositeDataType">
+				<xs:sequence>
+					<xs:element name="DimensionList"
+						type="seds:ArrayDimensionsType" />
+				</xs:sequence>
+				<xs:attribute name="dataTypeRef"
+					type="seds:DataTypeRefType" use="required">
+					<xs:annotation>
+						<xs:documentation>The data type that this is an array of.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ArrayDimensionsType">
+		<xs:annotation>
+			<xs:documentation>The dimensions of an array, where the Dimension
+				list is in this form:
+				Array[1stDim][2ndDim][lastDim]. The last
+				dimension is assumed to be the least significant - that is
+				this
+				dimension
+				will cycle through its combination before the next to last
+				dimension
+				changes.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Dimension" type="seds:DimensionSizeType"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BinaryDataType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Contains a raw binary
+				value
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:ScalarDataType">
+				<xs:attribute name="sizeInBits"
+					type="seds:PositiveLongType" use="required">
+					<xs:annotation>
+						<xs:documentation>The size of binary field an instance of this
+							binary data type can hold, in bits. If fixedSize is
+							true, the
+							value must always be this large, if fixedSize is false, this
+							is
+							the maximum size.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="fixedSize" type="xs:boolean"
+					use="optional" default="false" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="BooleanDataType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Contains a Boolean value
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:ScalarDataType">
+				<xs:sequence>
+					<xs:element name="BooleanDataEncoding"
+						type="seds:BooleanDataEncodingType" minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CompositeDataType" abstract="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">An abstract type used by
+				within the schema to derive composite data types
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:RootDataType" >
+				<xs:attribute name="encodingRules" type="seds:EncodingRulesType" use="optional" />
+				<xs:attribute name="encodedAs" type="seds:DataTypeRefType" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="EncodingRulesType">
+		<xs:annotation>
+			<xs:documentation>
+				Standard and local types of encoding rules for composite data types
+			</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="seds:CoreEncodingRulesType seds:DoTEncodingRulesType seds:ExtEncodingRulesType"/>
+	</xs:simpleType>
+	<xs:simpleType name="CoreEncodingRulesType">
+		<xs:annotation>
+			<xs:documentation>
+				Standard types of encoding rules for composite data types
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CBOR" />
+			<xs:enumeration value="CBORindefinite" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ContainerConstraintType"
+		abstract="true">
+		<xs:annotation>
+			<xs:documentation>A constraint on a container entry
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:DescriptionType">
+				<xs:attribute name="entry" type="seds:EntryRefType"
+					use="required" />
+				<xs:attribute name="negate" type="xs:boolean"
+					use="optional" default="false"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ConstraintSetType">
+		<xs:annotation>
+			<xs:documentation>
+				The set of constraints on container field values.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="RangeConstraint"
+				type="seds:ContainerRangeConstraintType" />
+			<xs:element name="TypeConstraint"
+				type="seds:ContainerTypeConstraintType" />
+			<xs:element name="ValueConstraint"
+				type="seds:ContainerValueConstraintType" />
+			<xs:element name="ORedConstraints"
+				type="seds:ConstraintSetType" >
+				<xs:annotation>
+					<xs:documentation>
+						The constraints in this list are
+						logically disjoined.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="ContainerDataType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">An ordered list of
+				entries usually with encoding information. Containers
+				may inherit
+				from other containers; when they do, the sequence in the
+				parent
+				Container is 'inherited' and if the
+				location of entries in the child
+				sequence is not specified, it is assumed to
+				start where the parent
+				sequence ended.
+				Parent containers may be marked as "abstract".
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:CompositeDataType">
+				<xs:sequence>
+					<xs:element name="ConstraintSet" minOccurs="0"
+						type="seds:ConstraintSetType">
+						<xs:annotation>
+							<xs:documentation>
+								Used to specify constraints of entries in
+								ancestor (base) container types. These can be used to
+								specify
+								fixed values for entries or to constrain the range of an entry
+								using a derived type.
+								The constraints in this list are
+								logically conjoined.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="EntryList" type="seds:EntryListType"
+						minOccurs="0">
+					</xs:element>
+					<xs:element name="TrailerEntryList"
+						type="seds:EntryListType" minOccurs="0">
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="abstract" type="xs:boolean"
+					default="false" />
+				<xs:attribute name="baseType"
+					type="seds:DataTypeRefType">
+					<xs:annotation>
+						<xs:documentation xml:lang="en">Used to derive one
+							Container from another, abstract, container. Will
+							treat the
+							abstract container as 'wrapping' this container, i.e.
+							defining its
+							header and trailer when encoded as a
+							PDU.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="EntryType">
+		<xs:annotation>
+			<xs:documentation>An entry in a container</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:ExternalFieldType">
+				<xs:sequence>
+					<xs:element name="PresentWhen"
+						type="seds:ConstraintSetType" minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="FixedValueEntryType">
+		<xs:annotation>
+			<xs:documentation>An entry in a container that repeats a number of
+				times indicated by the specified field value
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:EntryType">
+				<xs:attribute name="fixedValue"
+					type="seds:LiteralValueType">
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PaddingEntryType">
+		<xs:annotation>
+			<xs:documentation>An entry in a container that contains a fixed
+				number of bits that are 0 when encoded
+				and ignored when decoded.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:DescriptionType">
+				<xs:sequence>
+					<xs:element name="PresentWhen"
+						type="seds:ConstraintSetType" minOccurs="0" />
+				</xs:sequence>
+				<xs:attribute name="sizeInBits"
+					type="seds:PositiveLongType" use="required">
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ListEntryType">
+		<xs:annotation>
+			<xs:documentation>An entry in a container that repeats a number of
+				times indicated by the specified field value
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:EntryType">
+				<xs:attribute name="listLengthField"
+					type="seds:EntryRefType" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ErrorControlEntryType">
+		<xs:annotation>
+			<xs:documentation>An error control entry in a container. Has a value
+				derived from the binary contents of the rest of
+				the container
+				according to a specified algortihm (e.g. CRC8).
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:EntryType">
+				<xs:attribute name="errorControlType"
+					type="seds:ErrorControlType" use="required">
+					<xs:annotation>
+						<xs:documentation>The type of error control code to be used for
+							calculating this entry.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="LengthEntryType">
+		<xs:annotation>
+			<xs:documentation>A entry in a container logically derived from
+				length of the container. In case the entry value is not exactly the
+				length of the container in bytes, a calibration may be used to
+				express the relation between
+				the two, i.e. container byte length =
+				calibration(entry raw value).
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:EntryType">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ContainerRangeConstraintType">
+		<xs:annotation>
+			<xs:documentation>A container entry constraint based on a specific
+				derived type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:ContainerConstraintType">
+				<xs:choice>
+					<xs:element name="MinMaxRange"
+						type="seds:MinMaxRangeType" />
+					<xs:element name="EnumeratedRange"
+						type="seds:EnumeratedDataTypeRangeType" />
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ContainerTypeConstraintType">
+		<xs:annotation>
+			<xs:documentation>A container entry constraint based on a specific
+				derived type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:ContainerConstraintType">
+				<xs:attribute name="type" type="seds:DataTypeRefType"
+					use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ContainerValueConstraintType">
+		<xs:annotation>
+			<xs:documentation>A container entry constraint based on a specific
+				value
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:ContainerConstraintType">
+				<xs:attribute name="value" type="seds:LiteralValueType"
+					use="required">
+					<xs:annotation>
+						<xs:documentation>A literal value</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="DerivedTypeRangeType">
+		<xs:annotation>
+			<xs:documentation>The valid range for a derived type or type
+				instance. This must be a restriction (or identical, but
+				not an
+				extension) of the range of the base type or the type being
+				instantiated.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="PrecisionRange"
+				type="seds:FloatPrecisionRangeType" />
+			<xs:element name="MinMaxRange" type="seds:MinMaxRangeType" />
+			<xs:element name="EnumeratedRange"
+				type="seds:EnumeratedDataTypeRangeType" />
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="DimensionSizeType">
+		<xs:annotation>
+			<xs:documentation>The size of a single array dimension. Exactly one
+				of size and indexTypeRef must be specified.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="size" type="seds:PositiveLongType"
+			use="optional">
+			<xs:annotation>
+				<xs:documentation>Specifies the number of elements in this dimension
+					of the array.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="indexTypeRef"
+			type="seds:DataTypeRefType" use="optional">
+			<xs:annotation>
+				<xs:documentation>Specifies the data type to use as an index for
+					this array. Must be an integer, enumeration or
+					range. The maximum
+					legal value determines the array length.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="EntryListType">
+		<xs:annotation>
+			<xs:documentation>The list of entries in this container
+			</xs:documentation>
+		</xs:annotation>
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="Entry" type="seds:EntryType" />
+			<xs:element name="FixedValueEntry"
+				type="seds:FixedValueEntryType" />
+			<xs:element name="PaddingEntry"
+				type="seds:PaddingEntryType" />
+			<xs:element name="ListEntry" type="seds:ListEntryType" />
+			<xs:element name="LengthEntry" type="seds:LengthEntryType" />
+			<xs:element name="ErrorControlEntry"
+				type="seds:ErrorControlEntryType" />
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="EnumeratedDataType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Contains an enumerated
+				value - a value that has both an integral and a
+				string
+				representation.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:ScalarDataType">
+				<xs:sequence>
+					<xs:element name="IntegerDataEncoding"
+						type="seds:IntegerDataEncodingType" minOccurs="0" />
+					<xs:element name="EnumerationList"
+						type="seds:EnumerationListType">
+						<xs:annotation>
+							<xs:documentation>The miminum and maximum values here also
+								constitute this types range.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="EnumeratedDataTypeRangeType">
+		<xs:annotation>
+			<xs:documentation>The list of in-range items for an enumerated data
+				type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Label" type="seds:EnumItemNameType"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EnumerationListType">
+		<xs:annotation>
+			<xs:documentation>The list of valid items for an enumerated type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Enumeration"
+				type="seds:ValueEnumerationType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FloatDataType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Contains a floating point
+				value
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NumericDataType">
+				<xs:sequence>
+					<xs:element name="FloatDataEncoding"
+						type="seds:FloatDataEncodingType" minOccurs="0" />
+					<xs:element name="Range"
+						type="seds:FloatDataTypeRangeType" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="SubRangeDataType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Contains a type defined
+				as a sub-range of another. Range must be
+				contained within that of
+				base type.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NumericDataType">
+				<xs:sequence>
+					<xs:element name="Range"
+						type="seds:DerivedTypeRangeType" minOccurs="1" />
+				</xs:sequence>
+				<xs:attribute name="baseType"
+					type="seds:DataTypeRefType" use="required">
+					<xs:annotation>
+						<xs:documentation xml:lang="en">Used to specific the
+							numeric type of which this is a sub-range.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="FloatDataTypeRangeType">
+		<xs:annotation>
+			<xs:documentation>The range of values supported by a float data type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="PrecisionRange"
+				type="seds:FloatPrecisionRangeType" />
+			<xs:element name="MinMaxRange" type="seds:MinMaxRangeType" />
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="MinMaxRangeType">
+		<xs:annotation>
+			<xs:documentation>The valid range of a numeric value specified as a
+				minimum and/or maximum
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="min" type="seds:LiteralValueType" />
+		<xs:attribute name="max" type="seds:LiteralValueType" />
+		<xs:attribute name="rangeType" type="seds:RangeType"
+			use="required" />
+	</xs:complexType>
+	<xs:complexType name="IntegerDataType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Contains an integer value
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NumericDataType">
+				<xs:sequence>
+					<xs:element name="IntegerDataEncoding"
+						type="seds:IntegerDataEncodingType" minOccurs="0" />
+					<xs:element name="Range"
+						type="seds:IntegerDataTypeRangeType" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="IntegerDataTypeRangeType">
+		<xs:annotation>
+			<xs:documentation>The valid range of an integer type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="MinMaxRange" type="seds:MinMaxRangeType" />
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="NumericDataType" abstract="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">An abstract type that is
+				a super type of either an Integer or Float Data
+				type.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:ScalarDataType" >
+				<xs:choice minOccurs="0">
+					<xs:element name="SplineCalibrator"
+						type="seds:SplineCalibratorType" />
+					<xs:element name="PolynomialCalibrator"
+						type="seds:PolynomialType" />
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="RootDataType" abstract="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">An abstract type used by
+				within the schema as the parent of all other
+				data types
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ScalarDataType" abstract="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">An abstract type used by
+				within the schema to derive scalar data types
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:RootDataType" />
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="StringDataType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Contains a String Value
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:ScalarDataType">
+				<xs:sequence>
+					<xs:element name="StringDataEncoding"
+						type="seds:StringDataEncodingType" minOccurs="0" />
+					<xs:element name="Range"
+						type="seds:StringDataTypeRangeType" minOccurs="0" />
+				</xs:sequence>
+				<xs:attribute name="length"
+					type="seds:PositiveLongType" use="required">
+					<xs:annotation>
+						<xs:documentation>The length of string an instance of this string
+							data type can hold in bytes. If fixedLength
+							is true, the
+							string
+							must always be this long, if fixedLength is
+							false, this is
+							the
+							maximum length.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="fixedLength" type="xs:boolean"
+					use="optional" default="false" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="StringDataTypeRangeType">
+		<xs:annotation>
+			<xs:documentation>
+				The valid range of a string type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="EnumeratedRange" type="seds:EnumeratedDataTypeRangeType" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InlineFieldType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>
+				An abstract type used within the schema as the
+				basis for instances that may be defined inline.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType">
+				<xs:sequence>
+					<xs:choice minOccurs="0">
+						<xs:element name="BooleanDataEncoding"
+							type="seds:BooleanDataEncodingType" />
+						<xs:element name="FloatDataEncoding"
+							type="seds:FloatDataEncodingType" />
+						<xs:element name="IntegerDataEncoding"
+							type="seds:IntegerDataEncodingType" />
+						<xs:element name="StringDataEncoding"
+							type="seds:StringDataEncodingType" />
+					</xs:choice>
+					<xs:element name="ArrayDimensions"
+						type="seds:ArrayDimensionsType" minOccurs="0" />
+					<xs:element name="ValidRange"
+						type="seds:DerivedTypeRangeType" minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="FieldType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>An abstract type used within the schema as the
+				parent of all type instances
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:InlineFieldType">
+				<xs:attribute name="type" type="seds:DataTypeRefType"
+					use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ExternalFieldType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>An abstract type used within the schema as the
+				parent of all type instances that can be visible outside a component
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:FieldType">
+				<xs:sequence>
+					<xs:choice minOccurs="0">
+						<xs:element name="SplineCalibrator"
+							type="seds:SplineCalibratorType" />
+						<xs:element name="PolynomialCalibrator"
+							type="seds:PolynomialType" />
+					</xs:choice>
+					<xs:element name="NominalRangeSet"
+						type="seds:DerivedTypeRangeType" minOccurs="0" />
+					<xs:element name="SafeRangeSet"
+						type="seds:DerivedTypeRangeType" minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ValueEnumerationType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Contains a value and an
+				associated string label
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:DescriptionType">
+				<xs:attribute name="value" type="xs:integer"
+					use="required" />
+				<xs:attribute name="label" type="seds:EnumItemNameType"
+					use="required" />
+				<xs:attributeGroup ref="seds:CoreSemanticsAttributeGroup" />
+				<xs:attributeGroup ref="seds:ExtensionSemanticsAttributeGroup" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="DataTypeRefType">
+		<xs:annotation>
+			<xs:documentation>A reference to a data type. This can be in the
+				local namespace, or any other namespace.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="seds:QualifiedNameType" />
+	</xs:simpleType>
+	<xs:simpleType name="EnumItemNameType">
+		<xs:annotation>
+			<xs:documentation>The name of an enumeration item</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="seds:NameType" />
+	</xs:simpleType>
+	<xs:simpleType name="ErrorControlType">
+		<xs:annotation>
+			<xs:documentation>Standard and local types of error control algorithm
+			</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="seds:CoreErrorControlType seds:DoTErrorControlType seds:ExtErrorControlType"/>
+	</xs:simpleType>
+	<xs:simpleType name="CoreErrorControlType">
+		<xs:annotation>
+			<xs:documentation>Standard types of error control algorithm
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CRC16_CCITT" />
+			<xs:enumeration value="CRC8" />
+			<xs:enumeration value="CRC8_CCITT" />
+			<xs:enumeration value="CHECKSUM" />
+			<xs:enumeration value="CHECKSUM_LONGITUDINAL" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="RangeType">
+		<xs:annotation>
+			<xs:documentation> (a..b) = {x | a lt; x lt; b} --
+				exclusiveMinExclusiveMax [a..b] = {x | a lt;= x lt;= b} --
+				inclusiveMinInclusiveMax [a..b) = {x | a lt;= x lt; b} --
+				inclusiveMinExclusiveMax (a..b] = {x | a lt; x lt;= b} --
+				exclusiveMinInclusiveMax (a..+∞) greaterThan(C) [a..+∞) atLeast(C)
+				(-∞..b) lessThan(C) (-∞..b] atMost(C)
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="exclusiveMinExclusiveMax" />
+			<xs:enumeration value="inclusiveMinInclusiveMax" />
+			<xs:enumeration value="inclusiveMinExclusiveMax" />
+			<xs:enumeration value="exclusiveMinInclusiveMax" />
+			<xs:enumeration value="greaterThan" />
+			<xs:enumeration value="lessThan" />
+			<xs:enumeration value="atLeast" />
+			<xs:enumeration value="atMost" />
+		</xs:restriction>
+	</xs:simpleType>
+	<!--Type Encoding -->
+	<xs:complexType name="BooleanDataEncodingType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Check for either zero
+				which is false, and non-zero which is true, or the
+				other way around.
+				Bit and byte order are ignored.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:DataEncodingType">
+				<xs:attribute name="sizeInBits"
+					type="seds:PositiveLongType" use="required" />
+				<xs:attribute name="falseValue"
+					type="seds:FalseValueType" default="zeroIsFalse">
+					<xs:annotation>
+						<xs:documentation>Define the false value, true is anything
+							non-false.
+							The default is zero, meaning non-zero is true.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="DataEncodingType" abstract="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Describes how a
+				particular piece of data is sent or received from some
+				non-native,
+				off-platform device. (e.g. a spacecraft)
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="byteOrder" type="seds:ByteOrderType"
+			use="optional" default="bigEndian">
+			<xs:annotation>
+				<xs:documentation>Big and Little.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="FloatDataEncodingType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">For common encodings of
+				floating point data
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:DataEncodingType">
+				<xs:attribute name="encodingAndPrecision"
+					type="seds:FloatEncodingAndPrecisionType" use="required" />
+				<xs:attribute name="sizeInBits"
+					type="seds:PositiveLongType" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="IntegerDataEncodingType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">For all major encodings
+				of integer data
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:DataEncodingType">
+				<xs:attribute name="encoding"
+					type="seds:IntegerEncodingType" use="required" />
+				<xs:attribute name="sizeInBits"
+					type="seds:PositiveLongType" use="required" >
+					<xs:annotation>
+						<xs:documentation>
+							The size of integer field an instance of this
+							integer data type can hold, in bits.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="StringDataEncodingType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">For common encodings of
+				string data
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:DataEncodingType">
+				<xs:attribute name="encoding"
+					type="seds:StringEncodingType" default="ASCII" />
+				<xs:attribute name="terminationByte"
+					type="xs:unsignedByte" use="optional">
+					<xs:annotation>
+						<xs:documentation>The byte value used to determine the end of a
+							string (e.g. 0 for a C string). Mandatory for
+							variable-length
+							strings, but syntactically optional to allow fixed-length
+							strings
+							without a terminator.
+							Pascal-style encoded strings with a
+							preceding length should be modelled as
+							arrays of byte values.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="ByteOrderType">
+		<xs:annotation>
+			<xs:documentation>The endianness of a type encoding. Big-endian has
+				the most significant byte first.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="bigEndian" />
+			<xs:enumeration value="littleEndian" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FalseValueType">
+		<xs:annotation>
+			<xs:documentation>The encoding for a Boolean data type "false" value
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="zeroIsFalse" />
+			<xs:enumeration value="nonZeroIsFalse" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FloatEncodingAndPrecisionType">
+		<xs:annotation>
+			<xs:documentation>The encoding and precision of a floating-point data
+				type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="seds:CoreEncodingAndPrecisionType seds:DoTEncodingAndPrecisionType seds:ExtEncodingAndPrecisionType"/>
+	</xs:simpleType>
+	<xs:simpleType name="CoreEncodingAndPrecisionType">
+		<xs:annotation>
+			<xs:documentation>Standard types of encoding and precision of floating-point data
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="IEEE754_2008_single" />
+			<xs:enumeration value="IEEE754_2008_double" />
+			<xs:enumeration value="IEEE754_2008_quad" />
+			<xs:enumeration value="MILSTD_1750A_simple" />
+			<xs:enumeration value="MILSTD_1750A_extended" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FloatPrecisionRangeType">
+		<xs:annotation>
+			<xs:documentation>The range of a float, specified as a "precision",
+				corresponding to that supported by the corresponding IEEE754
+				standard.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="single" />
+			<xs:enumeration value="double" />
+			<xs:enumeration value="quad" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="IntegerEncodingType">
+		<xs:annotation>
+			<xs:documentation>The valid encodings for an integer data type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="seds:CoreIntegerEncodingType seds:DoTIntegerEncodingType seds:ExtIntegerEncodingType"/>
+	</xs:simpleType>
+	<xs:simpleType name="CoreIntegerEncodingType">
+		<xs:annotation>
+			<xs:documentation>Standard types of encoding of integer data
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="unsigned" />
+			<xs:enumeration value="signMagnitude" />
+			<xs:enumeration value="twosComplement" />
+			<xs:enumeration value="onesComplement" />
+			<xs:enumeration value="BCD" />
+			<xs:enumeration value="packedBCD" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="StringEncodingType">
+		<xs:annotation>
+			<xs:documentation>Supported string encoding types</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="seds:CoreStringEncodingType seds:DoTStringEncodingType seds:ExtStringEncodingType"/>
+	</xs:simpleType>
+	<xs:simpleType name="CoreStringEncodingType">
+		<xs:annotation>
+			<xs:documentation>Standard types of encoding of string data
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ASCII" />
+			<xs:enumeration value="UTF-8" />
+		</xs:restriction>
+	</xs:simpleType>
+	<!--Interface Types -->
+	<xs:complexType name="BaseInterfaceSetType">
+		<xs:annotation>
+			<xs:documentation>The set of types from which this interface inherits
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Interface" type="seds:InterfaceRefType"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CommandArgumentType">
+		<xs:annotation>
+			<xs:documentation>An argument to a command</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:ExternalFieldType">
+				<xs:attribute name="mode"
+					type="seds:CommandArgumentModeType" use="optional" default="in" />
+				<xs:attribute name="defaultValue"
+					type="seds:LiteralValueType" />
+				<xs:attribute name="dataUnit" type="xs:boolean"
+					default="false" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="InterfaceCommandType">
+		<xs:annotation>
+			<xs:documentation>The declaration of a command on in interface
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType">
+				<xs:sequence>
+					<xs:element name="Argument"
+						type="seds:CommandArgumentType" minOccurs="0"
+						maxOccurs="unbounded" />
+				</xs:sequence>
+				<xs:attribute name="mode" type="seds:ModeType"
+					default="sync" />
+				<xs:attribute name="pattern"
+					type="seds:CommandArgumentModeType" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CommandSetType">
+		<xs:annotation>
+			<xs:documentation>The set of commands supported by an interface
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Command"
+				type="seds:InterfaceCommandType" maxOccurs="unbounded">
+				<xs:key name="InterfaceCommandArgumentNameKey">
+					<xs:selector xpath="./seds:Argument" />
+					<xs:field xpath="@name" />
+				</xs:key>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InterfaceParameterType">
+		<xs:annotation>
+			<xs:documentation>The declaration of a parameter on an interface.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:ExternalFieldType">
+				<xs:attribute name="mode" type="seds:ModeType"
+					default="sync" />
+				<xs:attribute name="readOnly" type="xs:boolean"
+					default="false">
+					<xs:annotation>
+						<xs:documentation>If true, set operations may not be performed on
+							the parameter
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ParameterSetType">
+		<xs:annotation>
+			<xs:documentation>The set of parameters supported by an interface
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Parameter"
+				type="seds:InterfaceParameterType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InterfaceRefType">
+		<xs:annotation>
+			<xs:documentation>A reference to an interface declaration with
+				associated generic type mapping.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="GenericTypeMapSet"
+				type="seds:GenericTypeMapSetType" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute name="type"
+			type="seds:InterfaceDeclarationRefType" use="required" />
+	</xs:complexType>
+	<xs:complexType name="InterfaceDeclarationType">
+		<xs:annotation>
+			<xs:documentation>A declaration of an interface type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType">
+				<xs:sequence>
+					<xs:element name="BaseInterfaceSet"
+						type="seds:BaseInterfaceSetType" minOccurs="0" />
+					<xs:element name="GenericTypeSet"
+						type="seds:GenericTypeSetType" minOccurs="0">
+						<xs:key name="InterfaceDeclarationGenericTypeNameKey">
+							<xs:selector xpath="./seds:GenericType" />
+							<xs:field xpath="@name" />
+						</xs:key>
+					</xs:element>
+					<xs:element name="ParameterSet"
+						type="seds:ParameterSetType" minOccurs="0">
+						<xs:key name="InterfaceDeclarationParameterNameKey">
+							<xs:selector xpath="./seds:Parameter" />
+							<xs:field xpath="@name" />
+						</xs:key>
+					</xs:element>
+					<xs:element name="CommandSet" type="seds:CommandSetType"
+						minOccurs="0">
+						<xs:key name="InterfaceDeclarationCommandNameKey">
+							<xs:selector xpath="./seds:Command" />
+							<xs:field xpath="@name" />
+						</xs:key>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="abstract" type="xs:boolean"
+					default="false" />
+				<xs:attribute name="level"
+					type="seds:InterfaceLevelType" default="application" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="CommandArgumentModeType">
+		<xs:annotation>
+			<xs:documentation>The mode of a command argument</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="in" />
+			<xs:enumeration value="out" />
+			<xs:enumeration value="inout" />
+			<xs:enumeration value="notify" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="InterfaceDeclarationRefType">
+		<xs:annotation>
+			<xs:documentation>A qualified reference to an interface declaration
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="seds:QualifiedNameType" />
+	</xs:simpleType>
+	<xs:simpleType name="ModeType">
+		<xs:annotation>
+			<xs:documentation>The mode of an interface parameter or command
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="sync" />
+			<xs:enumeration value="async" />
+		</xs:restriction>
+	</xs:simpleType>
+	<!--Component Types -->
+	<xs:complexType name="ActivitySetType">
+		<xs:annotation>
+			<xs:documentation>The set of activities used to implement a component
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Activity" type="seds:ActivityType"
+				maxOccurs="unbounded">
+				<xs:key name="ActivityArgumentNameKey">
+					<xs:selector xpath="./seds:Argument" />
+					<xs:field xpath="@name" />
+				</xs:key>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ComponentImplementationType">
+		<xs:annotation>
+			<xs:documentation>The implementation for a component type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="VariableSet" type="seds:VariableSetType"
+				minOccurs="0">
+				<xs:key name="VariableNameKey">
+					<xs:selector xpath="./seds:Variable" />
+					<xs:field xpath="@name" />
+				</xs:key>
+			</xs:element>
+			<xs:element name="ParameterMapSet"
+				type="seds:ParameterMapSetType" minOccurs="0" />
+			<xs:element name="ParameterActivityMapSet"
+				type="seds:ParameterActivityMapSetType" minOccurs="0" />
+			<xs:element name="ActivitySet" type="seds:ActivitySetType"
+				minOccurs="0">
+			</xs:element>
+			<xs:element name="StateMachineSet"
+				type="seds:StateMachineSetType" minOccurs="0">
+				<xs:key name="StateMachineNameKey">
+					<xs:selector xpath="./seds:StateMachine" />
+					<xs:field xpath="@name" />
+				</xs:key>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ComponentType">
+		<xs:annotation>
+			<xs:documentation>A component type</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType">
+				<xs:sequence>
+					<xs:element name="ProvidedInterfaceSet"
+						type="seds:InterfaceSetType" minOccurs="0" />
+					<xs:element name="RequiredInterfaceSet"
+						type="seds:InterfaceSetType" minOccurs="0" />
+					<xs:element name="DataTypeSet"
+						type="seds:DataTypeSetType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Data types which are private to the component.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DeclaredInterfaceSet"
+						type="seds:InterfaceDeclarationSetType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Interface types which are private to the
+								component type.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Implementation"
+						type="seds:ComponentImplementationType" minOccurs="0">
+						<xs:key name="ActivityNameKey">
+							<xs:selector xpath="./seds:ActivitySet/seds:Activity" />
+							<xs:field xpath="@name" />
+						</xs:key>
+						<xs:keyref name="ActivityNameRef"
+							refer="seds:ActivityNameKey">
+							<xs:selector
+								xpath=".//seds:Call|.//seds:OnEntry|.//seds:OnExit|.//seds:Do" />
+							<xs:field xpath="@activity" />
+						</xs:keyref>
+						<xs:key name="ParameterMapKey">
+							<xs:selector
+								xpath="./seds:ParameterMapSet/seds:ParameterMap|.//seds:Provided" />
+							<xs:field xpath="@parameter" />
+							<xs:field xpath="@interface" />
+						</xs:key>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="InterfaceSetType">
+		<xs:annotation>
+			<xs:documentation>The set of interfaces provided or required by a
+				component
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Interface" type="seds:InterfaceType"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InterfaceType">
+		<xs:annotation>
+			<xs:documentation>An interface provided or required by a component
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType">
+				<xs:sequence>
+					<xs:element name="GenericTypeMapSet"
+						type="seds:GenericTypeMapSetType" minOccurs="0" />
+				</xs:sequence>
+				<xs:attribute name="type"
+					type="seds:InterfaceDeclarationRefType" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ParameterActivityMapSetType">
+		<xs:annotation>
+			<xs:documentation>The set of required/provided parameter mappings
+				using activities
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ParameterActivityMap"
+				type="seds:ParameterActivityMapType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ParameterActivityMapType">
+		<xs:annotation>
+			<xs:documentation>A mapping between a parameter on a required
+				interface and a parameter on a provided interface using
+				an activity
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Provided"
+				type="seds:ParameterMapDataType" />
+			<xs:element name="Required"
+				type="seds:ParameterMapDataType" />
+			<xs:choice>
+				<xs:sequence>
+					<xs:element name="GetActivity" type="seds:BodyType" />
+					<xs:element name="SetActivity" type="seds:BodyType"
+						minOccurs="0" />
+				</xs:sequence>
+				<xs:sequence>
+					<xs:element name="SetActivityOnly" type="seds:BodyType" />
+				</xs:sequence>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ParameterMapDataType">
+		<xs:annotation>
+			<xs:documentation>A parameter which is mapped to an interface
+				parameter
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="seds:NameType"
+			use="required" />
+		<xs:attributeGroup
+			ref="seds:ParameterRefAttributeGroup"></xs:attributeGroup>
+	</xs:complexType>
+	<xs:complexType name="ParameterMapSetType">
+		<xs:annotation>
+			<xs:documentation>The set of direct mapings between internal and
+				interface parameters
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ParameterMap"
+				type="seds:ParameterMapType" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ParameterMapType">
+		<xs:annotation>
+			<xs:documentation>A direct mapping between an internal parameter and
+				an interface parameter
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attributeGroup
+			ref="seds:ParameterRefAttributeGroup"></xs:attributeGroup>
+		<xs:attribute name="variableRef"
+			type="seds:VariableRefType" use="required" />
+	</xs:complexType>
+	<xs:complexType name="StateMachineSetType">
+		<xs:annotation>
+			<xs:documentation>The set of state machines used to implement a
+				component
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="StateMachine"
+				type="seds:StateMachineType" maxOccurs="unbounded">
+				<xs:key name="StateNameKey2">
+					<xs:selector xpath=".//seds:State|.//seds:EntryState" />
+					<xs:field xpath="@name" />
+				</xs:key>
+				<xs:key name="StateNameKey3">
+					<xs:selector xpath=".//seds:State|.//seds:ExitState" />
+					<xs:field xpath="@name" />
+				</xs:key>
+				<xs:key name="TransitionNameKey">
+					<xs:selector xpath=".//seds:Transition" />
+					<xs:field xpath="@name" />
+					<xs:field xpath="@fromState" />
+				</xs:key>
+				<xs:keyref name="FromStateNameRef"
+					refer="seds:StateNameKey2">
+					<xs:selector xpath=".//seds:Transition" />
+					<xs:field xpath="@fromState" />
+				</xs:keyref>
+				<xs:keyref name="ToStateNameRef"
+					refer="seds:StateNameKey3">
+					<xs:selector xpath=".//seds:Transition" />
+					<xs:field xpath="@toState" />
+				</xs:keyref>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="VariableSetType">
+		<xs:annotation>
+			<xs:documentation>The set of variables used by a component
+				implementation
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Variable" type="seds:VariableType"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="VariableType">
+		<xs:annotation>
+			<xs:documentation>An instance of a data type local to a component
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:FieldType">
+				<xs:attribute name="initialValue"
+					type="seds:LiteralValueType">
+					<xs:annotation>
+						<xs:documentation>The initial value of a variable. This is only
+							valid if the type is scalar.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="readOnly" type="xs:boolean"
+					default="false">
+					<xs:annotation>
+						<xs:documentation>If true, the variable should be considered as a
+							fixed constant.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="VariableRefType">
+		<xs:annotation>
+			<xs:documentation>A reference to a component implementation variable
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="seds:FieldRefType" />
+	</xs:simpleType>
+	<xs:simpleType name="EntryRefType">
+		<xs:annotation>
+			<xs:documentation>A reference to a field within a container
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="seds:FieldRefType" />
+	</xs:simpleType>
+	<!--Component Types -> Primitives -->
+	<xs:complexType name="OnCommandPrimitiveType">
+		<xs:annotation>
+			<xs:documentation>Represents an interface command service primitive
+				sink, i.e. a place where commands are read from an input channel.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:PrimitiveSinkType">
+				<xs:sequence>
+					<xs:element name="ArgumentValue"
+						type="seds:SinkArgumentValueType" minOccurs="0"
+						maxOccurs="unbounded" />
+				</xs:sequence>
+				<xs:attributeGroup
+					ref="seds:CommandRefAttributeGroup" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="SendCommandPrimitiveType">
+		<xs:annotation>
+			<xs:documentation>Represents an interface command service primitive
+				source
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:PrimitiveSourceType">
+				<xs:sequence>
+					<xs:element name="ArgumentValue"
+						type="seds:NamedArgumentValueType" minOccurs="0"
+						maxOccurs="unbounded" />
+				</xs:sequence>
+				<xs:attributeGroup
+					ref="seds:CommandRefAttributeGroup" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="NamedArgumentValueType">
+		<xs:annotation>
+			<xs:documentation>A named argument value.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:OperandType">
+				<xs:attribute name="name" type="seds:NameType"
+					use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="SinkArgumentValueType">
+		<xs:annotation>
+			<xs:documentation>A named incoming argument value.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="seds:NameType"
+			use="required" />
+		<xs:attribute name="outputVariableRef"
+			type="seds:VariableRefType" use="required" />
+	</xs:complexType>
+	<xs:complexType name="OnParameterPrimitiveType">
+		<xs:annotation>
+			<xs:documentation>Represents an interface parameter service primitive
+				sink, i.e. a place where commands are read from an input channel.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:PrimitiveSinkType">
+				<xs:sequence>
+					<xs:element name="VariableRef"
+						type="seds:VariableRefType" minOccurs="0" />
+				</xs:sequence>
+				<xs:attributeGroup
+					ref="seds:ParameterRefAttributeGroup" />
+				<xs:attribute name="operation"
+					type="seds:ParameterOperationType" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="SendParameterPrimitiveType">
+		<xs:annotation>
+			<xs:documentation>Represents an interface parameter service primitive
+				source
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:PrimitiveSourceType">
+				<xs:sequence>
+					<xs:element name="ArgumentValue" type="seds:OperandType"
+						minOccurs="0" />
+				</xs:sequence>
+				<xs:attributeGroup
+					ref="seds:ParameterRefAttributeGroup" />
+				<xs:attribute name="operation"
+					type="seds:ParameterOperationType" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PrimitiveSinkType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Represents a service primitive sink (i.e. a place
+				where a primitive will be read from an input channel)
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="transaction" type="seds:NameType" />
+		<xs:attribute name="failed" type="xs:boolean"
+			default="false" />
+	</xs:complexType>
+	<xs:complexType name="PrimitiveSourceType"
+		abstract="true">
+		<xs:annotation>
+			<xs:documentation>Represents a service primitive source (i.e. a place
+				where a primitive will be sent to an output channel).
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:StatementType">
+				<xs:attribute name="transaction" type="seds:NameType" />
+				<xs:attribute name="failed" type="xs:boolean"
+					default="false" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="ParameterOperationType">
+		<xs:annotation>
+			<xs:documentation>The operations possible on an interface parameter
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="get" />
+			<xs:enumeration value="set" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:attributeGroup name="CommandRefAttributeGroup">
+		<xs:annotation>
+			<xs:documentation>Attributes for referencing a command on an
+				interface from within a component
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="interface" type="seds:NameType"
+			use="required" />
+		<xs:attribute name="command" type="seds:NameType"
+			use="required" />
+	</xs:attributeGroup>
+	<xs:attributeGroup name="ParameterRefAttributeGroup">
+		<xs:annotation>
+			<xs:documentation>Attributes for referencing a parameter on an
+				interface from within a component
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="interface" type="seds:NameType"
+			use="required" />
+		<xs:attribute name="parameter" type="seds:NameType"
+			use="required" />
+	</xs:attributeGroup>
+	<!--Component Types -> Activities -->
+	<xs:complexType name="ActivityArgumentType">
+		<xs:annotation>
+			<xs:documentation>An argument to an activity</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:FieldType" />
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="BodyType">
+		<xs:annotation>
+			<xs:documentation>The implementation of an activity
+			</xs:documentation>
+		</xs:annotation>
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="Assignment" type="seds:AssignmentType" />
+			<xs:element name="Conditional" type="seds:ConditionalType" />
+			<xs:element name="Iteration" type="seds:IterationType" />
+			<xs:element name="Calibration" type="seds:CalibrationType" />
+			<xs:element name="SendParameterPrimitive"
+				type="seds:SendParameterPrimitiveType" />
+			<xs:element name="SendCommandPrimitive"
+				type="seds:SendCommandPrimitiveType" />
+			<xs:element name="MathOperation"
+				type="seds:MathOperationType" />
+			<xs:element name="Call" type="seds:ActivityInvocationType">
+				<xs:key name="CallArgumentNameKey">
+					<xs:selector xpath="./seds:ArgumentValue" />
+					<xs:field xpath="@name" />
+				</xs:key>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="StatementType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>A single step within an activity body.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:DescriptionType" />
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ActivityInvocationType">
+		<xs:annotation>
+			<xs:documentation>Represents the invocation of an activity
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:StatementType">
+				<xs:sequence>
+					<xs:element name="ArgumentValue"
+						type="seds:NamedArgumentValueType" minOccurs="0"
+						maxOccurs="unbounded" />
+				</xs:sequence>
+				<xs:attribute name="activity" type="seds:NameType"
+					use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ActivityType">
+		<xs:annotation>
+			<xs:documentation>An activity used to implement a component
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType">
+				<xs:sequence>
+					<xs:element name="Argument"
+						type="seds:ActivityArgumentType" minOccurs="0"
+						maxOccurs="unbounded" />
+					<xs:element name="Body" type="seds:BodyType" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ANDedConditionsType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">A list of boolean
+				comparisons, or boolean groups that are logically ANDed
+				together. Any
+				ORed conditions in the list are evaluated first.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:BaseConditionsType">
+				<xs:choice minOccurs="2" maxOccurs="unbounded">
+					<xs:element name="Condition" type="seds:ComparisonType" />
+					<xs:element name="ORedConditions"
+						type="seds:ORedConditionsType" />
+					<xs:element name="TypeCondition"
+						type="seds:TypeCheckType" />
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="AssignmentType">
+		<xs:annotation>
+			<xs:documentation>An assignment to a variable</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:StatementType">
+				<xs:choice>
+					<xs:element name="VariableRef"
+						type="seds:VariableRefOperandType">
+						<xs:annotation>
+							<xs:documentation>The variable being referred to is assumed to be
+								of the correct type
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Value" type="seds:ValueOperandType">
+						<xs:annotation>
+							<xs:documentation>Value is assumed to be of the correct type
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+				<xs:attribute name="outputVariableRef"
+					type="seds:VariableRefType" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="BaseConditionsType"
+		abstract="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">An abstract type
+				definition used as the base for the various elements of
+				Boolean
+				comparison operations.
+			</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="BaseMathOperationsType"
+		abstract="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">An abstract type
+				definition used as the base for the various elements of
+				math
+				operations.
+			</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="BooleanExpressionType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Holds an arbitrarily
+				complex boolean expression
+			</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="Condition" type="seds:ComparisonType" />
+			<xs:element name="ANDedConditions"
+				type="seds:ANDedConditionsType" />
+			<xs:element name="ORedConditions"
+				type="seds:ORedConditionsType" />
+			<xs:element name="TypeCondition" type="seds:TypeCheckType" />
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="CalibrationType">
+		<xs:annotation>
+			<xs:documentation>A calibration operation</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:StatementType">
+				<xs:choice>
+					<xs:element name="SplineCalibrator"
+						type="seds:SplineCalibratorType" />
+					<xs:element name="PolynomialCalibrator"
+						type="seds:PolynomialType" />
+				</xs:choice>
+				<xs:attribute name="outputVariableRef"
+					type="seds:VariableRefType" use="required" />
+				<xs:attribute name="inputVariableRef"
+					type="seds:VariableRefType" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ComparisonType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Compare a variable to a
+				value or another variable
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:BaseConditionsType">
+				<xs:sequence>
+					<xs:element name="FirstOperand"
+						type="seds:VariableRefOperandType" />
+					<xs:element name="ComparisonOperator"
+						type="seds:ComparisonOperatorType" />
+					<xs:choice>
+						<xs:element name="SecondOperand"
+							type="seds:VariableRefOperandType">
+							<xs:annotation>
+								<xs:documentation xml:lang="en">The variable being
+									referred to is assumed to have a compatible type
+									with the first
+									operand
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Value" type="seds:ValueOperandType">
+							<xs:annotation>
+								<xs:documentation xml:lang="en">The value is assumed
+									to have a compatible type with the first
+									operand
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="TypeCheckType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Check a variable for
+				compatibility with a type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:BaseConditionsType">
+				<xs:sequence>
+					<xs:element name="FirstOperand"
+						type="seds:VariableRefOperandType" />
+					<xs:element name="TypeOperand"
+						type="seds:DataTypeRefType" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ConditionalType">
+		<xs:annotation>
+			<xs:documentation>A conditional statement for an activity
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:StatementType">
+				<xs:sequence>
+					<xs:element name="Condition"
+						type="seds:BooleanExpressionType" />
+					<xs:element name="OnConditionTrue" type="seds:BodyType"
+						minOccurs="0" />
+					<xs:element name="OnConditionFalse" type="seds:BodyType"
+						minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="IterationType">
+		<xs:annotation>
+			<xs:documentation>An iteration for an activity, either over the
+				elements of an array or numeric iteration
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:StatementType">
+				<xs:sequence>
+					<xs:choice>
+						<xs:sequence>
+							<xs:element name="OverArray"
+								type="seds:VariableRefType" />
+						</xs:sequence>
+						<xs:sequence>
+							<xs:element name="StartAt" type="seds:OperandType" />
+							<xs:element name="Step" type="seds:OperandType" />
+							<xs:element name="EndAt" type="seds:OperandType" />
+						</xs:sequence>
+					</xs:choice>
+					<xs:element name="Do" type="seds:BodyType" />
+				</xs:sequence>
+				<xs:attribute name="iteratorVariableRef"
+					type="seds:VariableRefType" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="MathOperationType">
+		<xs:annotation>
+			<xs:documentation>A mathematical operation for an activity
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:StatementType">
+				<xs:choice maxOccurs="unbounded">
+					<xs:element name="Value" type="seds:ValueOperandType">
+						<xs:annotation>
+							<xs:documentation>Use a constant in the calculation
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="VariableRef"
+						type="seds:VariableRefOperandType">
+						<xs:annotation>
+							<xs:documentation>Use the value of a variable in the calculation
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Operator" type="seds:OperatorType">
+						<xs:annotation>
+							<xs:documentation>Binary operators: +, -, *, /, %, ^ operate on
+								the top two values in the stack, leaving the
+								result on the top of
+								the stack. Unary operators: 1/x, x!, e^x, ln,
+								log, and
+								trigonometric operators operate on
+								the top member of the stack
+								also leaving the result on the top of
+								the stack. 'ln' is a
+								natural log where 'log'
+								is a base 10 logarithm. Trigonometric
+								operators use degrees.
+								'swap' swaps the top two members of the
+								stack.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+				<xs:attribute name="outputVariableRef"
+					type="seds:VariableRefType" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="OperandType">
+		<xs:annotation>
+			<xs:documentation>An operand value derived from a variable or a
+				literal
+			</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="VariableRef"
+				type="seds:VariableRefOperandType">
+				<xs:annotation>
+					<xs:documentation>The variable being referred to is assumed to be
+						of the correct type
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Value" type="seds:ValueOperandType">
+				<xs:annotation>
+					<xs:documentation>Value is assumed to be of the correct type
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="OperatorType">
+		<xs:annotation>
+			<xs:documentation>A mathematical operator</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:BaseMathOperationsType">
+				<xs:attribute name="operator"
+					type="seds:MathOperatorsType" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ORedConditionsType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">A list of boolean
+				comparisons, or boolean groups that are logically ORed
+				together. Any
+				ANDed conditions in the list are evaluated first.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:BaseConditionsType">
+				<xs:choice minOccurs="2" maxOccurs="unbounded">
+					<xs:element name="Condition" type="seds:ComparisonType" />
+					<xs:element name="ANDedConditions"
+						type="seds:ANDedConditionsType" />
+					<xs:element name="TypeCondition"
+						type="seds:TypeCheckType" />
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PolynomialTermType">
+		<xs:annotation>
+			<xs:documentation>A single term from a polynomial</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="coefficient" type="xs:double"
+			use="required" />
+		<xs:attribute name="exponent" type="xs:unsignedLong"
+			use="required" />
+	</xs:complexType>
+	<xs:complexType name="PolynomialType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">A polynomial expression.
+				For example: 3 + 2x.
+				The first coefficient belongs with the X^0 term,
+				the next
+				coefficient belongs to the X^1 term and so on.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Term" type="seds:PolynomialTermType"
+				maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">A term in a polynomial
+						expression.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SplineCalibratorType">
+		<xs:annotation>
+			<xs:documentation>A spline calibration. This is a calibration type
+				where a segmented line in a raw vs calibrated plane is described
+				using a set of
+				points. Raw values are converted to calibrated values
+				by finding a position
+				on the line corresponding to the raw value. The
+				line may be a
+				curve if the order is two or higher. The order of each
+				point must
+				be given, the highest order is order of the spline.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="SplinePoint" type="seds:SplinePointType"
+				minOccurs="2" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="extrapolate" type="xs:boolean"
+			default="false" />
+	</xs:complexType>
+	<xs:complexType name="SplinePointType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Describe a point on a
+				spline. Besides the raw and calibrated values the
+				specific order may
+				be given, one means linear. See SplineCalibratorType.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="order" default="1">
+			<xs:simpleType>
+				<xs:restriction base="xs:int">
+					<xs:minInclusive value="1" />
+					<xs:maxInclusive value="3" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="raw" type="xs:double" use="required" />
+		<xs:attribute name="calibrated" type="xs:double"
+			use="required" />
+	</xs:complexType>
+	<xs:complexType name="ValueOperandType">
+		<xs:annotation>
+			<xs:documentation>A value as an operand to an operation
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:BaseMathOperationsType">
+				<xs:attribute name="value" type="seds:LiteralValueType"
+					use="required">
+					<xs:annotation>
+						<xs:documentation>A literal value</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="VariableRefOperandType">
+		<xs:annotation>
+			<xs:documentation>A reference to a variable as an operand to an
+				operation
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:BaseMathOperationsType">
+				<xs:attribute name="variableRef"
+					type="seds:VariableRefType" use="required">
+					<xs:annotation>
+						<xs:documentation>Refer to a variable and take its value.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="ComparisonOperatorType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Operators to use when
+				testing a boolean condition
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="equals" />
+			<xs:enumeration value="notEquals" />
+			<xs:enumeration value="lessThan" />
+			<xs:enumeration value="lessThanEquals" />
+			<xs:enumeration value="greaterThan" />
+			<xs:enumeration value="greaterThanEquals" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MathOperatorsType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Mathematical operators
+			</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="seds:CoreMathOperatorsType seds:DoTMathOperatorsType seds:ExtMathOperatorsType"/>
+	</xs:simpleType>
+	<xs:simpleType name="CoreMathOperatorsType">
+		<xs:annotation>
+			<xs:documentation>Standard types of math operators
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="add" />
+			<xs:enumeration value="subtract" />
+			<xs:enumeration value="multiply" />
+			<xs:enumeration value="divide" />
+			<xs:enumeration value="modulus" />
+			<xs:enumeration value="pow" />
+			<xs:enumeration value="ln" />
+			<xs:enumeration value="log" />
+			<xs:enumeration value="exp" />
+			<xs:enumeration value="inverse" />
+			<xs:enumeration value="tan" />
+			<xs:enumeration value="cos" />
+			<xs:enumeration value="sin" />
+			<xs:enumeration value="atan" />
+			<xs:enumeration value="atan2" />
+			<xs:enumeration value="acos" />
+			<xs:enumeration value="asin" />
+			<xs:enumeration value="tanh" />
+			<xs:enumeration value="cosh" />
+			<xs:enumeration value="sinh" />
+			<xs:enumeration value="atanh" />
+			<xs:enumeration value="acosh" />
+			<xs:enumeration value="asinh" />
+			<xs:enumeration value="swap" />
+			<xs:enumeration value="abs" />
+			<xs:enumeration value="ceil" />
+			<xs:enumeration value="floor" />
+			<xs:enumeration value="round" />
+			<xs:enumeration value="sqrt" />
+			<xs:enumeration value="min" />
+			<xs:enumeration value="max" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="InterfaceLevelType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">The level within the
+				system architecture at which an interface resides
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="application">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">An interface exposed by
+						application software.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="functional">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">A functional interface
+						to/from a device, using calibrated values.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="access">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">An access interface
+						to/from a device, using raw values.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="subnetwork">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">A subnetwork interface
+						to/from a device, using encoded data units.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="physical">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">OSI layer 1,
+						including voltages, pins, etc.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="environment">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						A device interacts with its physical environment,
+						either in simulation or in the real world.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--Component Types -> State Machines -->
+	<xs:complexType name="EntryStateType">
+		<xs:annotation>
+			<xs:documentation>A state machine entry pseudo-state
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:StateMachineElementType" />
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ExitStateType">
+		<xs:annotation>
+			<xs:documentation>A state machine exit pseudo-state
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:StateMachineElementType" />
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="StateMachineElementType"
+		abstract="true">
+		<xs:annotation>
+			<xs:documentation>An element of a state machine. This is the parent
+				for all state machine elements.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType" />
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="StateMachineType">
+		<xs:annotation>
+			<xs:documentation>A state machine used to implement a component
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:NamedEntityType">
+				<xs:choice maxOccurs="unbounded">
+					<xs:element name="EntryState" type="seds:EntryStateType" />
+					<xs:element name="ExitState" type="seds:ExitStateType" />
+					<xs:element name="State" type="seds:StateType" />
+					<xs:element name="Transition" type="seds:TransitionType" />
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="StateType">
+		<xs:annotation>
+			<xs:documentation>A state machine state</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:StateMachineElementType">
+				<xs:sequence>
+					<xs:element name="OnEntry"
+						type="seds:ActivityInvocationType" minOccurs="0" />
+					<xs:element name="OnExit"
+						type="seds:ActivityInvocationType" minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="TransitionType">
+		<xs:annotation>
+			<xs:documentation>A state machine transition</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="seds:StateMachineElementType">
+				<xs:sequence>
+					<xs:choice>
+						<xs:element name="OnCommandPrimitive"
+							type="seds:OnCommandPrimitiveType">
+							<xs:key name="OnCommandArgumentNameKey">
+								<xs:selector xpath="./seds:ArgumentValue" />
+								<xs:field xpath="@name" />
+							</xs:key>
+						</xs:element>
+						<xs:element name="OnParameterPrimitive"
+							type="seds:OnParameterPrimitiveType" />
+						<xs:element name="OnTimer" type="seds:TimerSinkType" />
+					</xs:choice>
+					<xs:element name="Guard"
+						type="seds:BooleanExpressionType" minOccurs="0" />
+					<xs:element name="Do" type="seds:ActivityInvocationType"
+						minOccurs="0" />
+				</xs:sequence>
+				<xs:attribute name="fromState" type="seds:StateRefType"
+					use="required" />
+				<xs:attribute name="toState" type="seds:StateRefType"
+					use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="TimerSinkType">
+		<xs:annotation>
+			<xs:documentation>The trigger for a transition from a state a
+				specified duration after entering it.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="nanosecondsAfterEntry"
+			type="xs:unsignedLong" default="0" />
+	</xs:complexType>
+	<xs:simpleType name="StateRefType">
+		<xs:annotation>
+			<xs:documentation>A reference to a state machine state.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="seds:NameType" />
+	</xs:simpleType>
+	<xs:simpleType name="PositiveLongType">
+		<xs:annotation>
+			<xs:documentation>SEDS-specific replacement for xs:positiveInteger
+				which more cleanly maps to native data types.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:unsignedLong">
+			<xs:minInclusive value="1" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="QuantityKind">
+		<xs:union memberTypes="seds:DoTQuantityKind seds:ExtQuantityKind"/>
+	</xs:simpleType>
+	<xs:simpleType name="Unit">
+		<xs:union memberTypes="seds:DoTUnit seds:ExtUnit"/>
+	</xs:simpleType>
+</xs:schema>

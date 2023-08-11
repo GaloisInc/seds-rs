@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="seds.xsd"?>
+<DataSheet xmlns="http://www.ccsds.org/schema/sois/seds">
+    <Device name="OpticalTerminalController">
+        <LongDescription>
+            SEDS XML for the Optical Terminal Controller
+        </LongDescription>
+        <Metadata>
+            <Category name="Cat1">
+                <LongDescription>
+                    * configuration management information for the SEDS instance in which it
+appears;
+                    * manufacturers information, including manufacturer name, device model, and
+                    serial number;
+                    * model of operation of device to enable semantic reference to subjects of data;
+                    * parameters of mission and platform that are configurable at design time.
+                </LongDescription>
+            </Category>
+        </Metadata>
+    </Device>
+
+    <Package name="CCSDS" shortDescription="CCSDS Space Packet Protocol definitions">
+        <DataTypeSet>
+            <BooleanDataType name="StatusBit" shortDescription="Single true/false status bit">
+                <BooleanDataEncoding sizeInBits="1" />
+            </BooleanDataType>
+        </DataTypeSet>
+
+        <DeclaredInterfaceSet>
+            <Interface name="xxx"></Interface>
+        </DeclaredInterfaceSet>
+
+        <ComponentSet>
+            <Component name="ComponentOne">
+                <LongDescription>
+                    Components describe entities that have interfaces and computational behaviour.
+                </LongDescription>
+                <Implementation>
+                    <ActivitySet>
+                        <Activity name="Act1">
+                            <Argument type="u32" name="Arg1"></Argument>
+                            <Body>
+                                <SendCommandPrimitive interface="xxx" command="Cmd1Reset"></SendCommandPrimitive>
+                            </Body>
+                        </Activity>
+                    </ActivitySet>
+
+                    <StateMachineSet>
+                        <StateMachine name="Sm1">
+                            <LongDescription>
+                                This is my first state machine
+                            </LongDescription>
+                            <EntryState name="PowerOn">
+                                <LongDescription>This is the power ON state</LongDescription>
+                            </EntryState>
+                            <ExitState name="Ex1">
+                                <LongDescription>
+                                    Exit state should be an "error state" if errors are not explicitly handled.
+                                </LongDescription>
+                            </ExitState>
+                            <State name="S1">
+                                <OnEntry activity="Act1">
+                                    <LongDescription>
+                                        Here we call an activity that sends a command...
+                                    </LongDescription>
+                                </OnEntry>
+                            </State>
+                            <State name="S2"></State>
+                            <Transition fromState="S1" toState="S2" name="T1">
+                                <OnCommandPrimitive interface="xxx" command="Cmd1Reset"></OnCommandPrimitive>
+                                <Guard>
+                                    <Condition>
+                                        <FirstOperand variableRef="X" />
+                                        <ComparisonOperator>equals</ComparisonOperator>
+                                        <Value value="1" />
+                                    </Condition>
+                                </Guard>
+                            </Transition>
+                            
+                        </StateMachine>
+                    </StateMachineSet>
+                </Implementation>
+
+            </Component>
+        </ComponentSet>
+
+    </Package>
+
+
+</DataSheet>
