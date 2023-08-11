@@ -25,3 +25,4 @@ walkdir = "2.3.3"
 deku = "0.16.0"
 seds_macro = {path = "seds_macro"}
 spacepackets = "0.6.0"
+rand = "0.8.5"

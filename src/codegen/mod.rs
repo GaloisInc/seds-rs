@@ -404,8 +404,26 @@ impl ToRustField for ContainerDataType {
                             };
                             fields.append_all(field);
                         }
-                        // TODO: handle length entry and error control entry
-                        EntryElement::LengthEntry(_) => (),
+                        // TODO: duplicate code
+                        EntryElement::LengthEntry(entry) => {
+                            // get type or return invalidtype
+                            let type_ = type_refs.lookup_type(&entry.type_.0)?;
+                            let name = &format_snake_case(&format_ident!(
+                                "{}",
+                                entry.name_entity_type.name.0
+                            ))?;
+                            let tref =
+                                type_refs.lookup_ident(&_get_datatype_name(&type_).to_string())?;
+                            let description = get_doc_string(
+                                Some(&entry.name_entity_type),
+                                &entry.name_entity_type,
+                            );
+                            let field = quote! {
+                                #[doc = #description]
+                                pub #name: #tref,
+                            };
+                            fields.append_all(field);
+                        }
                         EntryElement::ErrorControlEntry(_) => (),
                         ee => return Err(RustCodegenError::UnsupportedEntryElement(ee.clone())),
                     }
