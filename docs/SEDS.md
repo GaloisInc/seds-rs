@@ -109,6 +109,18 @@ of a type corresponding to table 3-1.
 - [ ] **3.10.23** Any calibration specified for a LengthEntry shall be reversible, that is, a linear polynomial, or spline, with all points of degree 1.
 - [x] **3.10.24** An ErrorControlEntry element within a container shall specify an entry whose value is constrained, or derived, based on the contents of the container in which it is present.  In addition to a subset of the attributes and elements supported for a regular container entry, it has the mandatory attribute type, which is one of the values specified in the DoT for errorControlType as illustrated in table 3-3.
 
+## 3.16 STATE MACHINES
+
+*A state machine responds to events and schedules the execution of activities.*
+
+- ~~[ ] **3.16.1** Deprecated~~
+- [ ] **3.16.2** Each StateMachine element shall include one or more of the following elements: `EntryState` , `ExitState` , `State`, and `Transition`.
+- [ ] **3.16.3** Each child element of a StateMachine element shall carry a name attribute identifying the name of that element.
+- [ ] **3.16.4** The name of each child element of a StateMachine element shall be unique within the state machine.
+- [ ] **3.16.5** Each State element shall include zero or one of the following elements: `OnEntry`, `OnExit`.
+- [ ] **3.16.6** The `OnEntry` , `OnExit`, and `Do` elements shall each specify the name of an activity, using the activity attribute, to be invoked on entry to the state, immediately before exit from the state, and when performing a transition between states, respectively.
+- [ ] **3.16.7** The `OnEntry` , `OnExit` , and `Do` elements shall each include zero or more ArgumentValue elements, each of which, in turn, carries a name attribute, identifying the name of an activity argument, and includes either a Value element, specifying a literal value to be associated with the named activity argument, or a VariableRef element, specifying a component variable to associate with the named activity argument
+
 ## Elements
 
 ![SEDS structure](key-elements.png)
@@ -170,4 +182,3 @@ of a type corresponding to table 3-1.
   * *CFE Functional Test (FT) Application Package*
   * *data types* and *components* for a functional test
   * rather minimal
-

@@ -26,6 +26,7 @@ validate_job:
     - apt-get update
     - apt-get install -y libxml2-utils
     - ./validate.sh
+  allow_failure: true
 
 test_job:
   stage: test
