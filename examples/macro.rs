@@ -2,7 +2,10 @@
 use deku::DekuContainerRead;
 use seds_macro::seds;
 
-#[seds("eds/test/simplified_spacepacket.xml")]
+#[seds(
+    "eds/test/simplified_spacepacket.xml",
+    parameters = "eds/test/mission_parameters.json"
+)]
 struct Dummy; // This will be replaced by the generated module.
 
 fn main() {
