@@ -23,6 +23,8 @@ build_job:
 validate_job:
   stage: test
   script:
+    - apt-get update
+    - apt-get install -y libxml2-utils
     - ./validate.sh
 
 test_job:
