@@ -9,7 +9,7 @@ use seds_rs::expr::ExpressionContext;
 use seds_rs::eds::resolve::Resolve;
 use seds_rs::codegen::ToRustMod;
 
-/// default mission parameters for testing
+/// TODO: default mission parameters for testing
 fn get_mission_params() -> ExpressionContext {
     let json = serde_json::json!({
         "CCSDS_SPACEPACKET": {
@@ -55,6 +55,7 @@ pub fn seds(attr: TokenStream, _item: TokenStream) -> TokenStream {
             xml_file = s.value().into();
         }
     }
+    
     // check if file exists
     let path = std::path::Path::new(&xml_file);
     if !path.exists() {
@@ -62,14 +63,27 @@ pub fn seds(attr: TokenStream, _item: TokenStream) -> TokenStream {
     }
     // Read the file content
     let file_content = std::fs::read_to_string(&xml_file)
-    .expect(&format!("Failed to read the file: {}", xml_file));
+        .expect(&format!("Failed to read the file: {}", xml_file));
 
     // Parse the XML content
     let rpf: raw::PackageFile = serde_xml_rs::from_str(&file_content).unwrap();
 
+    // TODO: allow use to pass in mission parameters
     let ectx = get_mission_params();
-    let pf = rpf.resolve(&ectx).unwrap();
-    let generated_code = pf.to_rust_mod(None).unwrap();
+   
+    // Run the resolver
+    let pf_result = rpf.resolve(&ectx);
+    if let Err(e) = pf_result {
+        panic!("Failed to resolve the package file: {:?}", e);
+    }
+    let pf = pf_result.unwrap();
+
+    // Generate Rust code
+    let generated_code_result = pf.to_rust_mod(None);
+    if let Err(e) = generated_code_result {
+        panic!("Failed to generate Rust code: {:?}", e);
+    }
+    let generated_code = generated_code_result.unwrap();
 
     // Convert the generated code into a TokenStream and return
     generated_code.into()

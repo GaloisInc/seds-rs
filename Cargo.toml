@@ -16,6 +16,7 @@ regex = "1.9.1"
 serde = {version = "1.0.171", features = ["derive"]}
 serde-xml-rs = "0.6.0"
 serde_json = "1.0.103"
+spacepackets = "0.6.0"
 syn = "2.0.27"
 
 [dev-dependencies]
@@ -23,3 +24,4 @@ clap = "4.3.19"
 walkdir = "2.3.3"
 deku = "0.16.0"
 seds_macro = {path = "seds_macro"}
+spacepackets = "0.6.0"
