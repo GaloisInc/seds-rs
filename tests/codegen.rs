@@ -59,7 +59,6 @@ fn test_spacepacket() {
     file.write_all(code.as_bytes()).unwrap();
 }
 
-
 /// test against the supported files in the cFE
 #[test]
 fn test_cfe() {
