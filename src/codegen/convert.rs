@@ -5,8 +5,8 @@ use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, TokenStreamExt};
 
 use crate::eds::ast::{
-    BooleanDataType, ContainerDataType, DataType, EntryElement, IntegerDataType, NamedEntityType,
-    Package, PackageFile,
+    BooleanDataType, ContainerDataType, DataType, EntryElement, FloatDataType, IntegerDataType,
+    NamedEntityType, Package, PackageFile, StringDataType,
 };
 
 use heck::{ToPascalCase, ToSnakeCase};
@@ -29,6 +29,23 @@ pub trait ToRustStruct {
         name: Option<&NamedEntityType>,
         type_refs: &RustTypeRefs,
     ) -> Result<TokenStream, RustCodegenError>;
+}
+
+/// Get the name of a datatype
+/// TODO: should be a public method?
+fn get_datatype_name(dt: &DataType) -> Ident {
+    let name = match dt {
+        DataType::IntegerDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::FloatDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::BooleanDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::ContainerDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::StringDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::EnumeratedDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::ArrayDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::SubRangeDataType(dt) => dt.name_entity_type.name.0.to_string(),
+        DataType::NoneDataType => "None".to_string(),
+    };
+    format_ident!("{}", name)
 }
 
 /// build the doc string from a NamedEntityType
@@ -128,6 +145,26 @@ impl ToRustMod for Package {
                     };
                     type_refs.insert(dt.name_entity_type.name.0.clone(), item)
                 }
+                DataType::FloatDataType(dt) => {
+                    let item = RustTypeItem {
+                        ident: format_pascal_case(&format_ident!(
+                            "{}",
+                            dt.name_entity_type.name.0
+                        ))?,
+                        data_type: datatype,
+                    };
+                    type_refs.insert(dt.name_entity_type.name.0.clone(), item)
+                }
+                DataType::StringDataType(dt) => {
+                    let item = RustTypeItem {
+                        ident: format_pascal_case(&format_ident!(
+                            "{}",
+                            dt.name_entity_type.name.0
+                        ))?,
+                        data_type: datatype,
+                    };
+                    type_refs.insert(dt.name_entity_type.name.0.clone(), item)
+                }
                 DataType::BooleanDataType(dt) => {
                     let item = RustTypeItem {
                         ident: format_pascal_case(&format_ident!(
@@ -186,8 +223,10 @@ impl ToRustStruct for DataType {
     ) -> Result<TokenStream, RustCodegenError> {
         match self {
             DataType::IntegerDataType(dt) => dt.to_rust_struct(name, type_refs),
+            DataType::FloatDataType(dt) => dt.to_rust_struct(name, type_refs),
             DataType::BooleanDataType(dt) => dt.to_rust_struct(name, type_refs),
             DataType::ContainerDataType(dt) => dt.to_rust_struct(name, type_refs),
+            DataType::StringDataType(dt) => dt.to_rust_struct(name, type_refs),
             dt => Err(RustCodegenError::UnsupportedDataType(dt.clone())),
         }
     }
@@ -201,8 +240,10 @@ impl ToRustField for DataType {
     ) -> Result<TokenStream, RustCodegenError> {
         match self {
             DataType::IntegerDataType(dt) => dt.to_rust_field(name, type_refs),
+            DataType::FloatDataType(dt) => dt.to_rust_field(name, type_refs),
             DataType::BooleanDataType(dt) => dt.to_rust_field(name, type_refs),
             DataType::ContainerDataType(dt) => dt.to_rust_field(name, type_refs),
+            DataType::StringDataType(dt) => dt.to_rust_field(name, type_refs),
             dt => Err(RustCodegenError::UnsupportedDataType(dt.clone())),
         }
     }
@@ -230,6 +271,50 @@ impl ToRustField for IntegerDataType {
     }
 }
 
+// TODO: this surely is incorrect
+impl ToRustField for FloatDataType {
+    fn to_rust_field(
+        &self,
+        name: Option<&NamedEntityType>,
+        _type_refs: &RustTypeRefs,
+    ) -> Result<TokenStream, RustCodegenError> {
+        let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
+        let ty = uint_nearest(&self.encoding.size_in_bits)?;
+        let sib = format!("{}", self.encoding.size_in_bits);
+        let endian = match self.encoding.byte_order {
+            crate::eds::ast::ByteOrder::BigEndian => quote! { "big" },
+            crate::eds::ast::ByteOrder::LittleEndian => quote! { "little" },
+        };
+        let description = get_doc_string(name, &self.name_entity_type);
+        Ok(quote! {
+            #[doc = #description]
+            #[deku(bits = #sib, endian = #endian)]
+            pub #sname: #ty,
+        })
+    }
+}
+
+impl ToRustField for StringDataType {
+    fn to_rust_field(
+        &self,
+        name: Option<&NamedEntityType>,
+        _type_refs: &RustTypeRefs,
+    ) -> Result<TokenStream, RustCodegenError> {
+        let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
+        let description = get_doc_string(name, &self.name_entity_type);
+        let length_ident = format_ident!("{}_dlen", sname);
+        let update_str = format!("self.{}.len()", sname);
+        let count_str = format!("{}_dlen", sname);
+        Ok(quote! {
+            #[doc = #description]
+            #[deku(update = #update_str)]
+            #length_ident: u8,
+            #[deku(count = #count_str)]
+            #sname: Vec<char>,
+        })
+    }
+}
+
 impl ToRustField for BooleanDataType {
     fn to_rust_field(
         &self,
@@ -251,7 +336,7 @@ impl ToRustField for BooleanDataType {
 /// Get Deku traits for a codegen struct
 fn get_traits() -> TokenStream {
     quote! {
-        #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+        #[derive(Debug, Default, PartialEq, DekuRead, DekuWrite)]
     }
 }
 
@@ -260,7 +345,49 @@ fn get_name(opt_name: Option<&NamedEntityType>, name: &NamedEntityType) -> Ident
     format_ident!("{}", opt_name.unwrap_or(&name).name.0.to_string())
 }
 
+//TODO: find a way to reduce code duplication
 impl ToRustStruct for IntegerDataType {
+    fn to_rust_struct(
+        &self,
+        name: Option<&NamedEntityType>,
+        type_refs: &RustTypeRefs,
+    ) -> Result<TokenStream, RustCodegenError> {
+        let sname = type_refs.lookup_ident(&get_name(name, &self.name_entity_type).to_string())?;
+        let field = self.to_rust_field(Some(&NamedEntityType::new("value")), type_refs)?;
+        let description = get_doc_string(name, &self.name_entity_type);
+        let traits = get_traits();
+        Ok(quote! {
+            #[doc = #description]
+            #traits
+            pub struct #sname {
+                #field
+            }
+        })
+    }
+}
+
+impl ToRustStruct for FloatDataType {
+    fn to_rust_struct(
+        &self,
+        name: Option<&NamedEntityType>,
+        type_refs: &RustTypeRefs,
+    ) -> Result<TokenStream, RustCodegenError> {
+        let sname = type_refs.lookup_ident(&get_name(name, &self.name_entity_type).to_string())?;
+        let field = self.to_rust_field(Some(&NamedEntityType::new("value")), type_refs)?;
+        let description = get_doc_string(name, &self.name_entity_type);
+        let traits = get_traits();
+        Ok(quote! {
+            #[doc = #description]
+            #traits
+            pub struct #sname {
+                #field
+            }
+
+        })
+    }
+}
+
+impl ToRustStruct for StringDataType {
     fn to_rust_struct(
         &self,
         name: Option<&NamedEntityType>,
@@ -302,22 +429,6 @@ impl ToRustStruct for BooleanDataType {
     }
 }
 
-/// Get the name of a datatype
-fn _get_datatype_name(dt: &DataType) -> Ident {
-    let name = match dt {
-        DataType::IntegerDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::FloatDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::BooleanDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::ContainerDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::StringDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::EnumeratedDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::ArrayDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::SubRangeDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::NoneDataType => "None".to_string(),
-    };
-    format_ident!("{}", name)
-}
-
 impl ToRustField for ContainerDataType {
     fn to_rust_field(
         &self,
@@ -328,7 +439,7 @@ impl ToRustField for ContainerDataType {
         match &self.base_type {
             Some(bt) => {
                 let type_ = type_refs.lookup_type(&bt)?;
-                let tref = _get_datatype_name(&type_);
+                let tref = get_datatype_name(&type_);
                 let base_field = quote!(
                     pub base: #tref,
                 );
@@ -348,7 +459,7 @@ impl ToRustField for ContainerDataType {
                                 entry.name_entity_type.name.0
                             ))?;
                             let tref =
-                                type_refs.lookup_ident(&_get_datatype_name(&type_).to_string())?;
+                                type_refs.lookup_ident(&get_datatype_name(&type_).to_string())?;
                             let description = get_doc_string(
                                 Some(&entry.name_entity_type),
                                 &entry.name_entity_type,
@@ -368,7 +479,7 @@ impl ToRustField for ContainerDataType {
                                 entry.name_entity_type.name.0
                             ))?;
                             let tref =
-                                type_refs.lookup_ident(&_get_datatype_name(&type_).to_string())?;
+                                type_refs.lookup_ident(&get_datatype_name(&type_).to_string())?;
                             let description = get_doc_string(
                                 Some(&entry.name_entity_type),
                                 &entry.name_entity_type,
