@@ -76,6 +76,6 @@ fn test_cfe() {
     use std::io::Write;
     // make sure the directory exists and make it if not
     std::fs::create_dir_all("test_output").unwrap();
-    let mut file = File::create("test_output/spacepacket.rs").unwrap();
+    let mut file = File::create("test_output/base_types.rs").unwrap();
     file.write_all(code.as_bytes()).unwrap();
 }
