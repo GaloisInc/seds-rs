@@ -4,6 +4,7 @@ use seds_rs::expr::ExpressionContext;
 
 /// unsafe way to load file into string
 /// (unsafe because it assumes the file exists and it will fail the test if not)
+#[allow(dead_code)]
 pub fn open_file(path: &str) -> String {
     let path = Path::new(path);
     let mut file = fs::File::open(&path).unwrap();
@@ -13,6 +14,7 @@ pub fn open_file(path: &str) -> String {
 }
 
 /// default mission parameters for testing
+#[allow(dead_code)]
 pub fn get_mission_params() -> ExpressionContext {
     let json = serde_json::json!({
         "CCSDS_SPACEPACKET": {
