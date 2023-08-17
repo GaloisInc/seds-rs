@@ -27,7 +27,7 @@ appears;
         </DataTypeSet>
 
         <DeclaredInterfaceSet>
-            <Interface name="xxx"></Interface>
+            <Interface name="MyInterface"></Interface>
         </DeclaredInterfaceSet>
 
         <ComponentSet>
@@ -35,12 +35,12 @@ appears;
                 <LongDescription>
                     Components describe entities that have interfaces and computational behaviour.
                 </LongDescription>
-                <Implementation>
+                <!--Implementation>
                     <ActivitySet>
                         <Activity name="Act1">
                             <Argument type="u32" name="Arg1"></Argument>
                             <Body>
-                                <SendCommandPrimitive interface="xxx" command="Cmd1Reset"></SendCommandPrimitive>
+                                <SendCommandPrimitive interface="MyInterface" command="Cmd1Reset"></SendCommandPrimitive>
                             </Body>
                         </Activity>
                     </ActivitySet>
@@ -67,7 +67,7 @@ appears;
                             </State>
                             <State name="S2"></State>
                             <Transition fromState="S1" toState="S2" name="T1">
-                                <OnCommandPrimitive interface="xxx" command="Cmd1Reset"></OnCommandPrimitive>
+                                <OnCommandPrimitive interface="MyInterface" command="Cmd1Reset"></OnCommandPrimitive>
                                 <Guard>
                                     <Condition>
                                         <FirstOperand variableRef="X" />
@@ -79,7 +79,7 @@ appears;
                             
                         </StateMachine>
                     </StateMachineSet>
-                </Implementation>
+                </Implementation-->
 
             </Component>
         </ComponentSet>

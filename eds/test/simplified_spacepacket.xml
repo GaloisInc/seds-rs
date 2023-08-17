@@ -180,7 +180,8 @@
       </ContainerDataType>
 
       <IntegerDataType name="uint32" shortDescription="Unsigned 32 bit integer">
-        <IntegerDataEncoding sizeInBits="32" encoding="unsigned" byteOrder="${CFE_MISSION/DATA_BYTE_ORDER}" />
+        <!-- Can be either bigEndian | littleEndian, see 3.7.2, originally was ${CFE_MISSION/DATA_BYTE_ORDER}-->
+        <IntegerDataEncoding sizeInBits="32" encoding="unsigned" byteOrder="bigEndian" />
         <Range>
           <MinMaxRange max="4294967295" min="0" rangeType="inclusiveMinInclusiveMax"/>
         </Range>
@@ -198,7 +199,8 @@
 
       <ContainerDataType name="SpacePacket">
          <EntryList>
-            <Entry name="Hdr" type="${CCSDS_SPACEPACKET/HEADER_TYPE}" shortDescription="Primary Header" />
+            <!-- Originally was: ${CCSDS_SPACEPACKET/HEADER_TYPE} -->
+            <Entry name="Hdr" type="BaseHdr" shortDescription="Primary Header" />
          </EntryList>
       </ContainerDataType>
 
@@ -231,4 +233,3 @@
 
 </Package>
 </PackageFile>
-
