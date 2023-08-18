@@ -5,9 +5,9 @@ use heck::ToPascalCase;
 use proc_macro2::Ident;
 use quote::format_ident;
 
-use crate::eds::ast::{NamedEntityType, PackageFile, Package, Identifier, DataType};
+use crate::eds::ast::{DataType, Identifier, NamedEntityType, Package, PackageFile};
 
-use super::{RustTypeRefs, RustTypeItem, RustCodegenError};
+use super::{RustCodegenError, RustTypeItem, RustTypeRefs};
 
 use std::convert::From;
 
@@ -18,7 +18,7 @@ fn format_pascal_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
     syn::parse_str(&pascal_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
 }
 
-/// CodegenContext houses all the necessary information for 
+/// CodegenContext houses all the necessary information for
 /// code generation trait
 pub struct CodegenContext<'a> {
     /// NamedEntityType of the AST item
@@ -31,7 +31,7 @@ pub struct CodegenContext<'a> {
 pub struct Namespace<'a> {
     pub name: Option<Identifier>,
     pub type_refs: HashMap<String, RustTypeItem<'a>>,
-    pub children: Option<Vec<Namespace<'a>>>
+    pub children: Option<Vec<Namespace<'a>>>,
 }
 
 impl<'a> From<Vec<&'a PackageFile>> for Namespace<'a> {
@@ -54,68 +54,89 @@ impl<'a> From<&'a Package> for Namespace<'a> {
             let ret = match datatype {
                 DataType::IntegerDataType(dt) => {
                     let item = RustTypeItem {
-                        ident: format_pascal_case(&format_ident!(
-                            "{}",
-                            dt.name_entity_type.name.0
-                        )).unwrap(),
-                        data_type: datatype, 
+                        ident: format_pascal_case(&format_ident!("{}", dt.name_entity_type.name.0))
+                            .unwrap(),
+                        data_type: datatype,
                     };
                     type_refs.insert(dt.name_entity_type.name.0.clone(), item)
                 }
                 DataType::FloatDataType(dt) => {
                     let item = RustTypeItem {
-                        ident: format_pascal_case(&format_ident!(
-                            "{}",
-                            dt.name_entity_type.name.0
-                        )).unwrap(),
+                        ident: format_pascal_case(&format_ident!("{}", dt.name_entity_type.name.0))
+                            .unwrap(),
                         data_type: datatype,
                     };
                     type_refs.insert(dt.name_entity_type.name.0.clone(), item)
                 }
                 DataType::StringDataType(dt) => {
                     let item = RustTypeItem {
-                        ident: format_pascal_case(&format_ident!(
-                            "{}",
-                            dt.name_entity_type.name.0
-                        )).unwrap(),
+                        ident: format_pascal_case(&format_ident!("{}", dt.name_entity_type.name.0))
+                            .unwrap(),
                         data_type: datatype,
                     };
                     type_refs.insert(dt.name_entity_type.name.0.clone(), item)
                 }
                 DataType::BooleanDataType(dt) => {
                     let item = RustTypeItem {
-                        ident: format_pascal_case(&format_ident!(
-                            "{}",
-                            dt.name_entity_type.name.0
-                        )).unwrap(),
+                        ident: format_pascal_case(&format_ident!("{}", dt.name_entity_type.name.0))
+                            .unwrap(),
                         data_type: datatype,
                     };
                     type_refs.insert(dt.name_entity_type.name.0.clone(), item)
                 }
                 DataType::ContainerDataType(dt) => {
                     let item = RustTypeItem {
-                        ident: format_pascal_case(&format_ident!(
-                            "{}",
-                            dt.name_entity_type.name.0
-                        )).unwrap(),
+                        ident: format_pascal_case(&format_ident!("{}", dt.name_entity_type.name.0))
+                            .unwrap(),
                         data_type: datatype,
                     };
                     type_refs.insert(dt.name_entity_type.name.0.clone(), item)
                 }
-                dt => panic!("unsupported datatype {:?}", dt) 
+                dt => panic!("unsupported datatype {:?}", dt),
             };
             match ret {
                 Some(_) => {
-                    panic!() 
+                    panic!()
                 }
                 None => (),
             }
         }
 
-       Namespace {
-           name: Some(value.name_entity_type.name.clone()),
-           type_refs: type_refs,
-           children: None,
-       }
+        Namespace {
+            name: Some(value.name_entity_type.name.clone()),
+            type_refs: type_refs,
+            children: None,
+        }
+    }
+}
+
+impl<'a> Namespace<'a> {
+    /// lookup RustTypeItem reference by path string
+    pub fn find_type_item(&self, path: &str) -> Option<&RustTypeItem<'a>> {
+        let mut path_segments = path.split('/').collect::<Vec<_>>();
+
+        if path_segments.is_empty() {
+            return None;
+        }
+
+        let current_segment = path_segments.remove(0);
+
+        // If this is the last segment, look up in type_refs
+        if path_segments.is_empty() {
+            return self.type_refs.get(current_segment);
+        }
+
+        // Otherwise, recurse into children
+        if let Some(children) = &self.children {
+            for child in children {
+                if let Some(ref name) = child.name {
+                    if name.0 == current_segment {
+                        return child.find_type_item(&path_segments.join("/"));
+                    }
+                }
+            }
+        }
+
+        None
     }
 }
