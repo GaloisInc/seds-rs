@@ -1,10 +1,10 @@
 use common::{get_mission_params, open_file};
+use seds_rs::codegen::context::{CodegenContext, Namespace};
 use seds_rs::codegen::RustTypeRefs;
-use seds_rs::codegen::context::{Namespace, CodegenContext};
 use seds_rs::eds::ast::PackageFile;
 use seds_rs::eds::raw;
 use seds_rs::{
-    codegen::{rustfmt, convert_rust::ToRustMod},
+    codegen::{convert_rust::ToRustMod, rustfmt},
     eds::{
         ast::{
             ByteOrder, Identifier, IntegerDataEncoding, IntegerDataType, IntegerEncoding,
@@ -33,21 +33,22 @@ fn test_cfe_namespace() {
         .iter()
         .map(|rpf| rpf.resolve(&ectx).unwrap())
         .collect();
-    let pf = packagefiles[0].clone();
+    let pf = packagefiles[1].clone();
     let pfs: Vec<&PackageFile> = packagefiles.iter().collect();
 
+    let pkg = pf.package[0].clone();
     let namespace = Namespace::from(pfs);
+    let locals = Namespace::from(&pkg);
 
-    println!("{:?}", namespace.find_type_item("BASE_TYPES/uint32"));
+    //println!("{:?}", namespace.find_type_item("BASE_TYPES/uint32"));
+    //println!("{:?}", locals.find_type_item("VersionId"));
+    //println!("{:?}", namespace);
 
     let ctx = CodegenContext {
         name: None,
-        type_refs: &RustTypeRefs{
-            type_refs: todo!() 
-        },
-        namespace: &namespace
+        locals: &locals,
+        namespace: &namespace,
     };
-    
     let code = rustfmt(pf.to_rust_mod(&ctx).unwrap()).unwrap();
     println!("{}", code);
 

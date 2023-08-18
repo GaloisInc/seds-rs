@@ -23,8 +23,8 @@ fn format_pascal_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
 pub struct CodegenContext<'a> {
     /// NamedEntityType of the current AST item
     pub name: Option<&'a NamedEntityType>,
-    /// Local Type References
-    pub type_refs: &'a RustTypeRefs<'a>,
+    /// Namespace for Local Type References
+    pub locals: &'a Namespace<'a>,
     /// Namespace for Global Type References
     pub namespace: &'a Namespace<'a>,
 }
@@ -33,21 +33,18 @@ impl<'a> CodegenContext<'a> {
     pub fn change_name(&self, name: Option<&'a NamedEntityType>) -> Self {
         CodegenContext {
             name: name,
-            type_refs: self.type_refs,
+            locals: self.locals,
             namespace: self.namespace,
         }
     }
 
     /// Looks up an identifier by its path.
-    /// If the path has a forward slash ("/"), it looks into the `namespace`.
-    /// Otherwise, it looks into the local `type_refs`.
     pub fn lookup_ident(&self, path: &str) -> Result<&RustTypeItem<'a>, RustCodegenError> {
         let res = if path.contains('/') {
             // Lookup in the namespace
             self.namespace.find_type_item(path)
         } else {
-            // Lookup in the local type_refs
-            self.type_refs.type_refs.get(path)
+            self.locals.find_type_item(path)
         };
         match res {
             Some(item) => Ok(item),

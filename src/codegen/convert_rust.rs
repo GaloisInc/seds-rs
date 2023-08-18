@@ -185,10 +185,9 @@ impl ToRustTokens for IntegerDataType {
 
     fn to_rust_struct(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         let name = ctx.name;
-        let sname = ctx
+        let sname = &ctx
             .lookup_ident(&get_name(name, &self.name_entity_type).to_string())?
-            .ident
-            .to_string();
+            .ident;
         let field_name = NamedEntityType::new("value");
         let nctx = ctx.change_name(Some(&field_name));
         let field = self.to_rust_field(&nctx)?;
@@ -220,10 +219,9 @@ impl ToRustTokens for BooleanDataType {
 
     fn to_rust_struct(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         let name = ctx.name;
-        let sname = ctx
+        let sname = &ctx
             .lookup_ident(&get_name(name, &self.name_entity_type).to_string())?
-            .ident
-            .to_string();
+            .ident;
         let field_name = NamedEntityType::new("value");
         let nctx = ctx.change_name(Some(&field_name));
         let field = self.to_rust_field(&nctx)?;
@@ -259,14 +257,14 @@ impl ToRustTokens for ContainerDataType {
                     match entry {
                         EntryElement::Entry(entry) => {
                             // get type or return invalidtype
-                            let type_ = ctx.lookup_ident(&entry.type_.0)?.data_type;
+                            let tref = &ctx.lookup_ident(&entry.type_.0)?.ident;
                             let name = &format_snake_case(&format_ident!(
                                 "{}",
                                 entry.name_entity_type.name.0
                             ))?;
-                            let tref = &ctx
-                                .lookup_ident(&get_datatype_name(&type_).to_string())?
-                                .ident;
+                            //let tref = &ctx
+                            //    .lookup_ident(&get_datatype_name(&type_).to_string())?
+                            //   .ident;
                             let description = get_doc_string(
                                 Some(&entry.name_entity_type),
                                 &entry.name_entity_type,
@@ -312,10 +310,9 @@ impl ToRustTokens for ContainerDataType {
 
     fn to_rust_struct(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         let name = ctx.name;
-        let sname = ctx
+        let sname = &ctx
             .lookup_ident(&get_name(name, &self.name_entity_type).to_string())?
-            .ident
-            .to_string();
+            .ident;
         let nctx = ctx.change_name(name);
         let fields = self.to_rust_field(&nctx)?;
         let description = get_doc_string(name, &self.name_entity_type);
