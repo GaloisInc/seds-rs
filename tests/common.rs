@@ -21,7 +21,7 @@ pub fn get_mission_params() -> ExpressionContext {
             "HEADER_TYPE": "BaseHdr",
         },
         "CFE_MISSION": {
-            "TELEMETRY_SUBSECONDS_TYPE": "<SUBSECONDS_TYPE>",
+            "TELEMETRY_SUBSECONDS_TYPE": "BASE_TYPES/uint32",
             "SIGNED_INTEGER_ENCODING": "signMagnitude",
             "DATA_BYTE_ORDER": "littleEndian",
             "MEM_REFERENCE_SIZE_BITS": "2",
