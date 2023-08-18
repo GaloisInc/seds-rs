@@ -15,12 +15,13 @@ use syn::parse::Error as SynError;
 use crate::eds::ast::{DataType, EntryElement};
 
 /// Type Information (Rust Identifier, SEDS DataType) to Store While Traversing the AST
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RustTypeItem<'a> {
     pub ident: Ident,
     pub data_type: &'a DataType,
 }
 
+#[derive(Debug, Clone)]
 /// Rust Type Refs Available to Traverser of the AST
 pub struct RustTypeRefs<'a> {
     type_refs: HashMap<String, RustTypeItem<'a>>,

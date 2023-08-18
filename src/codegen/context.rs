@@ -57,6 +57,7 @@ impl<'a> CodegenContext<'a> {
 }
 
 /// Namespace struct that supports nested namespaces
+#[derive(Debug, Clone)]
 pub struct Namespace<'a> {
     pub name: Option<Identifier>,
     pub type_refs: HashMap<String, RustTypeItem<'a>>,
