@@ -21,10 +21,39 @@ fn format_pascal_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
 /// CodegenContext houses all the necessary information for
 /// code generation trait
 pub struct CodegenContext<'a> {
-    /// NamedEntityType of the AST item
+    /// NamedEntityType of the current AST item
     pub name: Option<&'a NamedEntityType>,
-    /// Type References
+    /// Local Type References
     pub type_refs: &'a RustTypeRefs<'a>,
+    /// Namespace for Global Type References
+    pub namespace: &'a Namespace<'a>,
+}
+
+impl<'a> CodegenContext<'a> {
+    pub fn change_name(&self, name: Option<&'a NamedEntityType>) -> Self {
+        CodegenContext {
+            name: name,
+            type_refs: self.type_refs,
+            namespace: self.namespace,
+        }
+    }
+
+    /// Looks up an identifier by its path.
+    /// If the path has a forward slash ("/"), it looks into the `namespace`.
+    /// Otherwise, it looks into the local `type_refs`.
+    pub fn lookup_ident(&self, path: &str) -> Result<&RustTypeItem<'a>, RustCodegenError> {
+        let res = if path.contains('/') {
+            // Lookup in the namespace
+            self.namespace.find_type_item(path)
+        } else {
+            // Lookup in the local type_refs
+            self.type_refs.type_refs.get(path)
+        };
+        match res {
+            Some(item) => Ok(item),
+            None => Err(RustCodegenError::InvalidType(path.to_string())),
+        }
+    }
 }
 
 /// Namespace struct that supports nested namespaces

@@ -1,6 +1,7 @@
 //! SEDS Rust Code Generator
 pub mod context;
 pub mod convert;
+pub mod convert_rust;
 mod format;
 pub use convert::*;
 use proc_macro2::Ident;
