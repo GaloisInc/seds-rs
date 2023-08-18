@@ -1,4 +1,5 @@
 //! SEDS Rust Code Generator
+pub mod context;
 pub mod convert;
 mod format;
 pub use convert::*;
@@ -13,6 +14,7 @@ use syn::parse::Error as SynError;
 use crate::eds::ast::{DataType, EntryElement};
 
 /// Type Information (Rust Identifier, SEDS DataType) to Store While Traversing the AST
+#[derive(Debug)]
 pub struct RustTypeItem<'a> {
     pub ident: Ident,
     pub data_type: &'a DataType,
