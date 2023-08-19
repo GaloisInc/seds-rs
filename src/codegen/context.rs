@@ -1,28 +1,13 @@
 //! Context for Code Generation
 use std::collections::HashMap;
 
-use heck::{ToPascalCase, ToSnakeCase};
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::TokenStream;
 use quote::{quote, format_ident};
 
 use crate::eds::ast::{DataType, Identifier, NamedEntityType, Package, PackageFile};
+use super::format::{format_pascal_case, format_snake_case};
 
 use super::{RustCodegenError, RustTypeItem};
-
-/// format an identifier to PascalCase
-fn format_pascal_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
-    let ident_str = ident.to_string();
-    let pascal_case = ident_str.to_pascal_case();
-    syn::parse_str(&pascal_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
-}
-
-/// format an identifier to snake_case
-fn format_snake_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
-    let ident_str = ident.to_string();
-    let snake_case = ident_str.to_snake_case();
-    syn::parse_str(&snake_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
-}
-
 
 /// CodegenContext houses all the necessary information for
 /// code generation trait

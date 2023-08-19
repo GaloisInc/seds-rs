@@ -1,4 +1,3 @@
-use heck::ToSnakeCase;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, TokenStreamExt};
 
@@ -7,7 +6,7 @@ use crate::eds::ast::{
     Package, PackageFile,
 };
 
-use super::{context::CodegenContext, RustCodegenError};
+use super::{context::CodegenContext, RustCodegenError, format::format_snake_case};
 
 /// Trait for DataTypes
 pub trait ToRustTokens {
@@ -24,13 +23,6 @@ pub trait ToRustMod {
 /// Resolve name from an optional NamedEntityType and a NamedEntityType
 fn get_name(opt_name: Option<&NamedEntityType>, name: &NamedEntityType) -> Ident {
     format_ident!("{}", opt_name.unwrap_or(&name).name.0.to_string())
-}
-
-/// format an identifier to snake_case
-fn format_snake_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
-    let ident_str = ident.to_string();
-    let snake_case = ident_str.to_snake_case();
-    syn::parse_str(&snake_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
 }
 
 /// build the doc string from a NamedEntityType

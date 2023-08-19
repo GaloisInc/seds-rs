@@ -2,16 +2,14 @@
 pub mod context;
 pub mod convert;
 pub mod convert_rust;
-mod format;
+pub mod format;
+
 pub use convert::*;
-use proc_macro2::Ident;
-
-use std::collections::HashMap;
-
 pub use format::rustfmt;
 
+use proc_macro2::Ident;
+use std::collections::HashMap;
 use syn::parse::Error as SynError;
-
 use crate::eds::ast::{DataType, EntryElement};
 
 /// Type Information (Rust Identifier, SEDS DataType) to Store While Traversing the AST
