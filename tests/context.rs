@@ -37,12 +37,8 @@ fn test_cfe_namespace() {
     let pfs: Vec<&PackageFile> = packagefiles.iter().collect();
 
     let pkg = pf.package[0].clone();
-    let namespace = Namespace::from(pfs);
-    let locals = Namespace::from(&pkg);
-
-    //println!("{:?}", namespace.find_type_item("BASE_TYPES/uint32"));
-    //println!("{:?}", locals.find_type_item("VersionId"));
-    //println!("{:?}", namespace);
+    let namespace = Namespace::try_from(pfs).unwrap();
+    let locals = Namespace::try_from(&pkg).unwrap();
 
     let ctx = CodegenContext {
         name: None,
