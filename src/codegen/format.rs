@@ -1,9 +1,28 @@
 //! Code Formatting
 use anyhow::Context;
+use heck::{ToSnakeCase, ToPascalCase};
+use proc_macro2::Ident;
 use std::io::Write;
 use std::process::{Command, Output, Stdio};
 
 use quote::ToTokens;
+
+use super::RustCodegenError;
+
+/// format an identifier to snake_case
+pub fn format_snake_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
+    let ident_str = ident.to_string();
+    let snake_case = ident_str.to_snake_case();
+    syn::parse_str(&snake_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
+}
+
+/// format an identifier to PascalCase
+pub fn format_pascal_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
+    let ident_str = ident.to_string();
+    let pascal_case = ident_str.to_pascal_case();
+    syn::parse_str(&pascal_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
+}
+
 
 /// run the rust formatter rustfmt on a token stream
 pub fn rustfmt(tokens: impl ToTokens) -> Result<String, anyhow::Error> {
