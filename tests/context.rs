@@ -1,17 +1,10 @@
 use common::{get_mission_params, open_file};
 use seds_rs::codegen::context::{CodegenContext, Namespace};
-use seds_rs::codegen::RustTypeRefs;
 use seds_rs::eds::ast::PackageFile;
 use seds_rs::eds::raw;
 use seds_rs::{
     codegen::{convert_rust::ToRustMod, rustfmt},
-    eds::{
-        ast::{
-            ByteOrder, Identifier, IntegerDataEncoding, IntegerDataType, IntegerEncoding,
-            MinMaxRange, NamedEntityType, Range,
-        },
-        resolve::Resolve,
-    },
+    eds::resolve::Resolve,
 };
 
 mod common;
