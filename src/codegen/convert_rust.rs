@@ -257,14 +257,11 @@ impl ToRustTokens for ContainerDataType {
                     match entry {
                         EntryElement::Entry(entry) => {
                             // get type or return invalidtype
-                            let tref = &ctx.lookup_ident(&entry.type_.0)?.ident;
+                            let tref = ctx.get_qualified_ident(&entry.type_.0)?;
                             let name = &format_snake_case(&format_ident!(
                                 "{}",
                                 entry.name_entity_type.name.0
                             ))?;
-                            //let tref = &ctx
-                            //    .lookup_ident(&get_datatype_name(&type_).to_string())?
-                            //   .ident;
                             let description = get_doc_string(
                                 Some(&entry.name_entity_type),
                                 &entry.name_entity_type,
@@ -283,9 +280,7 @@ impl ToRustTokens for ContainerDataType {
                                 "{}",
                                 entry.name_entity_type.name.0
                             ))?;
-                            let tref = &ctx
-                                .lookup_ident(&get_datatype_name(&type_).to_string())?
-                                .ident;
+                            let tref = ctx.get_qualified_ident(&get_datatype_name(&type_).to_string())?;
                             let description = get_doc_string(
                                 Some(&entry.name_entity_type),
                                 &entry.name_entity_type,

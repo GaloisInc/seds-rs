@@ -1,9 +1,9 @@
 //! Context for Code Generation
 use std::collections::HashMap;
 
-use heck::ToPascalCase;
-use proc_macro2::Ident;
-use quote::format_ident;
+use heck::{ToPascalCase, ToSnakeCase};
+use proc_macro2::{Ident, TokenStream};
+use quote::{quote, format_ident};
 
 use crate::eds::ast::{DataType, Identifier, NamedEntityType, Package, PackageFile};
 
@@ -15,6 +15,14 @@ fn format_pascal_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
     let pascal_case = ident_str.to_pascal_case();
     syn::parse_str(&pascal_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
 }
+
+/// format an identifier to snake_case
+fn format_snake_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
+    let ident_str = ident.to_string();
+    let snake_case = ident_str.to_snake_case();
+    syn::parse_str(&snake_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
+}
+
 
 /// CodegenContext houses all the necessary information for
 /// code generation trait
@@ -48,6 +56,28 @@ impl<'a> CodegenContext<'a> {
         match res {
             Some(item) => Ok(item),
             None => Err(RustCodegenError::InvalidType(path.to_string())),
+        }
+    }
+
+    pub fn get_qualified_ident(&self, path: &str) -> Result<TokenStream, RustCodegenError> {
+        let segments = path.split('/').collect::<Vec<_>>();
+
+        match segments.len() {
+            1 => {
+                // Single identifier
+                let ident = format_ident!("{}", segments[0]); // Create an Ident from the string
+                let pascal_ident = format_pascal_case(&ident)?;
+                Ok(quote! { #pascal_ident })
+            },
+            2 => {
+                // Module and identifier
+                let module_ident = format_ident!("{}", segments[0]);
+                let snake_module = format_snake_case(&module_ident)?;
+                let ident = format_ident!("{}", segments[1]);
+                let pascal_ident = format_pascal_case(&ident)?;
+                Ok(quote! { #snake_module::#pascal_ident })
+            },
+            _ => Err(RustCodegenError::InvalidType(path.into())),
         }
     }
 }
