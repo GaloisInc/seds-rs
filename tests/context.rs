@@ -38,8 +38,18 @@ fn test_cfe_namespace() {
         locals: &locals,
         namespace: &namespace,
     };
-    let code = rustfmt(pf.to_rust_mod(&ctx).unwrap()).unwrap();
-    println!("{}", code);
+    //let code = rustfmt(pf.to_rust_mod(&ctx).unwrap()).unwrap();
+
+    let mut spacepacket = pf.to_rust_mod(&ctx).unwrap();
+
+    let npkg = packagefiles[0].package[0].clone();
+    let nctx = CodegenContext {
+        name: None,
+        locals: &Namespace::try_from(&npkg).unwrap(),
+        namespace: &namespace,
+    };
+    spacepacket.extend(packagefiles[0].to_rust_mod(&nctx).unwrap());
+    let code = rustfmt(spacepacket).unwrap();
 
     // write to a tmp file
     use std::fs::File;

@@ -2,11 +2,16 @@ use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, TokenStreamExt};
 
 use crate::eds::ast::{
-    BooleanDataType, ContainerDataType, DataType, EntryElement, IntegerDataType, NamedEntityType,
-    Package, PackageFile, QualifiedName,
+    BooleanDataType, ContainerDataType, DataType, EntryElement, FloatDataType, IntegerDataType,
+    NamedEntityType, Package, PackageFile, QualifiedName, StringDataType,
 };
 
-use super::{context::CodegenContext, RustCodegenError, format::{format_snake_case, format_pascal_case}, dependency::{AstNode, QualifiedNameIter}};
+use super::{
+    context::CodegenContext,
+    dependency::{AstNode, QualifiedNameIter},
+    format::{format_pascal_case, format_snake_case},
+    RustCodegenError,
+};
 
 /// Trait for DataTypes
 pub trait ToRustTokens {
@@ -112,7 +117,7 @@ impl ToRustMod for PackageFile {
 }
 
 /// Get all depencies mentioned in a package as imports tokenstream
-fn get_package_imports(pkg: &Package) -> Result<TokenStream, RustCodegenError>{
+fn get_package_imports(pkg: &Package) -> Result<TokenStream, RustCodegenError> {
     // collect the necessary imports
     let mut imports = TokenStream::new();
     let qni = QualifiedNameIter::new(AstNode::Package(pkg));
@@ -130,12 +135,10 @@ fn get_package_imports(pkg: &Package) -> Result<TokenStream, RustCodegenError>{
                 let snake_module = format_snake_case(&module_ident)?;
                 let ident = format_ident!("{}", segments[1]);
                 let pascal_ident = format_pascal_case(&ident)?;
-                imports.extend(
-                    quote!(
-                        use #snake_module::#pascal_ident;
-                    )
-                );
-            },
+                imports.extend(quote!(
+                    use #snake_module::#pascal_ident;
+                ));
+            }
             _ => return Err(RustCodegenError::InvalidType(path.0.to_string())),
         }
     }
@@ -154,9 +157,9 @@ impl ToRustMod for Package {
             let nctx = ctx.change_name(None);
             structs.extend(dt.to_rust_struct(&nctx)?);
         }
-        
+
         let imports = get_package_imports(&self)?;
-        
+
         Ok(quote!(
             #[doc = #description]
             pub mod #sname {
@@ -173,10 +176,10 @@ impl ToRustTokens for DataType {
     fn to_rust_struct(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         match self {
             DataType::IntegerDataType(dt) => dt.to_rust_struct(&ctx),
-            //DataType::FloatDataType(dt) => dt.to_rust_struct(name, type_refs),
+            DataType::FloatDataType(dt) => dt.to_rust_struct(&ctx),
             DataType::BooleanDataType(dt) => dt.to_rust_struct(&ctx),
             DataType::ContainerDataType(dt) => dt.to_rust_struct(&ctx),
-            //DataType::StringDataType(dt) => dt.to_rust_struct(name, type_refs),
+            DataType::StringDataType(dt) => dt.to_rust_struct(&ctx),
             dt => Err(RustCodegenError::UnsupportedDataType(dt.clone())),
         }
     }
@@ -184,12 +187,89 @@ impl ToRustTokens for DataType {
     fn to_rust_field(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         match self {
             DataType::IntegerDataType(dt) => dt.to_rust_field(&ctx),
-            //DataType::FloatDataType(dt) => dt.to_rust_field(name, type_refs),
+            DataType::FloatDataType(dt) => dt.to_rust_field(&ctx),
             DataType::BooleanDataType(dt) => dt.to_rust_field(&ctx),
             DataType::ContainerDataType(dt) => dt.to_rust_field(&ctx),
-            //DataType::StringDataType(dt) => dt.to_rust_field(name, type_refs),
+            DataType::StringDataType(dt) => dt.to_rust_field(&ctx),
             dt => Err(RustCodegenError::UnsupportedDataType(dt.clone())),
         }
+    }
+}
+
+impl ToRustTokens for StringDataType {
+    fn to_rust_field(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
+        let name = ctx.name;
+        let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
+        let description = get_doc_string(name, &self.name_entity_type);
+        let length_ident = format_ident!("{}_dlen", sname);
+        let update_str = format!("self.{}.len()", sname);
+        let count_str = format!("{}_dlen", sname);
+        Ok(quote! {
+            #[doc = #description]
+            #[deku(update = #update_str)]
+            #length_ident: u8,
+            #[deku(count = #count_str)]
+            #sname: Vec<char>,
+        })
+    }
+
+    fn to_rust_struct(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
+        let name = ctx.name;
+        let sname = &ctx
+            .lookup_ident(&get_name(name, &self.name_entity_type).to_string())?
+            .ident;
+        let field_name = NamedEntityType::new("value");
+        let nctx = ctx.change_name(Some(&field_name));
+        let field = self.to_rust_field(&nctx)?;
+        let description = get_doc_string(name, &self.name_entity_type);
+        let traits = get_traits();
+        Ok(quote! {
+            #[doc = #description]
+            #traits
+            pub struct #sname {
+                #field
+            }
+
+        })
+    }
+}
+
+impl ToRustTokens for FloatDataType {
+    fn to_rust_field(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
+        let name = ctx.name;
+        let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
+        let ty = uint_nearest(&self.encoding.size_in_bits)?;
+        let sib = format!("{}", self.encoding.size_in_bits);
+        let endian = match self.encoding.byte_order {
+            crate::eds::ast::ByteOrder::BigEndian => quote! { "big" },
+            crate::eds::ast::ByteOrder::LittleEndian => quote! { "little" },
+        };
+        let description = get_doc_string(name, &self.name_entity_type);
+        Ok(quote! {
+            #[doc = #description]
+            #[deku(bits = #sib, endian = #endian)]
+            pub #sname: #ty,
+        })
+    }
+
+    fn to_rust_struct(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
+        let name = ctx.name;
+        let sname = &ctx
+            .lookup_ident(&get_name(name, &self.name_entity_type).to_string())?
+            .ident;
+        let field_name = NamedEntityType::new("value");
+        let nctx = ctx.change_name(Some(&field_name));
+        let field = self.to_rust_field(&nctx)?;
+        let description = get_doc_string(name, &self.name_entity_type);
+        let traits = get_traits();
+        Ok(quote! {
+            #[doc = #description]
+            #traits
+            pub struct #sname {
+                #field
+            }
+
+        })
     }
 }
 
@@ -308,7 +388,8 @@ impl ToRustTokens for ContainerDataType {
                                 "{}",
                                 entry.name_entity_type.name.0
                             ))?;
-                            let tref = ctx.get_qualified_ident(&get_datatype_name(&type_).to_string())?;
+                            let tref =
+                                ctx.get_qualified_ident(&get_datatype_name(&type_).to_string())?;
                             let description = get_doc_string(
                                 Some(&entry.name_entity_type),
                                 &entry.name_entity_type,
