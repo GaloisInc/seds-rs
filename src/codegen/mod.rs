@@ -1,7 +1,6 @@
 //! SEDS Rust Code Generator
 pub mod context;
 pub mod convert;
-pub mod convert_rust;
 pub mod dependency;
 pub mod format;
 

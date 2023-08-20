@@ -3,7 +3,7 @@ use seds_rs::codegen::context::{CodegenContext, Namespace};
 use seds_rs::eds::ast::PackageFile;
 use seds_rs::eds::raw;
 use seds_rs::{
-    codegen::{convert_rust::ToRustMod, rustfmt},
+    codegen::{convert::ToRustMod, rustfmt},
     eds::resolve::Resolve,
 };
 
