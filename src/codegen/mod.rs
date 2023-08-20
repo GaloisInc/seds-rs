@@ -3,6 +3,7 @@ pub mod context;
 pub mod convert;
 pub mod convert_rust;
 pub mod format;
+pub mod dependency;
 
 pub use convert::*;
 pub use format::rustfmt;

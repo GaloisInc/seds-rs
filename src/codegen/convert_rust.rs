@@ -3,10 +3,10 @@ use quote::{format_ident, quote, TokenStreamExt};
 
 use crate::eds::ast::{
     BooleanDataType, ContainerDataType, DataType, EntryElement, IntegerDataType, NamedEntityType,
-    Package, PackageFile,
+    Package, PackageFile, QualifiedName,
 };
 
-use super::{context::CodegenContext, RustCodegenError, format::format_snake_case};
+use super::{context::CodegenContext, RustCodegenError, format::{format_snake_case, format_pascal_case}, dependency::{AstNode, QualifiedNameIter}};
 
 /// Trait for DataTypes
 pub trait ToRustTokens {
@@ -111,6 +111,38 @@ impl ToRustMod for PackageFile {
     }
 }
 
+/// Get all depencies mentioned in a package as imports tokenstream
+fn get_package_imports(pkg: &Package) -> Result<TokenStream, RustCodegenError>{
+    // collect the necessary imports
+    let mut imports = TokenStream::new();
+    let qni = QualifiedNameIter::new(AstNode::Package(pkg));
+    let mut qnames: Vec<&QualifiedName> = qni.into_iter().collect();
+    qnames.dedup();
+
+    for path in qnames.iter() {
+        let segments = path.0.split('/').collect::<Vec<_>>();
+
+        match segments.len() {
+            1 => (),
+            2 => {
+                // Module and identifier
+                let module_ident = format_ident!("{}", segments[0]);
+                let snake_module = format_snake_case(&module_ident)?;
+                let ident = format_ident!("{}", segments[1]);
+                let pascal_ident = format_pascal_case(&ident)?;
+                imports.extend(
+                    quote!(
+                        use #snake_module::#pascal_ident;
+                    )
+                );
+            },
+            _ => return Err(RustCodegenError::InvalidType(path.0.to_string())),
+        }
+    }
+
+    Ok(imports)
+}
+
 impl ToRustMod for Package {
     fn to_rust_mod(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         let name = ctx.name;
@@ -122,10 +154,14 @@ impl ToRustMod for Package {
             let nctx = ctx.change_name(None);
             structs.extend(dt.to_rust_struct(&nctx)?);
         }
+        
+        let imports = get_package_imports(&self)?;
+        
         Ok(quote!(
             #[doc = #description]
             pub mod #sname {
                 use deku::{DekuRead, DekuWrite, DekuContainerWrite, DekuUpdate};
+                #imports
 
                 #structs
             }
