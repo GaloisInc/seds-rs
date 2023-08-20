@@ -1,7 +1,13 @@
 //! manage and codegen depedencies during codegen
-use quote::format_ident;
-use seds_rs::{eds::{raw, resolve::Resolve, ast::QualifiedName}, codegen::{dependency::{QualifiedNameIter, AstNode}, format::{format_snake_case, format_pascal_case}}};
 use common::{get_mission_params, open_file};
+use quote::format_ident;
+use seds_rs::{
+    codegen::{
+        dependency::{AstNode, QualifiedNameIter},
+        format::{format_pascal_case, format_snake_case},
+    },
+    eds::{ast::QualifiedName, raw, resolve::Resolve},
+};
 
 mod common;
 
@@ -28,8 +34,12 @@ fn test_spacepacket() {
                 let snake_module = format_snake_case(&module_ident).unwrap();
                 let ident = format_ident!("{}", segments[1]);
                 let pascal_ident = format_pascal_case(&ident).unwrap();
-                println!("use {}::{};", snake_module.to_string(), pascal_ident.to_string());
-            },
+                println!(
+                    "use {}::{};",
+                    snake_module.to_string(),
+                    pascal_ident.to_string()
+                );
+            }
             _ => (),
         }
     }

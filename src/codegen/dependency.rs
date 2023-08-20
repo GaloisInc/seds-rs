@@ -7,18 +7,27 @@ pub enum AstNode<'a> {
     PackageFile(&'a PackageFile),
     Package(&'a Package),
     NamedEntityType(&'a NamedEntityType),
-    DataTypeSet(&'a DataTypeSet),
-    DataType(&'a DataType),
-    IntegerDataType(&'a IntegerDataType),
-    FloatDataType(&'a FloatDataType),
-    StringDataType(&'a StringDataType),
-    ContainerDataType(&'a ContainerDataType),
-    BooleanDataType(&'a BooleanDataType),
     EntryList(&'a EntryList),
     EntryElement(&'a EntryElement),
+    FixedValueEntry(&'a FixedValueEntry),
     ErrorControlEntry(&'a ErrorControlEntry),
     Entry(&'a Entry),
     LengthEntry(&'a LengthEntry),
+    DataTypeSet(&'a DataTypeSet),
+    DataType(&'a DataType),
+    NoneDataType,
+    BooleanDataType(&'a BooleanDataType),
+    IntegerDataType(&'a IntegerDataType),
+    ArrayDataType(&'a ArrayDataType),
+    EnumeratedDataType(&'a EnumeratedDataType),
+    ContainerDataType(&'a ContainerDataType),
+    FloatDataType(&'a FloatDataType),
+    StringDataType(&'a StringDataType),
+    SubRangeDataType(&'a SubRangeDataType),
+    DimensionList(&'a DimensionList),
+    Range(&'a Range),
+    PaddingEntry(&'a PaddingEntry),
+    ListEntry(&'a ListEntry),
 }
 
 /// iterate over qualified names in the ast
@@ -45,7 +54,8 @@ impl<'a> Iterator for QualifiedNameIter<'a> {
                     }
                 }
                 AstNode::Package(pkg) => {
-                    self.stack.push(AstNode::NamedEntityType(&pkg.name_entity_type));
+                    self.stack
+                        .push(AstNode::NamedEntityType(&pkg.name_entity_type));
                     self.stack.push(AstNode::DataTypeSet(&pkg.data_type_set));
                 }
                 AstNode::DataTypeSet(dts) => {
@@ -53,21 +63,29 @@ impl<'a> Iterator for QualifiedNameIter<'a> {
                         self.stack.push(AstNode::DataType(dt));
                     }
                 }
-                AstNode::DataType(datatype) => {
-                    match datatype {
-                        DataType::IntegerDataType(dt) => self.stack.push(AstNode::IntegerDataType(dt)),
-                        DataType::ContainerDataType(dt) => self.stack.push(AstNode::ContainerDataType(dt)),
-                        DataType::FloatDataType(dt) => self.stack.push(AstNode::FloatDataType(dt)),
-                        DataType::StringDataType(dt) => self.stack.push(AstNode::StringDataType(dt)),
-                        DataType::BooleanDataType(dt) => self.stack.push(AstNode::BooleanDataType(dt)),
-                        other => panic!("{:?} not supported", other),
+                AstNode::DataType(datatype) => match datatype {
+                    DataType::NoneDataType => self.stack.push(AstNode::NoneDataType),
+                    DataType::BooleanDataType(dt) => self.stack.push(AstNode::BooleanDataType(dt)),
+                    DataType::IntegerDataType(dt) => self.stack.push(AstNode::IntegerDataType(dt)),
+                    DataType::ArrayDataType(dt) => self.stack.push(AstNode::ArrayDataType(dt)),
+                    DataType::EnumeratedDataType(dt) => {
+                        self.stack.push(AstNode::EnumeratedDataType(dt))
                     }
-                }
+                    DataType::ContainerDataType(dt) => {
+                        self.stack.push(AstNode::ContainerDataType(dt))
+                    }
+                    DataType::FloatDataType(dt) => self.stack.push(AstNode::FloatDataType(dt)),
+                    DataType::StringDataType(dt) => self.stack.push(AstNode::StringDataType(dt)),
+                    DataType::SubRangeDataType(dt) => {
+                        self.stack.push(AstNode::SubRangeDataType(dt))
+                    }
+                },
                 AstNode::ContainerDataType(cdt) => {
-                    self.stack.push(AstNode::NamedEntityType(&cdt.name_entity_type));
+                    self.stack
+                        .push(AstNode::NamedEntityType(&cdt.name_entity_type));
                     match &cdt.entry_list {
                         Some(el) => self.stack.push(AstNode::EntryList(el)),
-                        None => ()
+                        None => (),
                     }
                 }
                 AstNode::EntryList(el) => {
@@ -75,30 +93,61 @@ impl<'a> Iterator for QualifiedNameIter<'a> {
                         self.stack.push(AstNode::EntryElement(entry));
                     }
                 }
-                AstNode::EntryElement(ee) => {
-                    match ee {
-                        EntryElement::Entry(e) => self.stack.push(AstNode::Entry(e)),
-                        EntryElement::LengthEntry(e) => self.stack.push(AstNode::LengthEntry(e)),
-                        EntryElement::ErrorControlEntry(e) => self.stack.push(AstNode::ErrorControlEntry(e)),
-                        other => panic!("{:?} not supported", other)
+                AstNode::EntryElement(ee) => match ee {
+                    EntryElement::Entry(e) => self.stack.push(AstNode::Entry(e)),
+                    EntryElement::LengthEntry(e) => self.stack.push(AstNode::LengthEntry(e)),
+                    EntryElement::ErrorControlEntry(e) => {
+                        self.stack.push(AstNode::ErrorControlEntry(e))
                     }
-                }
+                    EntryElement::FixedValueEntry(e) => {
+                        self.stack.push(AstNode::FixedValueEntry(e))
+                    }
+                    EntryElement::PaddingEntry(e) => self.stack.push(AstNode::PaddingEntry(e)),
+                    EntryElement::ListEntry(e) => self.stack.push(AstNode::ListEntry(e)),
+                },
                 AstNode::Entry(e) => {
-                    self.stack.push(AstNode::NamedEntityType(&e.name_entity_type));
+                    self.stack
+                        .push(AstNode::NamedEntityType(&e.name_entity_type));
                     return Some(&e.type_);
                 }
                 AstNode::LengthEntry(le) => {
-                    self.stack.push(AstNode::NamedEntityType(&le.name_entity_type));
+                    self.stack
+                        .push(AstNode::NamedEntityType(&le.name_entity_type));
                     return Some(&le.type_);
                 }
                 AstNode::ErrorControlEntry(ece) => {
-                    self.stack.push(AstNode::NamedEntityType(&ece.name_entity_type));
+                    self.stack
+                        .push(AstNode::NamedEntityType(&ece.name_entity_type));
                     return Some(&ece.type_);
+                }
+                AstNode::FixedValueEntry(fve) => {
+                    self.stack
+                        .push(AstNode::NamedEntityType(&fve.name_entity_type));
+                    return Some(&fve.type_);
+                }
+                AstNode::ArrayDataType(adt) => {
+                    self.stack
+                        .push(AstNode::NamedEntityType(&adt.name_entity_type));
+                    self.stack.push(AstNode::DimensionList(&adt.dimension_list));
+                    return Some(&adt.data_type_ref);
+                }
+                AstNode::SubRangeDataType(srdt) => {
+                    self.stack
+                        .push(AstNode::NamedEntityType(&srdt.name_entity_type));
+                    self.stack.push(AstNode::Range(&srdt.range));
+                    return Some(&srdt.base_type);
                 }
                 AstNode::IntegerDataType(_idt) => (),
                 AstNode::BooleanDataType(_bdt) => (),
                 AstNode::NamedEntityType(_net) => (),
-                other => panic!("{:?} not supported", other)
+                AstNode::NoneDataType => (),
+                AstNode::FloatDataType(_net) => (),
+                AstNode::EnumeratedDataType(_edt) => (),
+                AstNode::StringDataType(_sdt) => (),
+                AstNode::DimensionList(_dl) => (),
+                AstNode::PaddingEntry(_pe) => (),
+                AstNode::Range(_r) => (),
+                AstNode::ListEntry(_el) => (),
             }
         }
         None

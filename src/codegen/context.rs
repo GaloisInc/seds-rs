@@ -2,10 +2,10 @@
 use std::collections::HashMap;
 
 use proc_macro2::TokenStream;
-use quote::{quote, format_ident};
+use quote::{format_ident, quote};
 
-use crate::eds::ast::{DataType, Identifier, NamedEntityType, Package, PackageFile};
 use super::format::{format_pascal_case, format_snake_case};
+use crate::eds::ast::{DataType, Identifier, NamedEntityType, Package, PackageFile};
 
 use super::{RustCodegenError, RustTypeItem};
 
@@ -53,7 +53,7 @@ impl<'a> CodegenContext<'a> {
                 let ident = format_ident!("{}", segments[0]); // Create an Ident from the string
                 let pascal_ident = format_pascal_case(&ident)?;
                 Ok(quote! { #pascal_ident })
-            },
+            }
             2 => {
                 // Module and identifier
                 let module_ident = format_ident!("{}", segments[0]);
@@ -61,7 +61,7 @@ impl<'a> CodegenContext<'a> {
                 let ident = format_ident!("{}", segments[1]);
                 let pascal_ident = format_pascal_case(&ident)?;
                 Ok(quote! { #snake_module::#pascal_ident })
-            },
+            }
             _ => Err(RustCodegenError::InvalidType(path.into())),
         }
     }

@@ -1,6 +1,6 @@
 //! Code Formatting
 use anyhow::Context;
-use heck::{ToSnakeCase, ToPascalCase};
+use heck::{ToPascalCase, ToSnakeCase};
 use proc_macro2::Ident;
 use std::io::Write;
 use std::process::{Command, Output, Stdio};
@@ -22,7 +22,6 @@ pub fn format_pascal_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
     let pascal_case = ident_str.to_pascal_case();
     syn::parse_str(&pascal_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
 }
-
 
 /// run the rust formatter rustfmt on a token stream
 pub fn rustfmt(tokens: impl ToTokens) -> Result<String, anyhow::Error> {
