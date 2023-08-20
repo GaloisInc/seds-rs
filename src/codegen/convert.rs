@@ -9,7 +9,7 @@ use crate::eds::ast::{
 use super::{
     context::CodegenContext,
     dependency::{AstNode, QualifiedNameIter},
-    format::{format_pascal_case, format_snake_case},
+    format::format_snake_case,
     RustCodegenError,
 };
 
@@ -124,6 +124,7 @@ fn get_package_imports(pkg: &Package) -> Result<TokenStream, RustCodegenError> {
     let mut qnames: Vec<&QualifiedName> = qni.into_iter().collect();
     qnames.dedup();
 
+    let mut imported_modules = Vec::<Ident>::new();
     for path in qnames.iter() {
         let segments = path.0.split('/').collect::<Vec<_>>();
 
@@ -133,11 +134,12 @@ fn get_package_imports(pkg: &Package) -> Result<TokenStream, RustCodegenError> {
                 // Module and identifier
                 let module_ident = format_ident!("{}", segments[0]);
                 let snake_module = format_snake_case(&module_ident)?;
-                let ident = format_ident!("{}", segments[1]);
-                let pascal_ident = format_pascal_case(&ident)?;
-                imports.extend(quote!(
-                    use #snake_module::#pascal_ident;
-                ));
+                if !imported_modules.contains(&snake_module) {
+                    imports.extend(quote!(
+                        use crate::#snake_module;
+                    ));
+                }
+                imported_modules.push(snake_module);
             }
             _ => return Err(RustCodegenError::InvalidType(path.0.to_string())),
         }
@@ -209,7 +211,7 @@ impl ToRustTokens for StringDataType {
             #[deku(update = #update_str)]
             #length_ident: u8,
             #[deku(count = #count_str)]
-            #sname: Vec<char>,
+            #sname: Vec<u8>,
         })
     }
 

@@ -8,7 +8,8 @@ use spacepackets::{CcsdsPacket, SpHeader};
 const NUM_FUZZ: usize = 5000;
 
 #[seds(
-    "eds/test/simplified_spacepacket.xml",
+    "eds/cFE/modules/core_api/eds/base_types.xml",
+    "eds/cFE/modules/core_api/eds/ccsds_spacepacket.xml",
     parameters = "eds/test/mission_parameters.json"
 )]
 struct Dummy; // This will be replaced by the generated module
