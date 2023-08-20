@@ -117,6 +117,15 @@ impl<'a> TryFrom<&'a Package> for Namespace<'a> {
         let mut type_refs: HashMap<String, RustTypeItem> = HashMap::new();
         for datatype in value.data_type_set.data_types.iter() {
             let ret = match datatype {
+                DataType::NoneDataType => None,
+                DataType::ArrayDataType(dt) => {
+                    let (k, v) = prepare_item(&dt.name_entity_type.name.0, datatype)?;
+                    type_refs.insert(k, v)
+                }
+                DataType::SubRangeDataType(dt) => {
+                    let (k, v) = prepare_item(&dt.name_entity_type.name.0, datatype)?;
+                    type_refs.insert(k, v)
+                }
                 DataType::IntegerDataType(dt) => {
                     let (k, v) = prepare_item(&dt.name_entity_type.name.0, datatype)?;
                     type_refs.insert(k, v)
@@ -137,7 +146,10 @@ impl<'a> TryFrom<&'a Package> for Namespace<'a> {
                     let (k, v) = prepare_item(&dt.name_entity_type.name.0, datatype)?;
                     type_refs.insert(k, v)
                 }
-                dt => return Err(RustCodegenError::UnsupportedDataType(dt.clone())),
+                DataType::EnumeratedDataType(dt) => {
+                    let (k, v) = prepare_item(&dt.name_entity_type.name.0, datatype)?;
+                    type_refs.insert(k, v)
+                }
             };
             match ret {
                 Some(item) => {
