@@ -2,12 +2,14 @@
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
+use proc_macro2;
 use syn::{parse_macro_input, AttributeArgs, NestedMeta, Lit, Meta};
 
 use seds_rs::eds::raw;
 use seds_rs::expr::ExpressionContext;
 use seds_rs::eds::resolve::Resolve;
 use seds_rs::codegen::ToRustMod;
+use seds_rs::codegen::context::{Namespace, CodegenContext};
 
 #[proc_macro_attribute]
 pub fn seds(attr: TokenStream, _item: TokenStream) -> TokenStream {
@@ -69,13 +71,22 @@ pub fn seds(attr: TokenStream, _item: TokenStream) -> TokenStream {
     let pf = pf_result.unwrap(); 
 
     // Generate Rust code
-    let generated_code_result = pf.to_rust_mod(None);
-    if let Err(e) = generated_code_result {
-        panic!("Failed to generate Rust code: {:?}", e);
+    let namespace = Namespace::try_from(vec![&pf]).unwrap();
+    let mut generated_code = proc_macro2::TokenStream::new();
+    for pkg in pf.package.iter() {
+        let locals = Namespace::try_from(pkg).unwrap();
+        let ctx = CodegenContext {
+            name: None,
+            locals: &locals,
+            namespace: &namespace,
+        };
+        let code_result = pf.to_rust_mod(&ctx);
+        if let Err(e) = code_result {
+            panic!("Failed to generate Rust code: {:?}", e);
+        }
+        generated_code.extend(code_result.unwrap());
     }
-    // Format the generated code
-    let generated_code = generated_code_result.unwrap();
-
+    
     // Convert the generated code into a TokenStream and return
     generated_code.into()
 }
