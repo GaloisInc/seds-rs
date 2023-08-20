@@ -3,7 +3,7 @@ use quote::{format_ident, quote, TokenStreamExt};
 
 use crate::eds::ast::{
     BooleanDataType, ContainerDataType, DataType, EntryElement, FloatDataType, IntegerDataType,
-    NamedEntityType, Package, PackageFile, QualifiedName, StringDataType,
+    NamedEntityType, Package, PackageFile, QualifiedName, StringDataType, EnumeratedDataType,
 };
 
 use super::{
@@ -182,6 +182,7 @@ impl ToRustTokens for DataType {
             DataType::BooleanDataType(dt) => dt.to_rust_struct(&ctx),
             DataType::ContainerDataType(dt) => dt.to_rust_struct(&ctx),
             DataType::StringDataType(dt) => dt.to_rust_struct(&ctx),
+            DataType::EnumeratedDataType(dt) => dt.to_rust_struct(&ctx),
             dt => Err(RustCodegenError::UnsupportedDataType(dt.clone())),
         }
     }
@@ -193,8 +194,53 @@ impl ToRustTokens for DataType {
             DataType::BooleanDataType(dt) => dt.to_rust_field(&ctx),
             DataType::ContainerDataType(dt) => dt.to_rust_field(&ctx),
             DataType::StringDataType(dt) => dt.to_rust_field(&ctx),
+            DataType::EnumeratedDataType(dt) => dt.to_rust_field(&ctx),
             dt => Err(RustCodegenError::UnsupportedDataType(dt.clone())),
         }
+    }
+}
+
+impl ToRustTokens for EnumeratedDataType {
+    fn to_rust_field(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
+        let name = ctx.name;
+        let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
+        let ty = uint_nearest(&self.encoding.size_in_bits)?;
+        let description = get_doc_string(name, &self.name_entity_type);
+        Ok(quote! {
+            #[doc = #description]
+            pub #sname: #ty,
+        })
+    }
+
+    fn to_rust_struct(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
+        let name = ctx.name;
+        let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
+        let description = get_doc_string(name, &self.name_entity_type);
+
+        let mut fields = TokenStream::new(); 
+        for enum_entry in self.enumeration_list.enumeration.iter() {
+            let value_str = &enum_entry.value.0;
+            let value = value_str.parse::<i32>().unwrap();
+            let field = quote!(
+                #[deku(id = #value_str)]
+                #(enum_entry.ident) = #value, 
+            );
+            fields.extend(field);
+        }
+        let endian = match self.encoding.byte_order {
+            crate::eds::ast::ByteOrder::BigEndian => quote! { "big" },
+            crate::eds::ast::ByteOrder::LittleEndian => quote! { "little" },
+        };
+
+        let traits = get_traits();
+        Ok(quote! {
+            #[doc = #description]
+            #traits
+            #[deku(type = "u8", endian = #endian)]
+            pub struct #sname {
+                #fields
+            }
+        })
     }
 }
 
