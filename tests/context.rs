@@ -13,8 +13,9 @@ mod common;
 #[test]
 fn test_cfe_namespace() {
     let paths = vec![
-        "eds/cFE/modules/core_api/eds/base_types.xml",
+        "eds/cFE/modules/core_api/eds/cfe_fs.xml",
         "eds/cFE/modules/core_api/eds/ccsds_spacepacket.xml",
+        "eds/cFE/modules/core_api/eds/base_types.xml",
     ];
     let rpackagefiles: Vec<raw::PackageFile> = paths
         .iter()
