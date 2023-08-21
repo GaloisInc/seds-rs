@@ -142,8 +142,7 @@ impl<'a> Iterator for QualifiedNameIter<'a> {
                 AstNode::NamedEntityType(_net) => (),
                 AstNode::NoneDataType => (),
                 AstNode::FloatDataType(_net) => (),
-                AstNode::EnumeratedDataType(edt) => {
-                },
+                AstNode::EnumeratedDataType(_edt) => {}
                 AstNode::StringDataType(_sdt) => (),
                 AstNode::DimensionList(_dl) => (),
                 AstNode::PaddingEntry(_pe) => (),
