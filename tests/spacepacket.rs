@@ -9,6 +9,7 @@ const NUM_FUZZ: usize = 5000;
 
 #[seds(
     "eds/cFE/modules/core_api/eds/base_types.xml",
+    "eds/cFE/modules/core_api/eds/cfe_fs.xml",
     "eds/cFE/modules/core_api/eds/ccsds_spacepacket.xml",
     parameters = "eds/test/mission_parameters.json"
 )]

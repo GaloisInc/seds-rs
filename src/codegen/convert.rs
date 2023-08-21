@@ -165,7 +165,7 @@ impl ToRustMod for Package {
         Ok(quote!(
             #[doc = #description]
             pub mod #sname {
-                use deku::{DekuRead, DekuWrite, DekuContainerWrite, DekuUpdate};
+                use deku::{DekuRead, DekuWrite, DekuContainerWrite, DekuUpdate, DekuEnumExt, DekuError};
                 #imports
 
                 #structs
@@ -214,16 +214,22 @@ impl ToRustTokens for EnumeratedDataType {
 
     fn to_rust_struct(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         let name = ctx.name;
-        let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
+        let sname = &ctx
+            .lookup_ident(&get_name(name, &self.name_entity_type).to_string())?
+            .ident;
         let description = get_doc_string(name, &self.name_entity_type);
 
-        let mut fields = TokenStream::new(); 
+        let mut fields = TokenStream::new();
+        fields.extend(quote!(
+            #[default]
+        ));
         for enum_entry in self.enumeration_list.enumeration.iter() {
-            let value_str = &enum_entry.value.0;
-            let value = value_str.parse::<i32>().unwrap();
+            let value_str = enum_entry.value.0.as_str();
+            let value = value_str.parse::<isize>().unwrap();
+            let fname = format_ident!("{}", enum_entry.label.0);
             let field = quote!(
                 #[deku(id = #value_str)]
-                #(enum_entry.ident) = #value, 
+                #fname = #value, 
             );
             fields.extend(field);
         }
@@ -237,7 +243,7 @@ impl ToRustTokens for EnumeratedDataType {
             #[doc = #description]
             #traits
             #[deku(type = "u8", endian = #endian)]
-            pub struct #sname {
+            pub enum #sname {
                 #fields
             }
         })
@@ -431,13 +437,29 @@ impl ToRustTokens for ContainerDataType {
                         // TODO: duplicate code
                         EntryElement::LengthEntry(entry) => {
                             // get type or return invalidtype
-                            let type_ = ctx.lookup_ident(&entry.type_.0)?.data_type;
+                            let tref = ctx.get_qualified_ident(&entry.type_.0)?;
                             let name = &format_snake_case(&format_ident!(
                                 "{}",
                                 entry.name_entity_type.name.0
                             ))?;
-                            let tref =
-                                ctx.get_qualified_ident(&get_datatype_name(&type_).to_string())?;
+                            let description = get_doc_string(
+                                Some(&entry.name_entity_type),
+                                &entry.name_entity_type,
+                            );
+                            let field = quote! {
+                                #[doc = #description]
+                                pub #name: #tref,
+                            };
+                            fields.append_all(field);
+                        }
+                        // TODO: duplicate code
+                        EntryElement::FixedValueEntry(entry) => { 
+                            // get type or return invalidtype
+                            let tref = ctx.get_qualified_ident(&entry.type_.0)?;
+                            let name = &format_snake_case(&format_ident!(
+                                "{}",
+                                entry.name_entity_type.name.0
+                            ))?;
                             let description = get_doc_string(
                                 Some(&entry.name_entity_type),
                                 &entry.name_entity_type,
