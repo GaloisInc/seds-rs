@@ -484,6 +484,22 @@ impl ToRustTokens for ContainerDataType {
                             fields.append_all(field);
                         }
                         EntryElement::ErrorControlEntry(_) => (),
+                        EntryElement::PaddingEntry(pe) => {
+                            let pad_size = pe.size_in_bits.to_string();
+                            let field = match &pe.short_description {
+                                Some(_descr) => {
+                                    quote!(
+                                        #[deku(pad_bits_before = #pad_size)]
+                                    )
+                                }
+                                None => {
+                                    quote!(
+                                        #[deku(pad_bits_before = #pad_size)]
+                                    )
+                                }
+                            };
+                            fields.append_all(field);
+                        }
                         ee => return Err(RustCodegenError::UnsupportedEntryElement(ee.clone())),
                     }
                 }

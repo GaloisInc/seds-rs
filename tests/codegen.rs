@@ -15,9 +15,9 @@ fn test_cfe_codegen() {
         "eds/cFE/modules/core_api/eds/base_types.xml",
         "eds/cFE/modules/fs/eds/cfe_fs.xml",
         "eds/cFE/modules/resourceid/eds/cfe_resourceid.xml",
-        // "eds/cFE/modules/sb/eds/cfe_sb.xml", // PaddingEntry is not yet supported
-        // "eds/cFE/modules/evs/eds/cfe_evs.xml", // PaddingEntry is not yet supported
-        // "eds/cFE/modules/tbl/eds/cfe_tbl.xml", // PaddingEntry is not yet supported
+        // "eds/cFE/modules/sb/eds/cfe_sb.xml", // ArrayDataType is not yet supported
+        // "eds/cFE/modules/evs/eds/cfe_evs.xml", // ArrayDataType is not yet supported
+        // "eds/cFE/modules/tbl/eds/cfe_tbl.xml", // depends on CFE_HDR/CommandHeader
         // "eds/cFE/modules/time/eds/cfe_time.xml", // 1HzCmd is not a valid Ident
         // "eds/cFE/modules/cfe_testcase/eds/cfe_testcase.xml", // depends on CFE_HDR
         // "eds/cFE/modules/core_private/eds/base_types.xml", // InvalidBitSize(8192)
