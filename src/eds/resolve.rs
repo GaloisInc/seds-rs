@@ -10,6 +10,7 @@ use super::ast::Literal;
 use super::raw::IntegerDataEncoding;
 
 /// Errors that can occur during resolution
+#[allow(missing_docs)]
 #[derive(Debug)]
 pub enum ResolveError {
     ExpressionError(EvalexprError),
@@ -171,6 +172,7 @@ fn string_to_tc(s: &String, ectx: &ExpressionContext) -> Result<char, ResolveErr
 
 /// trait to convert a raw EDS component to a resolved EDS component
 pub trait Resolve<T> {
+    /// Resolve self to a AstItem T
     fn resolve(&self, ectx: &ExpressionContext) -> Result<T, ResolveError>;
 }
 

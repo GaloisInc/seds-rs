@@ -6,4 +6,5 @@ pub mod raw;
 /// EDS Model: what we use to represent the CCSDS Blue Book EDS Specification (expression resolved and namespace qualified)
 pub mod ast;
 
+/// Resolver that converts raw ast to ast
 pub mod resolve;
