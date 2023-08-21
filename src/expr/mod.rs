@@ -7,14 +7,18 @@ use std::collections::HashMap;
 /// Error Types for Expression Evaluator
 #[derive(Clone, Debug)]
 pub enum NamespaceError {
+    /// Variable Identifier isn't found
     VariableIdentifierNotFound(String),
+    /// String failed expression evaluation
     ExpressionEvaluationError(EvalexprError),
 }
 
 /// A namespace is a nested mapping of variable names to values
 #[derive(Clone, Debug)]
 pub enum NamespaceValue {
+    /// NamespaceValue HashMap
     Namespace(HashMap<String, NamespaceValue>),
+    /// NamespaceValue Value
     Value(String),
 }
 

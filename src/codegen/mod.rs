@@ -15,7 +15,9 @@ use syn::parse::Error as SynError;
 /// Type Information (Rust Identifier, SEDS DataType) to Store While Traversing the AST
 #[derive(Debug, Clone)]
 pub struct RustTypeItem<'a> {
+    /// Rust Identifier
     pub ident: Ident,
+    /// DataType from SEDS Ast
     pub data_type: &'a DataType,
 }
 
@@ -48,11 +50,18 @@ impl<'a> RustTypeRefs<'a> {
 /// RustCodegenError is the error type for the Rust code generator
 #[derive(Debug)]
 pub enum RustCodegenError {
+    /// Syn Crate Identifier Error
     InvalidIdentifier(SynError),
+    /// String cannot resolve to a type somewhere
     InvalidType(String),
+    /// usize value cannot map to a bit size
     InvalidBitSize(usize),
+    /// DataType isn't supported (yet)
     UnsupportedDataType(DataType),
+    /// EntryElement isn't supported (yet)
     UnsupportedEntryElement(EntryElement),
+    /// DataType conflicts with another one
     ConflictingDataType(DataType),
+    /// Multiple package files are not supported
     MultiplePackageFiles,
 }
