@@ -4,29 +4,53 @@ use crate::eds::ast::*;
 /// put all relevant ast items in an enum so we iterate over them
 #[derive(Debug)]
 pub enum AstNode<'a> {
+    /// AstNode Reference to PackageFile
     PackageFile(&'a PackageFile),
+    /// AstNode Reference to Package
     Package(&'a Package),
+    /// AstNode Reference to NamedEntityType
     NamedEntityType(&'a NamedEntityType),
+    /// AstNode Reference to EntryList
     EntryList(&'a EntryList),
+    /// AstNode Reference to EntryElement
     EntryElement(&'a EntryElement),
+    /// AstNode Reference to FixedValueEntry
     FixedValueEntry(&'a FixedValueEntry),
+    /// AstNode Reference to ErrorControlEntry
     ErrorControlEntry(&'a ErrorControlEntry),
+    /// AstNode Reference to Entry
     Entry(&'a Entry),
+    /// AstNode Reference to LengthEntry
     LengthEntry(&'a LengthEntry),
+    /// AstNode Reference to DataTypeSet
     DataTypeSet(&'a DataTypeSet),
+    /// AstNode Reference to DataType
     DataType(&'a DataType),
+    /// AstNode Reference to NoneDataType
     NoneDataType,
+    /// AstNode Reference to BooleanDataType
     BooleanDataType(&'a BooleanDataType),
+    /// AstNode Reference to IntegerDataType
     IntegerDataType(&'a IntegerDataType),
+    /// AstNode Reference to ArrayDataType
     ArrayDataType(&'a ArrayDataType),
+    /// AstNode Reference to EnumeratedDataType
     EnumeratedDataType(&'a EnumeratedDataType),
+    /// AstNode Reference to ContainerDataType
     ContainerDataType(&'a ContainerDataType),
+    /// AstNode Reference to FloatDataType
     FloatDataType(&'a FloatDataType),
+    /// AstNode Reference to StringDataType
     StringDataType(&'a StringDataType),
+    /// AstNode Reference to SubRangeDataType
     SubRangeDataType(&'a SubRangeDataType),
+    /// AstNode Reference to DimensionList
     DimensionList(&'a DimensionList),
+    /// AstNode Reference to Range
     Range(&'a Range),
+    /// AstNode Reference to PaddingEntry
     PaddingEntry(&'a PaddingEntry),
+    /// AstNode Reference to ListEntry
     ListEntry(&'a ListEntry),
 }
 

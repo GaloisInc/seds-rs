@@ -44,6 +44,7 @@ impl<'a> CodegenContext<'a> {
         }
     }
 
+    /// Get an identifier from locals or another module in the global namespace
     pub fn get_qualified_ident(&self, path: &str) -> Result<TokenStream, RustCodegenError> {
         let segments = path.split('/').collect::<Vec<_>>();
 
@@ -70,8 +71,11 @@ impl<'a> CodegenContext<'a> {
 /// Namespace struct that supports nested namespaces
 #[derive(Debug, Clone)]
 pub struct Namespace<'a> {
+    /// optional namespace identifier
     pub name: Option<Identifier>,
+    /// map from ast item strings to rust type items
     pub type_refs: HashMap<String, RustTypeItem<'a>>,
+    /// optional children namespace
     pub children: Option<Vec<Namespace<'a>>>,
 }
 

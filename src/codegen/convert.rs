@@ -1,3 +1,4 @@
+//! conversion from AST Items to TokenStreams
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, TokenStreamExt};
 
@@ -15,13 +16,17 @@ use super::{
 
 /// Trait for DataTypes
 pub trait ToRustTokens {
+    /// convert self to a field for a rust struct
     fn to_rust_field(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError>;
 
+    /// convert self to a struct implementation
+    /// TODO: enum generation uses this so it should be renamed
     fn to_rust_struct(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError>;
 }
 
 /// Trait for module generators
 pub trait ToRustMod {
+    /// convert self to a rust module
     fn to_rust_mod(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError>;
 }
 
