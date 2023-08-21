@@ -2,8 +2,8 @@ use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, TokenStreamExt};
 
 use crate::eds::ast::{
-    BooleanDataType, ContainerDataType, DataType, EntryElement, FloatDataType, IntegerDataType,
-    NamedEntityType, Package, PackageFile, QualifiedName, StringDataType, EnumeratedDataType,
+    BooleanDataType, ContainerDataType, DataType, EntryElement, EnumeratedDataType, FloatDataType,
+    IntegerDataType, NamedEntityType, Package, PackageFile, QualifiedName, StringDataType,
 };
 
 use super::{
@@ -229,7 +229,7 @@ impl ToRustTokens for EnumeratedDataType {
             let fname = format_ident!("{}", enum_entry.label.0);
             let field = quote!(
                 #[deku(id = #value_str)]
-                #fname = #value, 
+                #fname = #value,
             );
             fields.extend(field);
         }
@@ -453,7 +453,7 @@ impl ToRustTokens for ContainerDataType {
                             fields.append_all(field);
                         }
                         // TODO: duplicate code
-                        EntryElement::FixedValueEntry(entry) => { 
+                        EntryElement::FixedValueEntry(entry) => {
                             // get type or return invalidtype
                             let tref = ctx.get_qualified_ident(&entry.type_.0)?;
                             let name = &format_snake_case(&format_ident!(
