@@ -1,13 +1,13 @@
 //! Context for Code Generation
 use std::collections::HashMap;
 
-use proc_macro2::TokenStream;
+use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 
 use super::format::{format_pascal_case, format_snake_case};
 use crate::eds::ast::{DataType, Identifier, NamedEntityType, Package, PackageFile};
 
-use super::{RustCodegenError, RustTypeItem};
+use super::RustCodegenError;
 
 /// CodegenContext houses all the necessary information for
 /// code generation trait
@@ -201,5 +201,40 @@ impl<'a> Namespace<'a> {
         }
 
         None
+    }
+}
+
+/// Type Information (Rust Identifier, SEDS DataType) to Store While Traversing the AST
+#[derive(Debug, Clone)]
+pub struct RustTypeItem<'a> {
+    /// Rust Identifier
+    pub ident: Ident,
+    /// DataType from SEDS Ast
+    pub data_type: &'a DataType,
+}
+
+#[derive(Debug, Clone)]
+/// Rust Type Refs Available to Traverser of the AST
+pub struct RustTypeRefs<'a> {
+    type_refs: HashMap<String, RustTypeItem<'a>>,
+}
+
+impl<'a> RustTypeRefs<'a> {
+    /// Lookup a type by name
+    pub fn lookup_type(&self, name: &String) -> Result<&'a DataType, RustCodegenError> {
+        let lu = self.type_refs.get(name);
+        match lu {
+            Some(t) => Ok(t.data_type),
+            None => Err(RustCodegenError::InvalidType(name.clone())),
+        }
+    }
+
+    /// Lookup an identifier by name
+    pub fn lookup_ident(&self, name: &String) -> Result<&Ident, RustCodegenError> {
+        let lu = self.type_refs.get(name);
+        match lu {
+            Some(t) => Ok(&t.ident),
+            None => Err(RustCodegenError::InvalidType(name.clone())),
+        }
     }
 }
