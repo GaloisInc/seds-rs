@@ -227,22 +227,30 @@ impl ToRustTokens for EnumeratedDataType {
             let value_str = enum_entry.value.0.as_str();
             let value = value_str.parse::<isize>().unwrap();
             let fname = format_ident!("{}", enum_entry.label.0);
-            let field = quote!(
-                #[deku(id = #value_str)]
-                #fname = #value,
-            );
+            let field = match &enum_entry.short_description {
+                Some(descr) => quote!(
+                    #[doc = #descr]
+                    #[deku(id = #value_str)]
+                    #fname = #value,
+                ),
+                None => quote!(
+                    #[deku(id = #value_str)]
+                    #fname = #value,
+                ),
+            };
             fields.extend(field);
         }
         let endian = match self.encoding.byte_order {
             crate::eds::ast::ByteOrder::BigEndian => quote! { "big" },
             crate::eds::ast::ByteOrder::LittleEndian => quote! { "little" },
         };
+        let ty = uint_nearest(&self.encoding.size_in_bits)?.to_string();
 
         let traits = get_traits();
         Ok(quote! {
             #[doc = #description]
             #traits
-            #[deku(type = "u8", endian = #endian)]
+            #[deku(type = #ty, endian = #endian)]
             pub enum #sname {
                 #fields
             }
