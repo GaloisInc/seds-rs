@@ -7,7 +7,9 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.72"
+clap = {version = "4.3.19", features = ["derive"]}
 evalexpr = "11.0.0"
+glob = "0.3.1"
 heck = "0.4.1"
 lazy_static = "1.4.0"
 proc-macro2 = "1.0.66"
@@ -19,9 +21,12 @@ serde_json = "1.0.103"
 syn = "2.0.27"
 
 [dev-dependencies]
-clap = "4.3.19"
 walkdir = "2.3.3"
 deku = "0.16.0"
 seds_macro = {path = "seds_macro"}
 spacepackets = "0.6.0"
 rand = "0.8.5"
+
+[[bin]]
+name = "seds-codegen"
+path = "src/bin/main.rs"
