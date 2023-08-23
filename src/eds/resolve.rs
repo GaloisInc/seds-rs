@@ -177,7 +177,13 @@ impl Resolve<ast::PackageFile> for raw::PackageFile {
             .iter()
             .map(|p| p.resolve(ectx))
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(ast::PackageFile { package })
+        Ok(ast::PackageFile {
+            package,
+            metadata: match self.metadata {
+                Some(ref m) => Some(m.resolve(ectx)?),
+                None => None,
+            },
+        })
     }
 }
 
@@ -190,10 +196,6 @@ impl Resolve<ast::Package> for raw::Package {
                 None => ast::DataTypeSet {
                     data_types: Vec::new(),
                 },
-            },
-            metadata: match self.metadata {
-                Some(ref m) => Some(m.resolve(ectx)?),
-                None => None,
             },
         })
     }

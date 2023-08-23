@@ -111,6 +111,9 @@ pub enum ErrorControlType {
 pub struct PackageFile {
     /// PackageFile includes a Package element  
     pub package: Vec<Package>,
+
+    /// PackageFile may contain zero or one MetaData
+    pub metadata: Option<MetaData>,
 }
 
 /// Package describes a related set of components, data types, and interfaces
@@ -121,9 +124,6 @@ pub struct Package {
 
     /// A Package element may contain a DataTypeSet element
     pub data_type_set: DataTypeSet,
-
-    /// A Package element may contain a MetaData element
-    pub metadata: Option<MetaData>,
 }
 
 /// MetaData provides additional information about the Device or PackageFile

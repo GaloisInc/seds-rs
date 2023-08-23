@@ -17,7 +17,7 @@ This document tracks our progress in implementing the SEDS requirements. A check
 - [x] **3.3.2** The DataSheet element shall contain exactly one Device element.
 - [x] **3.3.3** The DataSheet element shall contain one or more Package elements.
 - [x] **3.3.4** The PackageFile element shall contain exactly one Package element.
-- [x] **3.3.5** The Device and PackageFile elements shall contain zero or one MetaData elements (see 3.4).
+- [ ] **3.3.5** The Device and PackageFile elements shall contain zero or one MetaData elements (see 3.4).
 - [x] **3.3.6** If any SEDS element is based on the NamedEntityType, the element shall have a name attribute and may have the optional shortDescription attribute and LongDescription child element. Optionally, such an element may carry attributes specified by the standard DoT (reference [1]).
 - [x] **3.3.7** The Device element shall be based on the NamedEntityType.
 

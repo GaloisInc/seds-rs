@@ -5,13 +5,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
 <Device name="SimpleDevice" shortDescription="Simple arbitrary example of SEDS XML usage">
-	<MetaData/>
 	<LongDescription>
 		Lorem ipsum
 	</LongDescription>
 </Device>
 <Package name="SimpleDemo">
-	<MetaData creationDate="date">
-	</MetaData>
 </Package>
 </DataSheet>
