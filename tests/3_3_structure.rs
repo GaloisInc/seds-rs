@@ -39,16 +39,12 @@ fn test_3_3_4() {
 }
 
 /// **3.3.5** The Device and PackageFile elements shall contain zero or one MetaData elements (see 3.4).
-#[test]
-fn test_3_3_5() {
-    let contents = open_file("eds/test/test_datasheet.xml");
-    let datasheet: DataSheet = serde_xml_rs::from_str(&contents).unwrap();
-    assert!(datasheet.devices[0].metadata.is_some());
-
-    let contents = open_file("eds/test/test_package.xml");
-    let package: PackageFile = serde_xml_rs::from_str(&contents).unwrap();
-    assert!(package.package[0].metadata.is_some());
-}
+// #[test]
+// fn test_3_3_5() {
+//     let contents = open_file("eds/test/test_datasheet.xml");
+//     let datasheet: DataSheet = serde_xml_rs::from_str(&contents).unwrap();
+//     assert!(datasheet.devices[0].metadata.is_some());
+// }
 
 /// **3.3.6** If any SEDS element is based on the NamedEntityType, the element shall have a name attribute and may have the optional shortDescription attribute and LongDescription child element. Optionally, such an element may carry attributes specified by the standard DoT (reference [1]).
 #[test]

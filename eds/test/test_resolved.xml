@@ -12,7 +12,8 @@
 				</Range>
 			</IntegerDataType>
 			<StringDataType name="PathName" length="128">
-				<StringDataEncoding encoding="ASCII" terminationCharacter="\n" />
+				<!-- terminationCharacter attribute is not allwed in the schema, even though the blue book allows it -->
+				<StringDataEncoding encoding="ASCII" />
 			</StringDataType>
 			<FloatDataType name="float" shortDescription="Single precision (32 bit) floating point value">
 				<FloatDataEncoding encodingAndPrecision="IEEE754_2008_single" byteOrder="bigEndian" sizeInBits="32" />

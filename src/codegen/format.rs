@@ -13,14 +13,14 @@ use super::RustCodegenError;
 pub fn format_snake_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
     let ident_str = ident.to_string();
     let snake_case = ident_str.to_snake_case();
-    syn::parse_str(&snake_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
+    syn::parse_str(&snake_case).map_err(RustCodegenError::InvalidIdentifier)
 }
 
 /// format an identifier to PascalCase
 pub fn format_pascal_case(ident: &Ident) -> Result<Ident, RustCodegenError> {
     let ident_str = ident.to_string();
     let pascal_case = ident_str.to_pascal_case();
-    syn::parse_str(&pascal_case).map_err(|e| RustCodegenError::InvalidIdentifier(e))
+    syn::parse_str(&pascal_case).map_err(RustCodegenError::InvalidIdentifier)
 }
 
 /// run the rust formatter rustfmt on a token stream

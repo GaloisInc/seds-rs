@@ -53,19 +53,25 @@ fn fetch_variable(namespace: &NamespaceValue, path: &[&str]) -> Result<String, E
         NamespaceValue::Namespace(inner) if !tail.is_empty() => inner
             .get(head[0])
             .and_then(|next| fetch_variable(next, tail).ok())
-            .ok_or_else(|| {
-                EvalexprError::VariableIdentifierNotFound(format!("{:?}", path).to_string())
-            }),
+            .ok_or_else(|| EvalexprError::VariableIdentifierNotFound(format!("{:?}", path))),
         NamespaceValue::Namespace(inner) if tail.is_empty() => match inner.get(head[0]) {
             Some(NamespaceValue::Value(value)) => Ok(value.clone()),
-            _ => Err(EvalexprError::VariableIdentifierNotFound(
-                format!("{:?}", path).to_string(),
-            )),
+            _ => Err(EvalexprError::VariableIdentifierNotFound(format!(
+                "{:?}",
+                path
+            ))),
         },
         NamespaceValue::Value(value) if tail.is_empty() => Ok(value.clone()),
-        _ => Err(EvalexprError::VariableIdentifierNotFound(
-            format!("{:?}", path).to_string(),
-        )),
+        _ => Err(EvalexprError::VariableIdentifierNotFound(format!(
+            "{:?}",
+            path
+        ))),
+    }
+}
+
+impl Default for ExpressionContext {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -80,12 +86,7 @@ impl ExpressionContext {
     /// create a namespace from a nested JSON dictionary
     pub fn from_json(json: &JsonValue) -> Option<ExpressionContext> {
         let namespace = json_to_namespace(json);
-        match namespace {
-            Some(namespace) => Some(ExpressionContext {
-                namespace: namespace,
-            }),
-            None => None,
-        }
+        namespace.map(|namespace| ExpressionContext { namespace })
     }
 
     /// get a variable from the namespace

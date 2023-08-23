@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PackageFile xmlns="http://www.ccsds.org/schema/sois/seds">
 	<Package name="TestPackage/SubPackage" shortDescription="NASA Core Flight System Executive Services">
-		<MetaData/>
 		<DataTypeSet>
+			<BooleanDataType name="StatusBit" shortDescription="Single true/false status bit">
+				<BooleanDataEncoding sizeInBits="1" falseValue="zeroIsFalse"/>
+			</BooleanDataType>
 		</DataTypeSet>
 	</Package>
 </PackageFile>

@@ -32,13 +32,13 @@ pub trait ToRustMod {
 
 /// Resolve name from an optional NamedEntityType and a NamedEntityType
 fn get_name(opt_name: Option<&NamedEntityType>, name: &NamedEntityType) -> Ident {
-    format_ident!("{}", opt_name.unwrap_or(&name).name.0.to_string())
+    format_ident!("{}", opt_name.unwrap_or(name).name.0.to_string())
 }
 
 /// build the doc string from a NamedEntityType
 fn get_doc_string(name: Option<&NamedEntityType>, name_entity_type: &NamedEntityType) -> String {
     let mut description = String::new();
-    description.push_str(&format!("{}", &name_entity_type.name.0));
+    description.push_str(&name_entity_type.name.0.to_string());
     match name {
         Some(name) => {
             if let Some(short_description) = &name.short_description {
@@ -106,7 +106,7 @@ fn get_datatype_name(dt: &DataType) -> Ident {
 impl ToRustMod for PackageFile {
     fn to_rust_mod(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         let name = ctx.name;
-        if self.package.len() == 0 {
+        if self.package.is_empty() {
             let sname = get_name(name, &NamedEntityType::new("Package"));
             Ok(quote!(
                 mod #sname {
@@ -165,7 +165,7 @@ impl ToRustMod for Package {
             structs.extend(dt.to_rust_struct(&nctx)?);
         }
 
-        let imports = get_package_imports(&self)?;
+        let imports = get_package_imports(self)?;
 
         Ok(quote!(
             #[doc = #description]
@@ -182,25 +182,25 @@ impl ToRustMod for Package {
 impl ToRustTokens for DataType {
     fn to_rust_struct(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         match self {
-            DataType::IntegerDataType(dt) => dt.to_rust_struct(&ctx),
-            DataType::FloatDataType(dt) => dt.to_rust_struct(&ctx),
-            DataType::BooleanDataType(dt) => dt.to_rust_struct(&ctx),
-            DataType::ContainerDataType(dt) => dt.to_rust_struct(&ctx),
-            DataType::StringDataType(dt) => dt.to_rust_struct(&ctx),
-            DataType::EnumeratedDataType(dt) => dt.to_rust_struct(&ctx),
-            dt => Err(RustCodegenError::UnsupportedDataType(dt.clone())),
+            DataType::IntegerDataType(dt) => dt.to_rust_struct(ctx),
+            DataType::FloatDataType(dt) => dt.to_rust_struct(ctx),
+            DataType::BooleanDataType(dt) => dt.to_rust_struct(ctx),
+            DataType::ContainerDataType(dt) => dt.to_rust_struct(ctx),
+            DataType::StringDataType(dt) => dt.to_rust_struct(ctx),
+            DataType::EnumeratedDataType(dt) => dt.to_rust_struct(ctx),
+            dt => Err(RustCodegenError::UnsupportedDataType(Box::new(dt.clone()))),
         }
     }
 
     fn to_rust_field(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         match self {
-            DataType::IntegerDataType(dt) => dt.to_rust_field(&ctx),
-            DataType::FloatDataType(dt) => dt.to_rust_field(&ctx),
-            DataType::BooleanDataType(dt) => dt.to_rust_field(&ctx),
-            DataType::ContainerDataType(dt) => dt.to_rust_field(&ctx),
-            DataType::StringDataType(dt) => dt.to_rust_field(&ctx),
-            DataType::EnumeratedDataType(dt) => dt.to_rust_field(&ctx),
-            dt => Err(RustCodegenError::UnsupportedDataType(dt.clone())),
+            DataType::IntegerDataType(dt) => dt.to_rust_field(ctx),
+            DataType::FloatDataType(dt) => dt.to_rust_field(ctx),
+            DataType::BooleanDataType(dt) => dt.to_rust_field(ctx),
+            DataType::ContainerDataType(dt) => dt.to_rust_field(ctx),
+            DataType::StringDataType(dt) => dt.to_rust_field(ctx),
+            DataType::EnumeratedDataType(dt) => dt.to_rust_field(ctx),
+            dt => Err(RustCodegenError::UnsupportedDataType(Box::new(dt.clone()))),
         }
     }
 }
@@ -417,8 +417,8 @@ impl ToRustTokens for ContainerDataType {
         let mut fields = TokenStream::new();
         match &self.base_type {
             Some(bt) => {
-                let type_ = ctx.lookup_ident(&bt)?.data_type;
-                let tref = get_datatype_name(&type_);
+                let type_ = ctx.lookup_ident(bt)?.data_type;
+                let tref = get_datatype_name(type_);
                 let base_field = quote!(
                     pub base: #tref,
                 );
@@ -500,7 +500,11 @@ impl ToRustTokens for ContainerDataType {
                             };
                             fields.append_all(field);
                         }
-                        ee => return Err(RustCodegenError::UnsupportedEntryElement(ee.clone())),
+                        ee => {
+                            return Err(RustCodegenError::UnsupportedEntryElement(Box::new(
+                                ee.clone(),
+                            )))
+                        }
                     }
                 }
             }

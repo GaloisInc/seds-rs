@@ -44,6 +44,9 @@ pub struct PackageFile {
     /// PackageFile includes a Package element  
     #[serde(rename = "Package", default)]
     pub package: Vec<Package>,
+
+    #[serde(rename = "MetaData", default)]
+    pub metadata: Option<MetaData>,
 }
 
 /// Package describes a related set of components, data types, and interfaces
@@ -56,9 +59,6 @@ pub struct Package {
     /// A Package element may contain a DataTypeSet element
     #[serde(rename = "DataTypeSet", default)]
     pub data_type_set: Option<DataTypeSet>,
-
-    #[serde(rename = "MetaData", default)]
-    pub metadata: Option<MetaData>,
 }
 
 /// DataTypeSet element contains one or more DataType elements
