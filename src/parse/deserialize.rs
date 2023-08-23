@@ -169,6 +169,8 @@ impl<'de> Deserialize<'de> for ConstraintSet {
     {
         deserializer
             .deserialize_map(ConstraintVisitor)
-            .map(|constraints| ConstraintSet { constraints })
+            .map(|constraints| ConstraintSet {
+                constraints,
+            })
     }
 }

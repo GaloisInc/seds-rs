@@ -500,11 +500,7 @@ impl ToRustTokens for ContainerDataType {
                             };
                             fields.append_all(field);
                         }
-                        ee => {
-                            return Err(RustCodegenError::UnsupportedEntryElement(Box::new(
-                                ee.clone(),
-                            )))
-                        }
+                        ee => return Err(RustCodegenError::UnsupportedEntryElement(Box::new(ee.clone()))),
                     }
                 }
             }

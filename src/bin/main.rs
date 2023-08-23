@@ -53,7 +53,11 @@ pub fn get_mission_params() -> ExpressionContext {
 }
 
 #[derive(Parser, Debug)]
-#[clap(version = "1.0", author = "Ethan Lew", about = "seds-rs CLI Tool")]
+#[clap(
+    version = "1.0",
+    author = "Ethan Lew",
+    about = "seds-rs CLI Tool"
+)]
 struct Args {
     /// XML paths pattern, e.g. eds/**/*xml
     #[clap(required = true)]
@@ -73,8 +77,8 @@ struct Args {
 }
 
 fn main() {
-    let matches = Args::parse();
-
+    let matches = Args::parse(); 
+    
     let patterns: Vec<_> = matches.paths;
     let _mission_params_path = matches.mission_params;
     let output_type = matches.output;
@@ -83,10 +87,7 @@ fn main() {
     // Collect all XML paths
     let mut paths = vec![];
     for pattern in patterns {
-        for path in glob(pattern.as_str())
-            .expect("Failed to read glob pattern")
-            .flatten()
-        {
+        for path in glob(pattern.as_str()).expect("Failed to read glob pattern").flatten() {
             paths.push(path.display().to_string());
         }
     }
@@ -132,12 +133,12 @@ fn create_cargo_project(name: &str, code: &str) {
 
     // Write code to main.rs
     let mut file = File::create(format!("{}/src/lib.rs", name)).expect("Failed to create main.rs");
-    file.write_all(code.as_bytes())
-        .expect("Failed to write to main.rs");
+    file.write_all(code.as_bytes()).expect("Failed to write to main.rs");
 
     // Read the contents of Cargo.toml
     let cargo_toml_path = format!("{}/Cargo.toml", name);
-    let contents = std::fs::read_to_string(&cargo_toml_path).expect("Failed to read Cargo.toml");
+    let contents = std::fs::read_to_string(&cargo_toml_path)
+        .expect("Failed to read Cargo.toml");
 
     // Add dependencies
     let updated_contents = contents + "\ndeku = \"0.16.0\"";
@@ -148,7 +149,6 @@ fn create_cargo_project(name: &str, code: &str) {
         .open(&cargo_toml_path)
         .expect("Failed to open Cargo.toml for writing");
 
-    cargo_toml_file
-        .write_all(updated_contents.as_bytes())
+    cargo_toml_file.write_all(updated_contents.as_bytes())
         .expect("Failed to write to Cargo.toml");
 }
