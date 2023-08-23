@@ -24,7 +24,7 @@ impl<'a> CodegenContext<'a> {
     /// rename a context and keep all other references the same
     pub fn change_name(&self, name: Option<&'a NamedEntityType>) -> Self {
         CodegenContext {
-            name: name,
+            name,
             locals: self.locals,
             namespace: self.namespace,
         }
@@ -85,7 +85,7 @@ impl<'a> TryFrom<Vec<&'a PackageFile>> for Namespace<'a> {
 
     fn try_from(value: Vec<&'a PackageFile>) -> Result<Self, RustCodegenError> {
         let package_vecs: Vec<&Vec<Package>> = value.iter().map(|p| &p.package).collect();
-        let packages: Vec<&Package> = package_vecs.iter().map(|v| *v).flatten().collect();
+        let packages: Vec<&Package> = package_vecs.iter().copied().flatten().collect();
         Ok(Namespace {
             name: None,
             type_refs: HashMap::new(),
@@ -167,7 +167,7 @@ impl<'a> TryFrom<&'a Package> for Namespace<'a> {
 
         Ok(Namespace {
             name: Some(value.name_entity_type.name.clone()),
-            type_refs: type_refs,
+            type_refs,
             children: None,
         })
     }

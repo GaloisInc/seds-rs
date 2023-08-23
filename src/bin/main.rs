@@ -10,7 +10,7 @@ use clap::Parser;
 
 pub fn open_file(path: &str) -> String {
     let path = Path::new(path);
-    let mut file = fs::File::open(&path).unwrap();
+    let mut file = fs::File::open(path).unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
     contents
@@ -79,17 +79,15 @@ fn main() {
     let matches = Args::parse(); 
     
     let patterns: Vec<_> = matches.paths;
-    let mission_params_path = matches.mission_params;
+    let _mission_params_path = matches.mission_params;
     let output_type = matches.output;
     let project_name = matches.project_name;
 
     // Collect all XML paths
     let mut paths = vec![];
     for pattern in patterns {
-        for entry in glob(pattern.as_str()).expect("Failed to read glob pattern") {
-            if let Ok(path) = entry {
-                paths.push(path.display().to_string());
-            }
+        for path in glob(pattern.as_str()).expect("Failed to read glob pattern").flatten() {
+            paths.push(path.display().to_string());
         }
     }
 

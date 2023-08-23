@@ -26,10 +26,10 @@ pub enum ResolveError {
     InvalidExpressionString(String),
 }
 
-fn eval_to_string(s: &String, ectx: &ExpressionContext) -> Result<String, ResolveError> {
+fn eval_to_string(s: &str, ectx: &ExpressionContext) -> Result<String, ResolveError> {
     let encoding_eval = ectx
         .eval_expression(s)
-        .map_err(|e| ResolveError::ExpressionContextError(e))?;
+        .map_err(ResolveError::ExpressionContextError)?;
     // convert Value to string
     match encoding_eval.as_string() {
         Ok(s) => Ok(s),
@@ -37,18 +37,18 @@ fn eval_to_string(s: &String, ectx: &ExpressionContext) -> Result<String, Resolv
     }
 }
 
-fn eval_to_i64(s: &String, ectx: &ExpressionContext) -> Result<i64, ResolveError> {
+fn eval_to_i64(s: &str, ectx: &ExpressionContext) -> Result<i64, ResolveError> {
     let encoding_eval = ectx
         .eval_expression(s)
-        .map_err(|e| ResolveError::ExpressionContextError(e))?;
+        .map_err(ResolveError::ExpressionContextError)?;
     // convert Value to string
     encoding_eval
         .as_int()
-        .map_err(|e| ResolveError::ExpressionError(e))
+        .map_err(ResolveError::ExpressionError)
 }
 
 fn string_to_int_encoding(
-    s: &String,
+    s: &str,
     ectx: &ExpressionContext,
 ) -> Result<ast::IntegerEncoding, ResolveError> {
     let encoding_string = eval_to_string(s, ectx)?;
@@ -63,7 +63,7 @@ fn string_to_int_encoding(
 }
 
 fn string_to_str_encoding(
-    s: &String,
+    s: &str,
     ectx: &ExpressionContext,
 ) -> Result<ast::StringEncoding, ResolveError> {
     let encoding_string = eval_to_string(s, ectx)?;
@@ -75,7 +75,7 @@ fn string_to_str_encoding(
 }
 
 fn string_to_byte_order(
-    s: &String,
+    s: &str,
     ectx: &ExpressionContext,
 ) -> Result<ast::ByteOrder, ResolveError> {
     let bo_string = eval_to_string(s, ectx)?;
@@ -86,11 +86,11 @@ fn string_to_byte_order(
     }
 }
 
-fn string_to_usize(s: &String, ectx: &ExpressionContext) -> Result<usize, ResolveError> {
+fn string_to_usize(s: &str, ectx: &ExpressionContext) -> Result<usize, ResolveError> {
     Ok(eval_to_i64(s, ectx)? as usize)
 }
 
-fn string_to_false_value(s: &String, ectx: &ExpressionContext) -> Result<bool, ResolveError> {
+fn string_to_false_value(s: &str, ectx: &ExpressionContext) -> Result<bool, ResolveError> {
     let s_string = eval_to_string(s, ectx)?;
     match s_string.as_str() {
         "zeroIsFalse" => Ok(true),
@@ -99,7 +99,7 @@ fn string_to_false_value(s: &String, ectx: &ExpressionContext) -> Result<bool, R
     }
 }
 
-fn string_to_boolean(s: &String, ectx: &ExpressionContext) -> Result<bool, ResolveError> {
+fn string_to_boolean(s: &str, ectx: &ExpressionContext) -> Result<bool, ResolveError> {
     let s_string = eval_to_string(s, ectx)?;
     match s_string.as_str() {
         "true" => Ok(true),
@@ -109,7 +109,7 @@ fn string_to_boolean(s: &String, ectx: &ExpressionContext) -> Result<bool, Resol
 }
 
 fn string_to_encoding_and_precision(
-    s: &String,
+    s: &str,
     ectx: &ExpressionContext,
 ) -> Result<ast::FloatEncodingAndPrecision, ResolveError> {
     let s_string = eval_to_string(s, ectx)?;
@@ -124,7 +124,7 @@ fn string_to_encoding_and_precision(
 }
 
 fn string_to_ect(
-    s: &String,
+    s: &str,
     ectx: &ExpressionContext,
 ) -> Result<ast::ErrorControlType, ResolveError> {
     let s_string = eval_to_string(s, ectx)?;
@@ -138,7 +138,7 @@ fn string_to_ect(
 }
 
 fn string_to_range_type(
-    s: &String,
+    s: &str,
     ectx: &ExpressionContext,
 ) -> Result<ast::MinMaxRangeType, ResolveError> {
     let s_string = eval_to_string(s, ectx)?;
@@ -155,7 +155,7 @@ fn string_to_range_type(
     }
 }
 
-fn string_to_tc(s: &String, ectx: &ExpressionContext) -> Result<char, ResolveError> {
+fn string_to_tc(s: &str, ectx: &ExpressionContext) -> Result<char, ResolveError> {
     let s_string = eval_to_string(s, ectx)?;
 
     Ok(match &s_string[..] {
@@ -222,7 +222,7 @@ impl Resolve<ast::DataTypeSet> for raw::DataTypeSet {
             .map(|p| p.resolve(ectx))
             .collect::<Result<Vec<_>, _>>()?;
         Ok(ast::DataTypeSet {
-            data_types: data_types,
+            data_types,
         })
     }
 }
