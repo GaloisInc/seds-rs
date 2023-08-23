@@ -188,7 +188,7 @@ impl ToRustTokens for DataType {
             DataType::ContainerDataType(dt) => dt.to_rust_struct(ctx),
             DataType::StringDataType(dt) => dt.to_rust_struct(ctx),
             DataType::EnumeratedDataType(dt) => dt.to_rust_struct(ctx),
-            dt => Err(RustCodegenError::UnsupportedDataType(dt.clone())),
+            dt => Err(RustCodegenError::UnsupportedDataType(Box::new(dt.clone()))),
         }
     }
 
@@ -200,7 +200,7 @@ impl ToRustTokens for DataType {
             DataType::ContainerDataType(dt) => dt.to_rust_field(ctx),
             DataType::StringDataType(dt) => dt.to_rust_field(ctx),
             DataType::EnumeratedDataType(dt) => dt.to_rust_field(ctx),
-            dt => Err(RustCodegenError::UnsupportedDataType(dt.clone())),
+            dt => Err(RustCodegenError::UnsupportedDataType(Box::new(dt.clone()))),
         }
     }
 }
@@ -500,7 +500,7 @@ impl ToRustTokens for ContainerDataType {
                             };
                             fields.append_all(field);
                         }
-                        ee => return Err(RustCodegenError::UnsupportedEntryElement(ee.clone())),
+                        ee => return Err(RustCodegenError::UnsupportedEntryElement(Box::new(ee.clone()))),
                     }
                 }
             }
