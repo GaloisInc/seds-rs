@@ -23,19 +23,19 @@ pub enum RustCodegenError {
     /// usize value cannot map to a bit size
     InvalidBitSize(usize),
     /// DataType isn't supported (yet)
-    UnsupportedDataType(DataType),
+    UnsupportedDataType(Box<DataType>),
     /// EntryElement isn't supported (yet)
-    UnsupportedEntryElement(EntryElement),
+    UnsupportedEntryElement(Box<EntryElement>),
     /// DataType conflicts with another one
-    ConflictingDataType(DataType),
+    ConflictingDataType(Box<DataType>),
     /// Multiple package files are not supported
     MultiplePackageFiles,
 }
 
 /// CodeGen function to convert packagefiles to a tokenstream
-pub fn codegen_packagefiles(pfs: &Vec<&PackageFile>) -> Result<TokenStream, RustCodegenError> {
+pub fn codegen_packagefiles(pfs: &[&PackageFile]) -> Result<TokenStream, RustCodegenError> {
     let mut generated_code = proc_macro2::TokenStream::new();
-    let namespace = Namespace::try_from(pfs.clone())?;
+    let namespace = Namespace::try_from(pfs.to_owned())?;
     for pf in pfs.iter() {
         for pkg in pf.package.iter() {
             let locals = Namespace::try_from(pkg)?;

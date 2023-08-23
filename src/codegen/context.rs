@@ -155,14 +155,9 @@ impl<'a> TryFrom<&'a Package> for Namespace<'a> {
                     type_refs.insert(k, v)
                 }
             };
-            match ret {
-                Some(item) => {
-                    return Err(RustCodegenError::ConflictingDataType(
-                        item.data_type.clone(),
-                    ))
-                }
-                None => (),
-            }
+            if let Some(item) = ret {
+                return Err(RustCodegenError::ConflictingDataType(Box::new(item.data_type.clone())))
+            } 
         }
 
         Ok(Namespace {
