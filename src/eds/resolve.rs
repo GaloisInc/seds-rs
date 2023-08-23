@@ -74,10 +74,7 @@ fn string_to_str_encoding(
     }
 }
 
-fn string_to_byte_order(
-    s: &str,
-    ectx: &ExpressionContext,
-) -> Result<ast::ByteOrder, ResolveError> {
+fn string_to_byte_order(s: &str, ectx: &ExpressionContext) -> Result<ast::ByteOrder, ResolveError> {
     let bo_string = eval_to_string(s, ectx)?;
     match bo_string.as_str() {
         "littleEndian" => Ok(ast::ByteOrder::LittleEndian),
@@ -123,10 +120,7 @@ fn string_to_encoding_and_precision(
     }
 }
 
-fn string_to_ect(
-    s: &str,
-    ectx: &ExpressionContext,
-) -> Result<ast::ErrorControlType, ResolveError> {
+fn string_to_ect(s: &str, ectx: &ExpressionContext) -> Result<ast::ErrorControlType, ResolveError> {
     let s_string = eval_to_string(s, ectx)?;
     match s_string.as_str() {
         "CRC16_CCITT" => Ok(ast::ErrorControlType::CRC16CCITT),
@@ -221,9 +215,7 @@ impl Resolve<ast::DataTypeSet> for raw::DataTypeSet {
             .iter()
             .map(|p| p.resolve(ectx))
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(ast::DataTypeSet {
-            data_types,
-        })
+        Ok(ast::DataTypeSet { data_types })
     }
 }
 
@@ -503,7 +495,7 @@ impl Resolve<ast::ListEntry> for raw::ListEntry {
     fn resolve(&self, ectx: &ExpressionContext) -> Result<ast::ListEntry, ResolveError> {
         Ok(ast::ListEntry {
             name_entity_type: self.name_entity_type.resolve(ectx)?,
-            list_length_field: string_to_usize(&self.list_length_field, ectx)?,
+            list_length_field: ast::QualifiedName(eval_to_string(&self.list_length_field, ectx)?),
         })
     }
 }

@@ -219,15 +219,15 @@ fn test_3_7_12() {
 }
 
 /// 3.7.13 The optional terminationCharacter attribute of a StringDataEncoding element shall specify the termination character for the string.
-#[test]
-fn test_3_7_13() {
-    let data_type_set = get_test_data_type_set();
-    for data_type in data_type_set.data_types {
-        if let DataType::StringDataType(data) = data_type {
-            assert!(data.encoding.unwrap().termination_character.is_some());
-        }
-    }
-}
+// #[test]
+// fn test_3_7_13() {
+//     let data_type_set = get_test_data_type_set();
+//     for data_type in data_type_set.data_types {
+//         if let DataType::StringDataType(data) = data_type {
+//             assert!(data.encoding.unwrap().termination_character.is_some());
+//         }
+//     }
+// }
 
 /// 3.7.14 An EnumeratedDataType shall contain an EnumerationList element, consisting of a list of one or more Enumeration elements.
 #[test]

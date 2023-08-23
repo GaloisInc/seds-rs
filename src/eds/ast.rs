@@ -531,7 +531,7 @@ pub struct FixedValueEntry {
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct ListEntry {
     pub name_entity_type: NamedEntityType,
-    pub list_length_field: usize,
+    pub list_length_field: QualifiedName,
 }
 
 /// SubRangeDataType defines a sub range data type

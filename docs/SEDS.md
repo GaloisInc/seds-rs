@@ -61,7 +61,7 @@ of a type corresponding to table 3-1.
 - [x] **3.7.10** A StringDataType shall carry a length attribute which defines the maximum possible length of the string, in bytes.
 - [x] **3.7.11** A StringDataType may carry a fixedLength attribute which, if ‘false’, indicates that the string can be shorter than the value specified by the length attribute.  NOTE – Specification of fixedLength="false" indicates a data type that occupies a variable amount of memory. When such a data type is an entry in a container, then the container is of variable length. (See 4.8 for details about string lengths.)
 - [x] **3.7.12** A StringDataEncoding element may carry an encoding attribute which has a value of either a) UTF-8, specifying Unicode UTF-8 encoding (reference [8]); or b) ASCII, the default, specifying US ASCII encoding (reference [9]).
-- [x] **3.7.13** The optional terminationCharacter attribute of a StringDataEncoding element shall specify the termination character for the string.  
+- [ ] **3.7.13** The optional terminationCharacter attribute of a StringDataEncoding element shall specify the termination character for the string.  
 - [x] **3.7.14** An EnumeratedDataType shall contain an EnumerationList element, consisting of a list of one or more Enumeration elements.
 - [x] **3.7.15** Each Enumeration element shall have required label and value attributes, indicating the integer value corresponding to a given label string.
 - [ ] **3.7.16** An Enumeration element may carry attributes provided by the standard DoT (reference [1]).
