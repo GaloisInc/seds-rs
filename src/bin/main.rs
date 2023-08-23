@@ -8,56 +8,33 @@ use seds_rs::{
     eds::{ast::PackageFile, raw, resolve::Resolve},
 };
 use std::fs::{self, OpenOptions};
-use std::io::{Read, Write};
+use std::io::{self, Read, Write};
 use std::{fs::File, path::Path};
 
-pub fn open_file(path: &str) -> String {
+/// open a file with the correct io Result return
+pub fn open_file(path: &str) -> io::Result<String> {
     let path = Path::new(path);
-    let mut file = fs::File::open(path).unwrap();
+    let mut file = fs::File::open(path)?;
     let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
-    contents
+    file.read_to_string(&mut contents)?;
+    Ok(contents)
 }
 
-pub fn get_mission_params() -> ExpressionContext {
-    let json = serde_json::json!({
-        "CCSDS_SPACEPACKET": {
-            "HEADER_TYPE": "BaseHdr",
-        },
-        "CFE_MISSION": {
-            "TELEMETRY_SUBSECONDS_TYPE": "BASE_TYPES/uint16",
-            "SIGNED_INTEGER_ENCODING": "signMagnitude",
-            "DATA_BYTE_ORDER": "littleEndian",
-            "MEM_REFERENCE_SIZE_BITS": "2",
-            "ES_CDS_MAX_FULL_NAME_LEN": "2",
-            "EVS_MAX_MESSAGE_LENGTH": "2",
-            "MAX_CPU_ADDRESS_SIZE": "1024",
-            "ES_MAX_APPLICATIONS": "2",
-            "FS_HDR_DESC_MAX_LEN": "2",
-            "MAX_PATH_LEN": "2",
-            "MAX_API_LEN": "2",
-            "SB_MAX_PIPES": "2",
-            "ES_PERF_MAX_IDS": "2",
-            "ES_POOL_MAX_BUCKETS": "2",
-            "TBL_MAX_FULL_NAME_LEN": "2",
-        },
-        "CFE_SB": {
-            "MSGID_BIT_SIZE": "2",
-            "SUB_ENTRIES_PER_PKT": "2",
-        },
-        "CFE_FS": {
-            "HDR_DESC_MAX_LEN": "2",
-        },
-    });
-    ExpressionContext::from_json(&json).unwrap()
+/// load the necessary JSON parameters
+/// TODO: support EDS Design Parameters
+pub fn load_mission_params_from_file(filepath: &str) -> io::Result<ExpressionContext> {
+    let contents = std::fs::read_to_string(filepath)?;
+    let json: serde_json::Value = serde_json::from_str(&contents)?;
+    ExpressionContext::from_json(&json).ok_or_else(|| {
+        io::Error::new(
+            io::ErrorKind::Other,
+            "Failed to create ExpressionContext from JSON",
+        )
+    })
 }
 
 #[derive(Parser, Debug)]
-#[clap(
-    version = "1.0",
-    author = "Ethan Lew",
-    about = "seds-rs CLI Tool"
-)]
+#[clap(version = "1.0", author = "Ethan Lew", about = "seds-rs CLI Tool")]
 struct Args {
     /// XML paths pattern, e.g. eds/**/*xml
     #[clap(required = true)]
@@ -76,35 +53,51 @@ struct Args {
     project_name: Option<String>,
 }
 
-fn main() {
-    let matches = Args::parse(); 
-    
+fn main() -> io::Result<()> {
+    let matches = Args::parse();
+
     let patterns: Vec<_> = matches.paths;
-    let _mission_params_path = matches.mission_params;
     let output_type = matches.output;
     let project_name = matches.project_name;
 
     // Collect all XML paths
     let mut paths = vec![];
     for pattern in patterns {
-        for path in glob(pattern.as_str()).expect("Failed to read glob pattern").flatten() {
+        for path in glob(pattern.as_str())
+            .expect("Failed to read glob pattern")
+            .flatten()
+        {
             paths.push(path.display().to_string());
         }
     }
 
     let rpackagefiles: Vec<raw::PackageFile> = paths
         .iter()
-        .map(|fp| serde_xml_rs::from_str(&open_file(fp)).unwrap())
-        .collect();
+        .map(|fp| serde_xml_rs::from_str(&open_file(fp)?))
+        .collect::<Result<_, _>>()
+        .map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Parse error: {:?}", e)))?;
 
-    let ectx = get_mission_params();
+    let ectx = if let Some(ref params_path) = matches.mission_params {
+        load_mission_params_from_file(params_path)?
+    } else {
+        ExpressionContext::new()
+    };
+
     let packagefiles: Vec<PackageFile> = rpackagefiles
         .iter()
-        .map(|rpf| rpf.resolve(&ectx).unwrap())
-        .collect();
+        .map(|rpf| rpf.resolve(&ectx))
+        .collect::<Result<_, _>>()
+        .map_err(|e| {
+            io::Error::new(
+                io::ErrorKind::Other,
+                format!("Expression resolution error: {:?}", e),
+            )
+        })?;
     let pfs: Vec<&PackageFile> = packagefiles.iter().collect();
-    let code_tokens = codegen_packagefiles(&pfs).unwrap();
-    let code = rustfmt(code_tokens).unwrap();
+    let code_tokens = codegen_packagefiles(&pfs)
+        .map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Codegen error: {:?}", e)))?;
+    let code = rustfmt(code_tokens)
+        .map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Rustfmt error: {:?}", e)))?;
 
     match output_type.as_str() {
         "stdout" => println!("{}", code),
@@ -121,6 +114,8 @@ fn main() {
         }
         _ => eprintln!("Invalid output type"),
     }
+
+    Ok(())
 }
 
 fn create_cargo_project(name: &str, code: &str) {
@@ -133,12 +128,12 @@ fn create_cargo_project(name: &str, code: &str) {
 
     // Write code to main.rs
     let mut file = File::create(format!("{}/src/lib.rs", name)).expect("Failed to create main.rs");
-    file.write_all(code.as_bytes()).expect("Failed to write to main.rs");
+    file.write_all(code.as_bytes())
+        .expect("Failed to write to main.rs");
 
     // Read the contents of Cargo.toml
     let cargo_toml_path = format!("{}/Cargo.toml", name);
-    let contents = std::fs::read_to_string(&cargo_toml_path)
-        .expect("Failed to read Cargo.toml");
+    let contents = std::fs::read_to_string(&cargo_toml_path).expect("Failed to read Cargo.toml");
 
     // Add dependencies
     let updated_contents = contents + "\ndeku = \"0.16.0\"";
@@ -149,6 +144,7 @@ fn create_cargo_project(name: &str, code: &str) {
         .open(&cargo_toml_path)
         .expect("Failed to open Cargo.toml for writing");
 
-    cargo_toml_file.write_all(updated_contents.as_bytes())
+    cargo_toml_file
+        .write_all(updated_contents.as_bytes())
         .expect("Failed to write to Cargo.toml");
 }

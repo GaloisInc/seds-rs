@@ -156,8 +156,10 @@ impl<'a> TryFrom<&'a Package> for Namespace<'a> {
                 }
             };
             if let Some(item) = ret {
-                return Err(RustCodegenError::ConflictingDataType(Box::new(item.data_type.clone())))
-            } 
+                return Err(RustCodegenError::ConflictingDataType(Box::new(
+                    item.data_type.clone(),
+                )));
+            }
         }
 
         Ok(Namespace {

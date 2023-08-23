@@ -74,10 +74,7 @@ fn string_to_str_encoding(
     }
 }
 
-fn string_to_byte_order(
-    s: &str,
-    ectx: &ExpressionContext,
-) -> Result<ast::ByteOrder, ResolveError> {
+fn string_to_byte_order(s: &str, ectx: &ExpressionContext) -> Result<ast::ByteOrder, ResolveError> {
     let bo_string = eval_to_string(s, ectx)?;
     match bo_string.as_str() {
         "littleEndian" => Ok(ast::ByteOrder::LittleEndian),
@@ -123,10 +120,7 @@ fn string_to_encoding_and_precision(
     }
 }
 
-fn string_to_ect(
-    s: &str,
-    ectx: &ExpressionContext,
-) -> Result<ast::ErrorControlType, ResolveError> {
+fn string_to_ect(s: &str, ectx: &ExpressionContext) -> Result<ast::ErrorControlType, ResolveError> {
     let s_string = eval_to_string(s, ectx)?;
     match s_string.as_str() {
         "CRC16_CCITT" => Ok(ast::ErrorControlType::CRC16CCITT),
@@ -223,9 +217,7 @@ impl Resolve<ast::DataTypeSet> for raw::DataTypeSet {
             .iter()
             .map(|p| p.resolve(ectx))
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(ast::DataTypeSet {
-            data_types,
-        })
+        Ok(ast::DataTypeSet { data_types })
     }
 }
 
