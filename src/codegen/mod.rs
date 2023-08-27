@@ -2,6 +2,7 @@
 pub mod context;
 pub mod convert;
 pub mod dependency;
+pub mod diagram;
 pub mod format;
 
 pub use convert::*;
@@ -28,6 +29,8 @@ pub enum RustCodegenError {
     UnsupportedEntryElement(Box<EntryElement>),
     /// DataType conflicts with another one
     ConflictingDataType(Box<DataType>),
+    /// Error generating SVG files
+    SVGConversion,
 }
 
 /// CodeGen function to convert packagefiles to a tokenstream

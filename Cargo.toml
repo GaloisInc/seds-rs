@@ -19,6 +19,7 @@ serde = {version = "1.0.171", features = ["derive"]}
 serde-xml-rs = "0.6.0"
 serde_json = "1.0.103"
 syn = "2.0.27"
+frame_generator = { path = "./frame-diagram" }
 
 [dev-dependencies]
 walkdir = "2.3.3"

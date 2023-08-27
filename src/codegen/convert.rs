@@ -10,6 +10,7 @@ use crate::eds::ast::{
 use super::{
     context::CodegenContext,
     dependency::{AstNode, QualifiedNameIter},
+    diagram::get_datatype_packet_svg,
     format::format_snake_case,
     RustCodegenError,
 };
@@ -495,7 +496,10 @@ impl ToRustTokens for ContainerDataType {
             .ident;
         let nctx = ctx.change_name(name);
         let fields = self.to_rust_field(&nctx)?;
-        let description = get_doc_string(name, &self.name_entity_type);
+        let descr = get_doc_string(name, &self.name_entity_type);
+        let svg = get_datatype_packet_svg(&DataType::ContainerDataType(self.clone()), ctx)?;
+        let description = format!("{descr}\n{svg}");
+
         let traits = get_traits();
         Ok(quote! {
             #[doc = #description]
