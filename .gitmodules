@@ -3,4 +3,4 @@
 	url = https://github.com/nasa/cFE.git
 [submodule "frame-diagram"]
 	path = frame-diagram
-	url = git@gitlab-ext.galois.com:space-bacn/frame-diagram.git
+	url = https://gitlab-ext.galois.com/space-bacn/frame-diagram.git
