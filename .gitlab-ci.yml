@@ -17,12 +17,14 @@ cache:
 build_job:
   stage: build
   script:
+    - git submodule update --init --recursive
     - rustc --version
     - cargo build --verbose
 
 validate_job:
   stage: test
   script:
+    - git submodule update --init --recursive
     - apt-get update
     - apt-get install -y libxml2-utils
     - ./validate.sh
@@ -40,7 +42,7 @@ test_job:
 
 coverage_job:
   stage: coverage
-  script:
+  script: 
     - rustup component add rustfmt
     - git submodule update --init
     - if cargo install --list | grep -q "cargo-tarpaulin"; then cargo uninstall cargo-tarpaulin; fi
@@ -51,5 +53,6 @@ coverage_job:
 rcoverage_job:
   stage: rcoverage
   script:
+    - git submodule update --init --recursive
     - cargo run --example req_coverage --  --file ./docs/SEDS.md
   coverage: '/^\d+.\d+% coverage/'
