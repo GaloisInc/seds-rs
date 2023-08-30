@@ -40,9 +40,10 @@ test_job:
 
 coverage_job:
   stage: coverage
-  script: 
+  script:
     - rustup component add rustfmt
     - git submodule update --init
+    - cargo uninstall cargo-tarpaulin
     - cargo install cargo-tarpaulin
     - cargo tarpaulin
   coverage: '/^\d+.\d+% coverage/'
