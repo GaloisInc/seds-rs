@@ -112,11 +112,13 @@ impl ToRustMod for PackageFile {
                 mod #sname {
                 }
             ))
-        } else if self.package.len() == 1 {
-            let nctx = ctx.change_name(name);
-            self.package[0].to_rust_mod(&nctx)
         } else {
-            Err(RustCodegenError::MultiplePackageFiles)
+            let mut code = TokenStream::new();
+            let nctx = ctx.change_name(name);
+            for pkg in self.package.iter() {
+                code.extend(pkg.to_rust_mod(&nctx)?);
+            }
+            Ok(code)
         }
     }
 }

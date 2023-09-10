@@ -28,8 +28,6 @@ pub enum RustCodegenError {
     UnsupportedEntryElement(Box<EntryElement>),
     /// DataType conflicts with another one
     ConflictingDataType(Box<DataType>),
-    /// Multiple package files are not supported
-    MultiplePackageFiles,
 }
 
 /// CodeGen function to convert packagefiles to a tokenstream
