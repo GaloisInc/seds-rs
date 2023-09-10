@@ -39,31 +39,16 @@ fn get_name(opt_name: Option<&NamedEntityType>, name: &NamedEntityType) -> Ident
 fn get_doc_string(name: Option<&NamedEntityType>, name_entity_type: &NamedEntityType) -> String {
     let mut description = String::new();
     description.push_str(&name_entity_type.name.0.to_string());
-    match name {
-        Some(name) => {
-            if let Some(short_description) = &name.short_description {
-                description.push_str(&format!(" - {}", short_description));
-            }
-        }
-        None => {
-            if let Some(short_description) = &name_entity_type.short_description {
-                description.push_str(&format!(" - {}", short_description));
-            }
-        }
+
+    // Select the relevant variant: name if present, otherwise name_entity_type
+    let relevant_name = name.unwrap_or(name_entity_type);
+
+    if let Some(long_description) = &relevant_name.long_description {
+        description.push_str(&format!("\n{}", long_description.text));
+    } else if let Some(short_description) = &relevant_name.short_description {
+        description.push_str(&format!(" - {}", short_description));
     }
 
-    match name {
-        Some(name) => {
-            if let Some(long_description) = &name.long_description {
-                description.push_str(&format!("\n{}", long_description.text));
-            }
-        }
-        None => {
-            if let Some(long_description) = &name_entity_type.long_description {
-                description.push_str(&format!("\n{}", long_description.text));
-            }
-        }
-    }
     description
 }
 
@@ -221,10 +206,11 @@ impl ToRustTokens for EnumeratedDataType {
                 Some(descr) => {
                     let description = format!("(value: {:?}) {}", value, descr);
                     quote!(
-                    #[doc = #description]
-                    #[deku(id = #value_str)]
-                    #fname = #value,
-                )},
+                        #[doc = #description]
+                        #[deku(id = #value_str)]
+                        #fname = #value,
+                    )
+                }
                 None => quote!(
                     #[deku(id = #value_str)]
                     #fname = #value,
