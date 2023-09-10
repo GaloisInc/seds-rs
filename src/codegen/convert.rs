@@ -218,11 +218,13 @@ impl ToRustTokens for EnumeratedDataType {
             let value = value_str.parse::<isize>().unwrap();
             let fname = format_ident!("{}", enum_entry.label.0);
             let field = match &enum_entry.short_description {
-                Some(descr) => quote!(
-                    #[doc = #descr]
+                Some(descr) => {
+                    let description = format!("(value: {:?}) {}", value, descr);
+                    quote!(
+                    #[doc = #description]
                     #[deku(id = #value_str)]
                     #fname = #value,
-                ),
+                )},
                 None => quote!(
                     #[deku(id = #value_str)]
                     #fname = #value,
