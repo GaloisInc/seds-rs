@@ -6,7 +6,7 @@ use seds_rs::{codegen::rustfmt, eds::resolve::Resolve};
 
 mod common;
 
-/// test the namespace on multiple eds files
+/// test codegen on multiple cFE eds files
 #[test]
 fn test_cfe_codegen() {
     let paths = vec![
@@ -23,6 +23,29 @@ fn test_cfe_codegen() {
         // "eds/cFE/modules/core_private/eds/base_types.xml", // InvalidBitSize(8192)
         // "eds/cFE/modules/es/eds/cfe_es.xml", // Unsupported ArrayDataType
     ];
+
+    test_paths_codegen(&paths);
+}
+
+/// test the codegen on multiple example eds files
+#[test]
+fn test_example_codegen() {
+    let paths = vec![
+        "eds/test/test_eds.xml",
+        "eds/test/simplified_spacepacket_bacn.xml",
+        "eds/test/otc.xml",
+        // "eds/test/test_package.xml", // we don't support nested packages (yet, easy to do)
+        "eds/test/test_datatypes.xml",
+        "eds/test/test_resolved.xml",
+        "eds/test/simplified_spacepacket.xml",
+        // "eds/test/test_container.xml", // we don't support List's yet
+        "eds/test/test_datasheet.xml",
+    ];
+
+    test_paths_codegen(&paths);
+}
+
+fn test_paths_codegen(paths: &Vec<&str>) {
     let rpackagefiles: Vec<raw::PackageFile> = paths
         .iter()
         .map(|fp| serde_xml_rs::from_str(&open_file(fp)).unwrap())
