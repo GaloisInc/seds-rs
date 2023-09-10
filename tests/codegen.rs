@@ -35,6 +35,7 @@ fn test_example_codegen() {
         "eds/test/simplified_spacepacket_bacn.xml",
         "eds/test/otc.xml",
         // "eds/test/test_package.xml", // we don't support nested packages (yet, easy to do)
+        "eds/test/test_multi_package.xml",
         "eds/test/test_datatypes.xml",
         "eds/test/test_resolved.xml",
         "eds/test/simplified_spacepacket.xml",
@@ -45,7 +46,7 @@ fn test_example_codegen() {
     test_paths_codegen(&paths);
 }
 
-fn test_paths_codegen(paths: &Vec<&str>) {
+fn test_paths_codegen(paths: &[&str]) {
     let rpackagefiles: Vec<raw::PackageFile> = paths
         .iter()
         .map(|fp| serde_xml_rs::from_str(&open_file(fp)).unwrap())
