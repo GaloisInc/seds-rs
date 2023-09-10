@@ -111,6 +111,10 @@ impl<'a> Iterator for QualifiedNameIter<'a> {
                         Some(el) => self.stack.push(AstNode::EntryList(el)),
                         None => (),
                     }
+                    match &cdt.base_type {
+                        Some(bt) => return Some(bt),
+                        None => (),
+                    }
                 }
                 AstNode::EntryList(el) => {
                     for entry in el.entries.iter().rev() {

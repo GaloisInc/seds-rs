@@ -211,7 +211,7 @@ pub struct ContainerDataType {
     pub name_entity_type: NamedEntityType,
     pub entry_list: Option<EntryList>,
     pub _abstract: bool,
-    pub base_type: Option<String>,
+    pub base_type: Option<QualifiedName>,
     pub constraint_set: Option<ConstraintSet>,
     pub trailer_entry_list: Option<EntryList>,
 }

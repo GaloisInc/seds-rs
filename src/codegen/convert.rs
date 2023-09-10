@@ -86,23 +86,6 @@ fn get_traits() -> TokenStream {
     }
 }
 
-/// Get the name of a datatype
-/// TODO: should be a public method?
-fn get_datatype_name(dt: &DataType) -> Ident {
-    let name = match dt {
-        DataType::IntegerDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::FloatDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::BooleanDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::ContainerDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::StringDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::EnumeratedDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::ArrayDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::SubRangeDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::NoneDataType => "None".to_string(),
-    };
-    format_ident!("{}", name)
-}
-
 impl ToRustMod for PackageFile {
     fn to_rust_mod(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         let name = ctx.name;
@@ -419,8 +402,8 @@ impl ToRustTokens for ContainerDataType {
         let mut fields = TokenStream::new();
         match &self.base_type {
             Some(bt) => {
-                let type_ = ctx.lookup_ident(bt)?.data_type;
-                let tref = get_datatype_name(type_);
+                // get type or return invalidtype
+                let tref = ctx.get_qualified_ident(&bt.0)?;
                 let base_field = quote!(
                     pub base: #tref,
                 );

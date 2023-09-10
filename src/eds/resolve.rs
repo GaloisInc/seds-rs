@@ -336,7 +336,7 @@ impl Resolve<ast::ContainerDataType> for raw::ContainerDataType {
                 None => false,
             },
             base_type: match self.base_type {
-                Some(ref bt) => Some(eval_to_string(bt, ectx)?),
+                Some(ref bt) => Some(ast::QualifiedName(eval_to_string(bt, ectx)?)),
                 None => None,
             },
             entry_list: match self.entry_list {
