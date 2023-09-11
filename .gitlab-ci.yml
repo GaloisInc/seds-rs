@@ -43,11 +43,10 @@ coverage_job:
   script:
     - rustup component add rustfmt
     - git submodule update --init
-    - cargo uninstall cargo-tarpaulin
+    - if cargo install --list | grep -q "cargo-tarpaulin"; then cargo uninstall cargo-tarpaulin; fi
     - cargo install cargo-tarpaulin
     - cargo tarpaulin
   coverage: '/^\d+.\d+% coverage/'
-
 
 rcoverage_job:
   stage: rcoverage

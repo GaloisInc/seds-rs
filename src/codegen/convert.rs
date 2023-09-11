@@ -39,31 +39,16 @@ fn get_name(opt_name: Option<&NamedEntityType>, name: &NamedEntityType) -> Ident
 fn get_doc_string(name: Option<&NamedEntityType>, name_entity_type: &NamedEntityType) -> String {
     let mut description = String::new();
     description.push_str(&name_entity_type.name.0.to_string());
-    match name {
-        Some(name) => {
-            if let Some(short_description) = &name.short_description {
-                description.push_str(&format!(" - {}", short_description));
-            }
-        }
-        None => {
-            if let Some(short_description) = &name_entity_type.short_description {
-                description.push_str(&format!(" - {}", short_description));
-            }
-        }
+
+    // Select the relevant variant: name if present, otherwise name_entity_type
+    let relevant_name = name.unwrap_or(name_entity_type);
+
+    if let Some(long_description) = &relevant_name.long_description {
+        description.push_str(&format!("\n{}", long_description.text));
+    } else if let Some(short_description) = &relevant_name.short_description {
+        description.push_str(&format!(" - {}", short_description));
     }
 
-    match name {
-        Some(name) => {
-            if let Some(long_description) = &name.long_description {
-                description.push_str(&format!("\n{}", long_description.text));
-            }
-        }
-        None => {
-            if let Some(long_description) = &name_entity_type.long_description {
-                description.push_str(&format!("\n{}", long_description.text));
-            }
-        }
-    }
     description
 }
 
@@ -86,23 +71,6 @@ fn get_traits() -> TokenStream {
     }
 }
 
-/// Get the name of a datatype
-/// TODO: should be a public method?
-fn get_datatype_name(dt: &DataType) -> Ident {
-    let name = match dt {
-        DataType::IntegerDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::FloatDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::BooleanDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::ContainerDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::StringDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::EnumeratedDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::ArrayDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::SubRangeDataType(dt) => dt.name_entity_type.name.0.to_string(),
-        DataType::NoneDataType => "None".to_string(),
-    };
-    format_ident!("{}", name)
-}
-
 impl ToRustMod for PackageFile {
     fn to_rust_mod(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         let name = ctx.name;
@@ -112,11 +80,13 @@ impl ToRustMod for PackageFile {
                 mod #sname {
                 }
             ))
-        } else if self.package.len() == 1 {
-            let nctx = ctx.change_name(name);
-            self.package[0].to_rust_mod(&nctx)
         } else {
-            Err(RustCodegenError::MultiplePackageFiles)
+            let mut code = TokenStream::new();
+            let nctx = ctx.change_name(name);
+            for pkg in self.package.iter() {
+                code.extend(pkg.to_rust_mod(&nctx)?);
+            }
+            Ok(code)
         }
     }
 }
@@ -233,11 +203,14 @@ impl ToRustTokens for EnumeratedDataType {
             let value = value_str.parse::<isize>().unwrap();
             let fname = format_ident!("{}", enum_entry.label.0);
             let field = match &enum_entry.short_description {
-                Some(descr) => quote!(
-                    #[doc = #descr]
-                    #[deku(id = #value_str)]
-                    #fname = #value,
-                ),
+                Some(descr) => {
+                    let description = format!("(value: {:?}) {}", value, descr);
+                    quote!(
+                        #[doc = #description]
+                        #[deku(id = #value_str)]
+                        #fname = #value,
+                    )
+                }
                 None => quote!(
                     #[deku(id = #value_str)]
                     #fname = #value,
@@ -417,8 +390,8 @@ impl ToRustTokens for ContainerDataType {
         let mut fields = TokenStream::new();
         match &self.base_type {
             Some(bt) => {
-                let type_ = ctx.lookup_ident(bt)?.data_type;
-                let tref = get_datatype_name(type_);
+                // get type or return invalidtype
+                let tref = ctx.get_qualified_ident(&bt.0)?;
                 let base_field = quote!(
                     pub base: #tref,
                 );

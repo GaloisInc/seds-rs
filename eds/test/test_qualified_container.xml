@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds">
+	<Package name="TestPackage" shortDescription="NASA Core Flight System Executive Services">
+		<DataTypeSet>
+            <ContainerDataType name="PriHdr" baseType="CCSDS/BaseHdr" shortDescription="Space packet protocol header version 1">
+                <ConstraintSet>
+                <ValueConstraint entry="VersionId" value="0" />
+                </ConstraintSet>
+            </ContainerDataType>
+        </DataTypeSet>
+    </Package>
+</PackageFile>

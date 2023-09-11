@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSheet
+	xmlns="http://www.ccsds.org/schema/sois/seds"
+	xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.ccsds.org/schema/sois/seds seds.xsd">
+	<Device name="SimpleDevice" shortDescription="Simple arbitrary example of SEDS XML usage">
+		<LongDescription>
+			Lorem ipsum
+		</LongDescription>
+	</Device>
+	<Package name="TestPackage1" shortDescription="NASA Core Flight System Executive Services">
+		<DataTypeSet>
+			<BooleanDataType name="StatusBit" shortDescription="Single true/false status bit">
+				<BooleanDataEncoding sizeInBits="1" />
+			  </BooleanDataType>
+		</DataTypeSet>
+	</Package>
+	<Package name="TestPackage2" shortDescription="NASA Core Flight System Executive Services">
+		<DataTypeSet>
+			<BooleanDataType name="StatusBit" shortDescription="Single true/false status bit">
+				<BooleanDataEncoding sizeInBits="1" />
+			  </BooleanDataType>
+		</DataTypeSet>
+	</Package>
+</DataSheet>
