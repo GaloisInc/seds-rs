@@ -35,7 +35,7 @@ fn test_example_codegen() {
         "eds/test/simplified_spacepacket_bacn.xml",
         "eds/test/otc.xml",
         // "eds/test/test_package.xml", // we don't support nested packages (yet, easy to do)
-        "eds/test/test_multi_package.xml",
+        "eds/test/test_multi_datasheet.xml",
         "eds/test/test_datatypes.xml",
         "eds/test/test_resolved.xml",
         "eds/test/simplified_spacepacket.xml",
