@@ -10,6 +10,8 @@
 #![warn(unused_imports)]
 #![allow(missing_copy_implementations)]
 #![deny(missing_docs)]
+#[macro_use]
+extern crate prettytable;
 
 pub mod codegen;
 pub mod eds;

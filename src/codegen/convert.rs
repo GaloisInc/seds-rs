@@ -2,7 +2,6 @@
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, TokenStreamExt};
 
-
 use crate::eds::ast::{
     BooleanDataType, ContainerDataType, DataType, EntryElement, EnumeratedDataType, FloatDataType,
     IntegerDataType, NamedEntityType, Package, PackageFile, QualifiedName, StringDataType,
@@ -11,10 +10,11 @@ use crate::eds::ast::{
 use super::{
     context::CodegenContext,
     dependency::{AstNode, QualifiedNameIter},
-    diagram::get_datatype_packet_svg,
     format::format_snake_case,
     RustCodegenError,
 };
+
+use super::doc::ToRustDoc;
 
 /// Trait for DataTypes
 pub trait ToRustTokens {
@@ -35,32 +35,6 @@ pub trait ToRustMod {
 /// Resolve name from an optional NamedEntityType and a NamedEntityType
 fn get_name(opt_name: Option<&NamedEntityType>, name: &NamedEntityType) -> Ident {
     format_ident!("{}", opt_name.unwrap_or(name).name.0.to_string())
-}
-
-/// build the doc string from a NamedEntityType
-fn get_doc_string(name: Option<&NamedEntityType>, name_entity_type: &NamedEntityType, dt: &DataType, ctx: &CodegenContext) -> String {
-    let mut description = String::new();
-    description.push_str(&name_entity_type.name.0.to_string());
-
-    // Select the relevant variant: name if present, otherwise name_entity_type
-    let relevant_name = name.unwrap_or(name_entity_type);
-
-    if let Some(long_description) = &relevant_name.long_description {
-        description.push_str(&format!("\n{}", long_description.text));
-    } else if let Some(short_description) = &relevant_name.short_description {
-        description.push_str(&format!(" - {}", short_description));
-    }
-        
-    let svg_res = get_datatype_packet_svg(dt, ctx);
-
-    match svg_res {
-        Ok(svg) => {
-            description.replace(r"#[packet_diagram]", &svg)
-        }
-        Err(_e) => {
-            description
-        }
-    }
 }
 
 /// get the closest, larger unsize type for a given size in bits
@@ -138,9 +112,9 @@ impl ToRustMod for Package {
     fn to_rust_mod(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         let name = ctx.name;
         let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
-        let name = ctx.name;
+        let _name = ctx.name;
         let mut structs = TokenStream::new();
-        let description = get_doc_string(name, &self.name_entity_type, &DataType::NoneDataType, ctx);
+        let description = self.to_description(ctx);
         for dt in self.data_type_set.data_types.iter() {
             let nctx = ctx.change_name(None);
             structs.extend(dt.to_rust_struct(&nctx)?);
@@ -191,7 +165,7 @@ impl ToRustTokens for EnumeratedDataType {
         let name = ctx.name;
         let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
         let ty = uint_nearest(&self.encoding.size_in_bits)?;
-        let description = get_doc_string(name, &self.name_entity_type, &DataType::EnumeratedDataType(self.clone()), ctx);
+        let description = self.to_description(ctx);
         Ok(quote! {
             #[doc = #description]
             pub #sname: #ty,
@@ -203,7 +177,7 @@ impl ToRustTokens for EnumeratedDataType {
         let sname = &ctx
             .lookup_ident(&get_name(name, &self.name_entity_type).to_string())?
             .ident;
-        let description = get_doc_string(name, &self.name_entity_type, &DataType::EnumeratedDataType(self.clone()), ctx);
+        let description = self.to_description(ctx);
 
         let mut fields = TokenStream::new();
         fields.extend(quote!(
@@ -251,7 +225,7 @@ impl ToRustTokens for StringDataType {
     fn to_rust_field(&self, ctx: &CodegenContext) -> Result<TokenStream, RustCodegenError> {
         let name = ctx.name;
         let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
-        let description = get_doc_string(name, &self.name_entity_type, &DataType::StringDataType(self.clone()), ctx);
+        let description = self.to_description(ctx);
         let length_ident = format_ident!("{}_dlen", sname);
         let update_str = format!("self.{}.len()", sname);
         let count_str = format!("{}_dlen", sname);
@@ -272,7 +246,7 @@ impl ToRustTokens for StringDataType {
         let field_name = NamedEntityType::new("value");
         let nctx = ctx.change_name(Some(&field_name));
         let field = self.to_rust_field(&nctx)?;
-        let description = get_doc_string(name, &self.name_entity_type, &DataType::StringDataType(self.clone()), ctx);
+        let description = self.to_description(ctx);
         let traits = get_traits();
         Ok(quote! {
             #[doc = #description]
@@ -295,7 +269,7 @@ impl ToRustTokens for FloatDataType {
             crate::eds::ast::ByteOrder::BigEndian => quote! { "big" },
             crate::eds::ast::ByteOrder::LittleEndian => quote! { "little" },
         };
-        let description = get_doc_string(name, &self.name_entity_type, &DataType::FloatDataType(self.clone()), ctx);
+        let description = self.to_description(ctx);
         Ok(quote! {
             #[doc = #description]
             #[deku(bits = #sib, endian = #endian)]
@@ -311,7 +285,7 @@ impl ToRustTokens for FloatDataType {
         let field_name = NamedEntityType::new("value");
         let nctx = ctx.change_name(Some(&field_name));
         let field = self.to_rust_field(&nctx)?;
-        let description = get_doc_string(name, &self.name_entity_type, &DataType::FloatDataType(self.clone()), ctx);
+        let description = self.to_description(ctx);
         let traits = get_traits();
         Ok(quote! {
             #[doc = #description]
@@ -334,7 +308,7 @@ impl ToRustTokens for IntegerDataType {
             crate::eds::ast::ByteOrder::BigEndian => quote! { "big" },
             crate::eds::ast::ByteOrder::LittleEndian => quote! { "little" },
         };
-        let description = get_doc_string(name, &self.name_entity_type, &DataType::IntegerDataType(self.clone()), ctx);
+        let description = self.to_description(ctx);
         Ok(quote! {
             #[doc = #description]
             #[deku(bits = #sib, endian = #endian)]
@@ -350,7 +324,7 @@ impl ToRustTokens for IntegerDataType {
         let field_name = NamedEntityType::new("value");
         let nctx = ctx.change_name(Some(&field_name));
         let field = self.to_rust_field(&nctx)?;
-        let description = get_doc_string(name, &self.name_entity_type, &DataType::IntegerDataType(self.clone()), ctx);
+        let description = self.to_description(ctx);
         let traits = get_traits();
         Ok(quote! {
             #[doc = #description]
@@ -368,7 +342,7 @@ impl ToRustTokens for BooleanDataType {
         let sname = format_snake_case(&get_name(name, &self.name_entity_type))?;
         let ty = uint_nearest(&self.encoding.size_in_bits)?;
         let sib = format!("{}", self.encoding.size_in_bits);
-        let description = get_doc_string(name, &self.name_entity_type, &DataType::BooleanDataType(self.clone()), ctx);
+        let description = self.to_description(ctx);
         Ok(quote! {
             #[doc = #description]
             #[deku(bits = #sib)]
@@ -384,7 +358,7 @@ impl ToRustTokens for BooleanDataType {
         let field_name = NamedEntityType::new("value");
         let nctx = ctx.change_name(Some(&field_name));
         let field = self.to_rust_field(&nctx)?;
-        let description = get_doc_string(name, &self.name_entity_type, &DataType::BooleanDataType(self.clone()), ctx);
+        let description = self.to_description(ctx);
         let traits = get_traits();
         Ok(quote! {
             #[doc = #description]
@@ -421,12 +395,7 @@ impl ToRustTokens for ContainerDataType {
                                 "{}",
                                 entry.name_entity_type.name.0
                             ))?;
-                            let description = get_doc_string(
-                                Some(&entry.name_entity_type),
-                                &entry.name_entity_type,
-                                &DataType::ContainerDataType(self.clone()),
-                                ctx,
-                            );
+                            let description = entry.to_description(ctx);
                             let field = quote! {
                                 #[doc = #description]
                                 pub #name: #tref,
@@ -441,12 +410,7 @@ impl ToRustTokens for ContainerDataType {
                                 "{}",
                                 entry.name_entity_type.name.0
                             ))?;
-                            let description = get_doc_string(
-                                Some(&entry.name_entity_type),
-                                &entry.name_entity_type,
-                                &DataType::ContainerDataType(self.clone()),
-                                ctx,
-                            );
+                            let description = entry.to_description(ctx);
                             let field = quote! {
                                 #[doc = #description]
                                 pub #name: #tref,
@@ -461,12 +425,7 @@ impl ToRustTokens for ContainerDataType {
                                 "{}",
                                 entry.name_entity_type.name.0
                             ))?;
-                            let description = get_doc_string(
-                                Some(&entry.name_entity_type),
-                                &entry.name_entity_type,
-                                &DataType::ContainerDataType(self.clone()),
-                                ctx,
-                            );
+                            let description = entry.to_description(ctx);
                             let field = quote! {
                                 #[doc = #description]
                                 pub #name: #tref,
@@ -512,8 +471,8 @@ impl ToRustTokens for ContainerDataType {
             .ident;
         let nctx = ctx.change_name(name);
         let fields = self.to_rust_field(&nctx)?;
-        let description = get_doc_string(name, &self.name_entity_type, &DataType::ContainerDataType(self.clone()), ctx);
-    
+        let description = self.to_description(ctx);
+
         let traits = get_traits();
         Ok(quote! {
             #[doc = #description]
