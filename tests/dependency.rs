@@ -36,8 +36,8 @@ fn test_spacepacket() {
                 let pascal_ident = format_pascal_case(&ident).unwrap();
                 println!(
                     "use {}::{};",
-                    snake_module.to_string(),
-                    pascal_ident.to_string()
+                    snake_module,
+                    pascal_ident
                 );
             }
             _ => (),

@@ -4,6 +4,7 @@ pub mod convert;
 pub mod dependency;
 pub mod diagram;
 pub mod format;
+mod frame_diagram;
 
 pub use convert::*;
 pub use format::rustfmt;

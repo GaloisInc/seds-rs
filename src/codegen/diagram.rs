@@ -1,7 +1,7 @@
 //! Methods to make diagrams from the seds ast
 use std::vec;
 
-use frame_generator::{format::ToSvg, frame::PacketFrame, minify::minify_svg};
+use crate::codegen::frame_diagram::{format::ToSvg, frame::PacketFrame, minify::minify_svg};
 
 use crate::eds::ast::{DataType, EntryElement};
 
@@ -40,7 +40,7 @@ fn get_frame_model(
         }),
         DataType::ContainerDataType(dt) => {
             let mut children = match &dt.base_type {
-                Some(bdt) => vec![get_frame_model(ctx.lookup_ident(bdt)?.data_type, ctx)?],
+                Some(bdt) => vec![get_frame_model(ctx.lookup_ident(&bdt.0)?.data_type, ctx)?],
                 None => vec![],
             };
             let entry_children: Vec<PacketFrame> = match &dt.entry_list {
