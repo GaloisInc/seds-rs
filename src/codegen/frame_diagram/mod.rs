@@ -20,28 +20,6 @@
 //!
 //! - **style**: Allows customization of visual appearance for drawables.
 //!
-//! ```
-//! # Example on SpacePacket
-//! use frame_generator::format::ToSvg;
-//! use frame_generator::frame::PacketFrame;
-//!
-//! fn main() {
-//!     let inner_frame = PacketFrame {
-//!         name: String::from("Inner"),
-//!         bits: 50,
-//!         children: vec![],
-//!     };
-//!
-//!     let outer_frame = PacketFrame {
-//!         name: String::from("Outer"),
-//!         bits: 50,
-//!         children: vec![inner_frame],
-//!     }
-//!
-//!     let svg_doc = outer_frame.to_svg();
-//!     svg::save("packet_diagram.svg", &svg_doc).unwrap();
-//! }
-//! ```
 //!
 //! ## Dependencies
 //! - `svg`: External crate used for generating SVG files.
