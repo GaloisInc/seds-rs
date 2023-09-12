@@ -45,8 +45,8 @@ fn test_3_7_2() {
             DataType::FloatDataType(data) => {
                 let data_string = data.encoding.unwrap().byte_order.unwrap();
                 assert!(
-                    data_string == "bigEndian".to_string()
-                        || data_string == "littleEndian".to_string()
+                    data_string == *"bigEndian"
+                        || data_string == *"littleEndian"
                 )
             }
             DataType::IntegerDataType(data) => {
@@ -196,7 +196,7 @@ fn test_3_7_11() {
     for data_type in data_type_set.data_types {
         if let DataType::StringDataType(data) = data_type {
             if let Some(fixed_length) = data.fixed_length {
-                assert!(fixed_length == "true".to_string() || fixed_length == "false".to_string());
+                assert!(fixed_length == *"true" || fixed_length == *"false");
             }
         }
     }
@@ -211,7 +211,7 @@ fn test_3_7_12() {
             if let Some(encoding) = data.encoding {
                 let encoding_string = encoding.encoding.unwrap();
                 assert!(
-                    encoding_string == "UTF8".to_string() || encoding_string == "ASCII".to_string()
+                    encoding_string == *"UTF8" || encoding_string == *"ASCII"
                 );
             }
         }
@@ -235,7 +235,7 @@ fn test_3_7_14() {
     let data_type_set = get_test_data_type_set();
     for data_type in data_type_set.data_types {
         if let DataType::EnumeratedDataType(data) = data_type {
-            assert!(data.enumeration_list.enumeration.len() > 0);
+            assert!(!data.enumeration_list.enumeration.is_empty());
         }
     }
 }
@@ -247,7 +247,7 @@ fn test_3_7_15() {
     for data_type in data_type_set.data_types {
         if let DataType::EnumeratedDataType(data) = data_type {
             for enum_element in data.enumeration_list.enumeration {
-                assert!(enum_element.label.len() > 0 && enum_element.value.len() > 0);
+                assert!(!enum_element.label.is_empty() && !enum_element.value.is_empty());
             }
         }
     }

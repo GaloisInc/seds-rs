@@ -27,7 +27,7 @@ fn test_3_3_2() {
 fn test_3_3_3() {
     let contents = open_file("eds/test/test_datasheet.xml");
     let datasheet: DataSheet = serde_xml_rs::from_str(&contents).unwrap();
-    assert!(datasheet.packages.len() >= 1);
+    assert!(!datasheet.packages.is_empty());
 }
 
 /// **3.3.4** The PackageFile element shall contain exactly one Package element.

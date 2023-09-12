@@ -20,7 +20,7 @@ fn test_3_10_1() {
     for data_type in data_type_set.data_types {
         if let DataType::ContainerDataType(data) = data_type {
             if let Some(is_abstract) = data._abstract {
-                assert!(is_abstract == "false".to_string() || is_abstract == "true".to_string());
+                assert!(is_abstract == *"false" || is_abstract == *"true");
             }
         }
     }
@@ -58,7 +58,7 @@ fn test_3_10_4() {
     for data_type in data_type_set.data_types {
         if let DataType::ContainerDataType(data) = data_type {
             let abstract_value = data._abstract.unwrap();
-            if abstract_value == "false".to_string() {
+            if abstract_value == *"false" {
                 assert!(
                     data.trailer_entry_list.is_none()
                         || data.trailer_entry_list.unwrap().entries.len() <= 1
@@ -76,7 +76,7 @@ fn test_3_10_5_6() {
     for data_type in data_type_set.data_types {
         if let DataType::ContainerDataType(data) = data_type {
             if let Some(constraint_set) = &data.constraint_set {
-                assert!(constraint_set.constraints.len() > 0);
+                assert!(!constraint_set.constraints.is_empty());
                 for constraint in constraint_set.constraints.iter() {
                     assert!(matches!(
                         constraint,
@@ -97,7 +97,7 @@ fn test_3_10_6() {
     for data_type in data_type_set.data_types {
         if let DataType::ContainerDataType(data) = data_type {
             if let Some(constraint_set) = &data.constraint_set {
-                assert!(constraint_set.constraints.len() > 0);
+                assert!(!constraint_set.constraints.is_empty());
                 for constraint in constraint_set.constraints.iter() {
                     assert!(matches!(
                         constraint,
@@ -145,7 +145,7 @@ fn test_3_10_8() {
         if let DataType::ContainerDataType(data) = data_type {
             for constraint in data.constraint_set.unwrap().constraints {
                 if let Constraint::RangeConstraint(range_constraint) = constraint {
-                    assert!(range_constraint.range.min_max_range.min.len() > 0);
+                    assert!(!range_constraint.range.min_max_range.min.is_empty());
                 }
             }
         }
@@ -188,8 +188,8 @@ fn test_3_10_11() {
     let data_type_set = get_test_data_type_set();
     for data_type in data_type_set.data_types {
         if let DataType::ContainerDataType(data) = data_type {
-            assert!(data.entry_list.unwrap().entries.len() > 0);
-            assert!(data.trailer_entry_list.unwrap().entries.len() > 0);
+            assert!(!data.entry_list.unwrap().entries.is_empty());
+            assert!(!data.trailer_entry_list.unwrap().entries.is_empty());
         }
     }
 }
@@ -207,7 +207,7 @@ fn test_3_10_13() {
     let data_type_set = get_test_data_type_set();
     for data_type in data_type_set.data_types {
         if let DataType::ContainerDataType(data) = data_type {
-            if data._abstract.unwrap_or_default() == "false".to_string() {
+            if data._abstract.unwrap_or_default() == *"false" {
                 for entry in data.trailer_entry_list.unwrap().entries {
                     match entry {
                         EntryElement::Entry(_) => visit_entry = true,
@@ -278,7 +278,7 @@ fn test_3_10_17() {
         if let DataType::ContainerDataType(data) = data_type {
             for entry in data.entry_list.unwrap().entries {
                 if let EntryElement::FixedValueEntry(entry) = entry {
-                    assert!(entry.fixed_value.len() > 0);
+                    assert!(!entry.fixed_value.is_empty());
                     visit_entry = true;
                 }
             }
@@ -296,7 +296,7 @@ fn test_3_10_18() {
         if let DataType::ContainerDataType(data) = data_type {
             for entry in data.entry_list.unwrap().entries {
                 if let EntryElement::FixedValueEntry(entry) = entry {
-                    assert!(entry.fixed_value.len() > 0);
+                    assert!(!entry.fixed_value.is_empty());
                     visit_entry = true;
                 }
             }

@@ -8,6 +8,7 @@ stages:
 
 variables:
   CARGO_HOME: "$CI_PROJECT_DIR/cargo"
+  GIT_SUBMODULE_STRATEGY: recursive
 
 cache:
   paths:
@@ -32,7 +33,6 @@ test_job:
   stage: test
   script:
     - rustup component add rustfmt
-    - git submodule update --init
     - cargo test --verbose -- --nocapture
   artifacts:
     paths:
@@ -40,7 +40,7 @@ test_job:
 
 coverage_job:
   stage: coverage
-  script:
+  script: 
     - rustup component add rustfmt
     - git submodule update --init
     - if cargo install --list | grep -q "cargo-tarpaulin"; then cargo uninstall cargo-tarpaulin; fi

@@ -7,7 +7,7 @@ use seds_rs::expr::ExpressionContext;
 #[allow(dead_code)]
 pub fn open_file(path: &str) -> String {
     let path = Path::new(path);
-    let mut file = fs::File::open(&path).unwrap();
+    let mut file = fs::File::open(path).unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
     contents
