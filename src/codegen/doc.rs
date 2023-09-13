@@ -3,12 +3,13 @@
 use std::io::Error;
 
 use crate::eds::ast::{
-    BooleanDataType, Constraint, ConstraintSet, ContainerDataType, DataType, Entry,
+    BooleanDataType, Constraint, ConstraintSet, ContainerDataType, DataType, DataTypeSet, Entry,
     EnumeratedDataType, FixedValueEntry, FloatDataType, IntegerDataType, LengthEntry, MinMaxRange,
     MinMaxRangeType, NamedEntityType, Package, StringDataType,
 };
 
 use super::{context::CodegenContext, diagram::get_datatype_packet_svg};
+
 
 use prettytable::{format, Cell, Row, Table};
 
@@ -103,6 +104,80 @@ fn get_constraint_docs(constraint_set: &ConstraintSet) -> Result<String, Error> 
     String::from_utf8(output).map_err(|e| Error::new(std::io::ErrorKind::Other, format!("{:?}", e)))
 }
 
+/// generate summary tables for the package docs
+fn get_data_type_docs(data_type_set: &DataTypeSet) -> Result<String, Error> {
+    // Helper function to create a table from a collection of data types
+    fn create_table(data: &Vec<(String, String)>) -> Result<String, Error> {
+        let mut table = Table::new();
+
+        let format = format::FormatBuilder::new()
+            .column_separator('|')
+            .borders('|')
+            .separator(
+                format::LinePosition::Title,
+                format::LineSeparator::new('-', '|', '|', '|'),
+            )
+            .padding(1, 1)
+            .build();
+        table.set_format(format);
+
+        table.set_titles(Row::new(vec![Cell::new("Entry Name"), Cell::new("Base")]));
+
+        for (name, datatype) in data {
+            let _row = table.add_row(Row::new(vec![Cell::new(name), Cell::new(datatype)]));
+        }
+
+        let mut output = Vec::new();
+        let _ = table.print(&mut output)?;
+        String::from_utf8(output)
+            .map_err(|e| Error::new(std::io::ErrorKind::Other, format!("{:?}", e)))
+    }
+
+    // Separate data by type
+    let mut integers = Vec::new();
+    let mut containers = Vec::new();
+    // ... Similarly, create collections for other types ...
+
+    for data_type in &data_type_set.data_types {
+        match data_type {
+            DataType::IntegerDataType(data) => {
+                integers.push((
+                    data.name_entity_type.name.0.clone(),
+                    "IntegerDataType".to_string(),
+                ));
+            }
+            DataType::ContainerDataType(data) => match &data.base_type {
+                Some(bn) => containers.push((data.name_entity_type.name.0.clone(), bn.0.clone())),
+                None => {
+                    containers.push((data.name_entity_type.name.0.clone(), "<None>".to_string()))
+                }
+            },
+            // ... Handle other DataType variants similarly ...
+            _ => {}
+        }
+    }
+
+    // Generate tables for each type and combine them
+    let _integer_table = if !integers.is_empty() {
+        Some(create_table(&integers)?)
+    } else {
+        None
+    };
+
+    let container_table = if !containers.is_empty() {
+        Some(create_table(&containers)?)
+    } else {
+        None
+    };
+
+    // Return all the tables combined by newline
+    Ok(vec![container_table /*, ... other tables ... */]
+        .into_iter()
+        .flatten()
+        .collect::<Vec<String>>()
+        .join("\n\n"))
+}
+
 /// format MinMaxRange in RustDoc using set builder notation
 impl FormatRustDoc for MinMaxRange {
     fn to_docstring(&self) -> String {
@@ -130,7 +205,10 @@ impl FormatRustDoc for MinMaxRange {
 impl ToRustDoc for Package {
     fn to_description(&self, ctx: &CodegenContext) -> String {
         let name = ctx.name;
-        get_doc_string(name, &self.name_entity_type, &DataType::NoneDataType, ctx)
+        let descr = get_doc_string(name, &self.name_entity_type, &DataType::NoneDataType, ctx);
+        let table = get_data_type_docs(&self.data_type_set)
+            .unwrap_or("ERROR generating DataType summary".to_string());
+        format!("{}\n\n## Containers\n\n{}", descr, table)
     }
 }
 
