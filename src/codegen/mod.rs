@@ -3,6 +3,7 @@ pub mod context;
 pub mod convert;
 pub mod dependency;
 pub mod diagram;
+pub mod doc;
 pub mod format;
 mod frame_diagram;
 

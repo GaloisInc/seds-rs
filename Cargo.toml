@@ -23,6 +23,7 @@ nalgebra = "0.32.3"
 svg = "0.13.1"
 svgcleaner = "0.9.5"
 svgdom = "0.10.5"
+prettytable-rs = "0.10.0"
 
 [dev-dependencies]
 walkdir = "2.3.3"

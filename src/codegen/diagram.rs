@@ -13,7 +13,9 @@ fn get_frame_model(
     ctx: &CodegenContext,
 ) -> Result<PacketFrame, RustCodegenError> {
     match &datatype {
-        DataType::NoneDataType => Err(RustCodegenError::UnsupportedDataType(Box::new(datatype.clone()))),
+        DataType::NoneDataType => Err(RustCodegenError::UnsupportedDataType(Box::new(
+            datatype.clone(),
+        ))),
         DataType::IntegerDataType(dt) => Ok(PacketFrame {
             name: dt.name_entity_type.name.0.clone(),
             bits: dt.encoding.size_in_bits,
