@@ -32,7 +32,7 @@ fn test_cfe_codegen() {
 fn test_example_codegen() {
     let paths = vec![
         "eds/test/test_eds.xml",
-        "eds/test/simplified_spacepacket_bacn.xml",
+        "eds/test/simplified_spacepacket_galois.xml",
         "eds/test/otc.xml",
         // "eds/test/test_package.xml", // we don't support nested packages (yet, easy to do)
         "eds/test/test_multi_datasheet.xml",

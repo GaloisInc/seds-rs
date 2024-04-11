@@ -227,11 +227,10 @@
         </EntryList>
       </ContainerDataType>
 
-      <!-- BACN specific application messages -->
-      <!-- TC to TA1 -->
+      <!-- Specific application messages -->
       <ContainerDataType name="SetTorpedoMode" baseType="TcmSecHdr">
         <LongDescription>
-          Configure TA1 to perform acquisition using in-band/out-of-band/beaconless mode
+          Configure torpedo controller to an appropriate mode.
         </LongDescription>
         <ConstraintSet>
           <ValueConstraint entry="MessageTypeId" value="0x1" />
@@ -245,15 +244,15 @@
       <!--EnumeratedDataType name="TorpedoMode" shortDescription="PAT modes">
         <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
         <EnumerationList>
-          <Enumeration label="InBand" value="0" shortDescription="Lorem Ipsum" />
-          <Enumeration label="OutOfBand" value="136" shortDescription="Lorem Ipsum" />
-          <Enumeration label="Beaconless" value="254" shortDescription="Lorem Ipsum" />
+          <Enumeration label="Photon" value="0" shortDescription="Lorem Ipsum" />
+          <Enumeration label="Graviton" value="1" shortDescription="Lorem Ipsum" />
+          <Enumeration label="Neutron" value="2" shortDescription="Lorem Ipsum" />
         </EnumerationList>
       </EnumeratedDataType-->
 
       <ContainerDataType name="EnablePhasers" baseType="TcmSecHdr">
         <LongDescription>
-          Command to enable/disable laser emission through the aperture.
+          Command to enable/disable phaser emission through the phaser aperture.
           1 - enable, 0 - disable
         </LongDescription>
         <ConstraintSet>
@@ -279,12 +278,11 @@
       <!--EnumeratedDataType name="PolarizationMode" shortDescription="Lorem Ipsum">
         <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
         <EnumerationList>
-          <Enumeration label="Right" value="0x44" shortDescription="Lorem Ipsum" />
-          <Enumeration label="Left" value="0x88" shortDescription="Lorem Ipsum" />
-          <Enumeration label="RightLeft" value="0xAA" shortDescription="Lorem Ipsum" />
+          <Enumeration label="Red" value="0x44" shortDescription="Lorem Ipsum" />
+          <Enumeration label="Blue" value="0x88" shortDescription="Lorem Ipsum" />
+          <Enumeration label="Black" value="0xAA" shortDescription="Lorem Ipsum" />
         </EnumerationList>
       </EnumeratedDataType-->
-
 
     </DataTypeSet>
   </Package>

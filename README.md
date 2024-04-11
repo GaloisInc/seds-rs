@@ -72,7 +72,7 @@ seds-rs = "0.1.0"
 ```
 Alternatively, to build and run the examples of the library directly, clone the seds-rs repository:
 ```shell
-git clone https://gitlab-ext.galois.com/space-bacn/seds-rs.git
+git clone https://github.com/GaloisInc/seds-rs.git
 cd seds-rs
 cargo build
 ```
