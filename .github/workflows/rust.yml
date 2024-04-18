@@ -12,14 +12,30 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup cache for Cargo
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
     - name: Build
       run: |
         git submodule update --init --recursive
         cargo build --verbose
+
     - name: Run tests
       run: cargo test --verbose
+
     - name: Validate XML
       run: |
         sudo apt-get update
