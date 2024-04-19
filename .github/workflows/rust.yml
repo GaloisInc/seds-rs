@@ -44,4 +44,4 @@ jobs:
 
     - name: Build Digital ICD
       run: |
-        cargo doc --manifest-path examples/digital-icd/Cargo.toml --features doc-images --open
+        cargo doc --manifest-path examples/digital-icd/Cargo.toml --features doc-images
