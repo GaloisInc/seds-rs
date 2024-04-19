@@ -4,6 +4,8 @@
 
 seds-rs is a Rust library designed to read and manipulate CCSDS Blue Book Standard Electronic Data Sheets (SEDS) files. These files, written in a XML format, provide a formal specification for spacecraft components and systems.
 
+`seds-rs` is somewhat analogous to [EdsLib](https://github.com/nasa/EdsLib), except written in Rust and leveraging Rust ecosystem.
+
 
 ## Functionality and Architecture
 
@@ -80,4 +82,6 @@ seds-rs comes with a collection of unit and integration tests to ensure correct 
 cargo test
 ```
 
+## Examples
 
+Various examples are in the [examples](./examples/) directory, to see how to use `seds-rs` for a digital [interface control document](https://en.wikipedia.org/wiki/Interface_control_document), see the [examples/digital-icd](./examples/digital-icd/) folder.
