@@ -5,5 +5,5 @@ This is a simple example of generating documentation suitable for Digital Interf
 Compile and view with:
 
 ```
-cargo doc --feature doc-images --open
+cargo doc --features doc-images --open
 ```

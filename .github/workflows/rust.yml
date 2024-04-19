@@ -42,3 +42,6 @@ jobs:
         sudo apt-get install -y libxml2-utils
         ./validate.sh
 
+    - name: Build Digital ICD
+      run: |
+        cargo doc --manifest-path examples/digital-icd/Cargo.toml --features doc-images --open
